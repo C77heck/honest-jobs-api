@@ -1,22 +1,26 @@
 import Redis from "ioredis";
-import {numArray, json} from "./helpers";
+import { numArray, json } from "./helpers";
 
-import {CONSTANTS} from './constants'
+import { CONSTANTS } from './constants';
+
+const { REDIS } = CONSTANTS;
+
 const redis = new Redis({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
     password: '',
 });
 
-const get = async (key: string) => {
+const get = async (key: string): any => {
     try {
-        const val = await redis.get(key)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        const val = await redis.get(key);
         return json(val);
     } catch (e) {
         console.log(e);
-        return false
+        return false;
     }
-}
+};
 
 const set = async (key: string, value: string) => {
     try {
@@ -24,7 +28,7 @@ const set = async (key: string, value: string) => {
     } catch (e) {
         console.log(e);
     }
-}
+};
 
 const clear = async (key: string) => {
     try {
@@ -32,7 +36,7 @@ const clear = async (key: string) => {
     } catch (e) {
         console.log(e);
     }
-}
+};
 
 const clearAll = async () => {
     try {
@@ -46,7 +50,7 @@ const clearAll = async () => {
     } catch (e) {
         console.log(e);
     }
-}
+};
 
 exports.get = get;
 exports.set = set;

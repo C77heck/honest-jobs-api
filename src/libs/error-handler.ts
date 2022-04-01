@@ -1,15 +1,15 @@
-const { validationResult } = require("express-validator");
-const HttpError = require("../models/http-error");
+import { validationResult } from "express-validator";
+import { HttpError } from "../models/http-error";
 
-const handleError = (req, next) => {
+const handleError = (req: Request, next: (error?: HttpError) => void): any => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
         return next(new HttpError(
             `Invalid inputs passed, please check your data`,
             422
-        ))
+        ));
     }
-}
+};
 
 exports.handleError = handleError;
