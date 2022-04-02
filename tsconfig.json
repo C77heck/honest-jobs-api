@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
-    "extends": "tslint-config-airbnb",
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
     "target": "es6",

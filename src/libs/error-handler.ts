@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import { HttpError } from "../models/http-error";
 
-const handleError = (req: Request, next: (error?: HttpError) => void): any => {
+export const handleError = (req: Request, next: (error?: HttpError) => void): any => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -11,5 +11,3 @@ const handleError = (req: Request, next: (error?: HttpError) => void): any => {
         ));
     }
 };
-
-exports.handleError = handleError;
