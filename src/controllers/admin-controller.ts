@@ -1,4 +1,4 @@
-import { loginAttempts } from '@models/helpers';
+import { loginAttempts } from '@models/libs/helpers';
 import { NextFunction } from 'express';
 
 import bcrypt from 'bcryptjs';
@@ -63,7 +63,6 @@ export const login = async (req: any, res: any, next: NextFunction) => {
             { expiresIn: '24h' }
         );
     } catch (err) {
-        console.log(err);
         return next(new HttpError(
             'Login failed, please try again',
             500
@@ -80,7 +79,8 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
-    const { name, email, password, hint, answer } = req.body;
+    const { name, email, password, hint, answer, isEmployer } = req.body;
+
     let existingUser;
     try {
         existingUser = await Admin.findOne({ email: email });
@@ -106,7 +106,14 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    const createdAdmin: any = new Admin({ name, email, hint, answer, password: hashedPassword });
+    const createdAdmin: any = new Admin({
+        name,
+        email,
+        hint,
+        answer,
+        isEmployer,
+        password: hashedPassword
+    });
     try {
         await createdAdmin.save();
     } catch (err) {
@@ -123,7 +130,6 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
             { expiresIn: '24h' }
         );
     } catch (err) {
-        console.log(err);
         return next(new HttpError(
             'Login failed, please try again',
             500

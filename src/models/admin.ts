@@ -9,6 +9,7 @@ export interface AdminModel extends Document {
     password: string;
     hint: string;
     answer: string;
+    isEmployer: boolean;
     status: {
         loginAttempts: number;
         isBlocked: boolean;
@@ -25,7 +26,8 @@ const adminSchema = new Schema({
         loginAttempts: { type: Number, required: false, default: 0 },
         isBlocked: { type: Boolean, required: false, default: false }
     },
-    timestamps: { type: Boolean, default: true }
+    timestamps: { type: Boolean, default: true },
+    isEmployer: { type: Boolean, required: true },
 });
 
 adminSchema.plugin(uniqueValidator);
