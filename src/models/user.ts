@@ -35,6 +35,7 @@ const userSchema = new Schema({
 userSchema.plugin(uniqueValidator);
 
 // TODO -> Notice that in order to touch static and query helper functions we need to extend the model like so. not the document.
+// notice the return statement on the promise in the argument part is what the actual data we return will be.
 interface UserModel extends Mongoose.Model<any> {
     loginAttempts(this: Mongoose.Model<any>, id: string, num: number): Promise<number>;
 
