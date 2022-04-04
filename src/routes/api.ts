@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import adminRoutes from './admin-routes';
+import userRoutes from './user-routes';
 
 // Export the base-router
 const baseRouter = Router();
 
 // Setup routers
-baseRouter.use('/admin', adminRoutes);
+baseRouter.use('/user', userRoutes);
 
 // Export default.
 export default baseRouter;

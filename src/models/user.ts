@@ -1,9 +1,9 @@
-import mongoose, { Model, Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
-export interface AdminModel extends Document {
+export interface UserModel extends Document {
     name: string;
     email: string;
     password: string;
@@ -16,7 +16,7 @@ export interface AdminModel extends Document {
     };
 }
 
-const adminSchema = new Schema({
+const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
@@ -30,6 +30,6 @@ const adminSchema = new Schema({
     isEmployer: { type: Boolean, required: true },
 });
 
-adminSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator);
 
-export default mongoose.model<AdminModel>('Admin', adminSchema);
+export default mongoose.model<UserModel>('User', userSchema);

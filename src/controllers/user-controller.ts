@@ -3,7 +3,7 @@ import { NextFunction } from 'express';
 
 import bcrypt from 'bcryptjs';
 import { HttpError } from '../models/http-error';
-import Admin, { AdminModel } from '../models/admin';
+import User, { UserModel } from '@models/user';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
 
@@ -11,10 +11,10 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;
 
-    let existingUser: AdminModel | null;
+    let existingUser: UserModel | null;
 
     try {
-        existingUser = await Admin.findOne({ email: email });
+        existingUser = await User.findOne({ email: email });
     } catch (err) {
         return next(new HttpError(
             `Login failed, please try again later.`,
@@ -33,7 +33,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     try {
         isValidPassword = await bcrypt.compare(password, existingUser.password);
     } catch (err) {
-        loginAttempts(Admin, existingUser._id, existingUser.status.loginAttempts + 1);
+        loginAttempts(User, existingUser._id, existingUser.status.loginAttempts + 1);
 
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
@@ -43,14 +43,14 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
     try {
         if (!isValidPassword) {
-            loginAttempts(Admin, existingUser._id, existingUser.status.loginAttempts + 1);
+            loginAttempts(User, existingUser._id, existingUser.status.loginAttempts + 1);
 
             return next(new HttpError(
                 'Could not log you in, please check your credentials and try again',
                 401
             ));
         } else {
-            loginAttempts(Admin, existingUser._id, 0);
+            loginAttempts(User, existingUser._id, 0);
         }
     } catch (e) {
         console.log('FAILED', e);
@@ -83,7 +83,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
 
     let existingUser;
     try {
-        existingUser = await Admin.findOne({ email: email });
+        existingUser = await User.findOne({ email: email });
     } catch (err) {
         existingUser = null;
     }
@@ -106,7 +106,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    const createdAdmin: any = new Admin({
+    const createdUser: any = new User({
         name,
         email,
         hint,
@@ -115,7 +115,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         password: hashedPassword
     });
     try {
-        await createdAdmin.save();
+        await createdUser.save();
     } catch (err) {
         return next(new HttpError(
             'Could not create user, please try again.',
@@ -125,7 +125,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
 
     let token;
     try {
-        token = jwt.sign({ userId: createdAdmin.id, email: createdAdmin.email },
+        token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
             process.env?.JWT_KEY || '',
             { expiresIn: '24h' }
         );
@@ -136,6 +136,6 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ userData: { userId: createdAdmin.id, token: token } });
+    res.status(201).json({ userData: { userId: createdUser.id, token: token } });
 };
 
