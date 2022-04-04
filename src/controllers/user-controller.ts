@@ -1,9 +1,9 @@
-import { loginAttempts } from '@models/libs/helpers';
+import { getUserSecurityQuestion, loginAttempts } from '@models/libs/helpers';
 import { NextFunction } from 'express';
 
 import bcrypt from 'bcryptjs';
-import { HttpError } from '../models/http-error';
-import User, { UserModel } from '@models/user';
+import { HttpError } from '@models/libs/http-error';
+import User, { UserDocument } from '@models/user';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
 
@@ -11,7 +11,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;
 
-    let existingUser: UserModel | null;
+    let existingUser: UserDocument | null;
 
     try {
         existingUser = await User.findOne({ email: email });
@@ -33,7 +33,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     try {
         isValidPassword = await bcrypt.compare(password, existingUser.password);
     } catch (err) {
-        loginAttempts(User, existingUser._id, existingUser.status.loginAttempts + 1);
+        User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
 
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
@@ -43,14 +43,14 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
     try {
         if (!isValidPassword) {
-            loginAttempts(User, existingUser._id, existingUser.status.loginAttempts + 1);
+            User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
 
             return next(new HttpError(
                 'Could not log you in, please check your credentials and try again',
                 401
             ));
         } else {
-            loginAttempts(User, existingUser._id, 0);
+            await User.loginAttempts(existingUser._id, 0);
         }
     } catch (e) {
         console.log('FAILED', e);
@@ -79,7 +79,10 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
-    const { name, email, password, hint, answer, isEmployer } = req.body;
+    const {
+        name, email, password, securityQuestion,
+        securityAnswer, isEmployer
+    } = req.body;
 
     let existingUser;
     try {
@@ -109,8 +112,8 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     const createdUser: any = new User({
         name,
         email,
-        hint,
-        answer,
+        securityQuestion,
+        securityAnswer,
         isEmployer,
         password: hashedPassword
     });
@@ -139,3 +142,21 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     res.status(201).json({ userData: { userId: createdUser.id, token: token } });
 };
 
+export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
+    let securityQuestion;
+
+    try {
+        securityQuestion = await User.getUserSecurityQuestion(req.params.userId);
+    } catch (e) {
+        return next(new HttpError(
+            'Something went wrong, please try again later.',
+            500
+        ));
+    }
+
+    res.status(200).json({ securityQuestion });
+};
+
+export const deleteAccount = (req: any, res: any, next: NextFunction) => {
+
+};

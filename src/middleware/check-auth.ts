@@ -1,7 +1,7 @@
 import { NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken';
-import { HttpError } from '../models/http-error';
+import { HttpError } from '@models/libs/http-error';
 
 interface AuthHeaders extends Headers {
     authorization?: string;
