@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken';
 export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;
+
     let existingUser: AdminModel | null;
 
     try {
