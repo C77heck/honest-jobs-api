@@ -28,18 +28,23 @@ const userSchema = new Schema({
         loginAttempts: { type: Number, required: false, default: 0 },
         isBlocked: { type: Boolean, required: false, default: false }
     },
-    timestamps: { type: Boolean, default: true },
     isEmployer: { type: Boolean, required: true },
 });
 
+userSchema.set('timestamps', true);
+
 userSchema.plugin(uniqueValidator);
 
-// TODO -> Notice that in order to touch static and query helper functions we need to extend the model like so. not the document.
-// notice the return statement on the promise in the argument part is what the actual data we return will be.
 interface UserModel extends Mongoose.Model<any> {
     loginAttempts(this: Mongoose.Model<any>, id: string, num: number): Promise<number>;
 
     getUserSecurityQuestion(this: Mongoose.Model<any>, userId: string): Promise<string>;
+
+    delete(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
+
+    updateUser(this: Mongoose.Model<any>, userData: UserDocument, userId: string): Promise<any>;
+
+    getUser(this: Mongoose.Model<any>, userId: string): Promise<UserDocument>;
 }
 
 userSchema.static('loginAttempts', async function (this: Mongoose.Model<any>, id: string, num: number): Promise<number> {
@@ -48,6 +53,20 @@ userSchema.static('loginAttempts', async function (this: Mongoose.Model<any>, id
 
 userSchema.static('getUserSecurityQuestion', async function (this: Mongoose.Model<any>, userId: string): Promise<string> {
     return (await this.findOne({ _id: userId }))?.securityQuestion;
+});
+
+userSchema.static('delete', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
+    const response = await this.deleteOne({ _id: userId });
+
+    return !!response?.acknowledged;
+});
+
+userSchema.static('updateUser', async function (this: Mongoose.Model<any>, userData: UserDocument, userId: string): Promise<any> {
+    return await this.updateOne({ _id: userId }, { ...userData });
+});
+
+userSchema.static('getUser', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument> {
+    return await this.findOne({ _id: userId });
 });
 
 export default mongoose.model<UserDocument, UserModel>('User', userSchema);

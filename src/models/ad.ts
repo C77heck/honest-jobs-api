@@ -22,6 +22,8 @@ const adSchema = new Schema({
     timestamps: { type: Boolean, default: true },
 });
 
+adSchema.set('timestamps', true);
+
 adSchema.plugin(uniqueValidator);
 
 export default mongoose.model<AdModel>('Ad', adSchema);

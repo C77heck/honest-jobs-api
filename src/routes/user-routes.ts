@@ -1,4 +1,9 @@
-import { deleteAccount, getSecurityQuestion } from '../controllers/user-controller';
+import {
+    deleteAccount,
+    getSecurityQuestion,
+    getUserData,
+    updateUserData
+} from '../controllers/user-controller';
 
 const express = require('express');
 const { check, body } = require('express-validator');
@@ -21,9 +26,21 @@ router.post('/signup', [
     check('isEmployer').isBoolean()
 ], signup);
 
+router.get('/get-user-data/:userId', [], getUserData);
+
 router.get('/get-security-question/:userId', [], getSecurityQuestion);
 
-router.delete('/delete-account', [
+router.put('/update/:userId', [
+    body('*').trim().escape(),
+    check('name').not().isEmpty(),
+    check('email').normalizeEmail().isEmail(),
+    check('password').isLength({ min: 6 }),
+    check('securityQuestion').not().isEmpty().escape(),
+    check('securityAnswer').isLength({ min: 4 }),
+    check('isEmployer').isBoolean()
+], updateUserData);
+
+router.delete('/delete-account/:userId', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
 

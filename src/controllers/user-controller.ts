@@ -157,6 +157,46 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
     res.status(200).json({ securityQuestion });
 };
 
-export const deleteAccount = (req: any, res: any, next: NextFunction) => {
+export const updateUserData = async (req: any, res: any, next: NextFunction) => {
+    handleError(req, next);
 
+    try {
+        await User.updateUser(req.body, req.params.userId);
+    } catch (e) {
+        return next(new HttpError(
+            'Something went wrong, please try again later.',
+            500
+        ));
+    }
+
+    res.status(201).json({ message: 'User data has been successfully updated.' });
+};
+
+export const getUserData = async (req: any, res: any, next: NextFunction) => {
+    handleError(req, next);
+    let userData: UserDocument;
+    try {
+        userData = await User.getUser(req.params.userId);
+    } catch (e) {
+        return next(new HttpError(
+            'Something went wrong, please try again later.',
+            500
+        ));
+    }
+
+    res.status(201).json({ userData });
+};
+
+export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
+
+    try {
+        await User.delete(req.params.userId);
+    } catch (e) {
+        return next(new HttpError(
+            'Something went wrong, please try again later.',
+            500
+        ));
+    }
+
+    res.status(200).json({ message: 'Account has been successfully deleted.' });
 };

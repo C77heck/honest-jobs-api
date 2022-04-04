@@ -16,6 +16,8 @@ const employeeSchema = new Schema({
     location: { type: String, required: true },
 });
 
+employeeSchema.set('timestamps', true);
+
 employeeSchema.plugin(uniqueValidator);
 
 export default mongoose.model<EmployeeModel>('Employee', employeeSchema);
