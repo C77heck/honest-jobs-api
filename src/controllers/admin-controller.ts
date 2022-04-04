@@ -1,15 +1,16 @@
+import { loginAttempts } from '@models/helpers';
 import { NextFunction } from 'express';
 
 import bcrypt from 'bcryptjs';
 import { HttpError } from '../models/http-error';
-import Admin, { AdminDocument } from '../models/admin';
+import Admin, { AdminModel } from '../models/admin';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
 
 export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;
-    let existingUser: AdminDocument | null;
+    let existingUser: AdminModel | null;
 
     try {
         existingUser = await Admin.findOne({ email: email });
@@ -31,7 +32,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     try {
         isValidPassword = await bcrypt.compare(password, existingUser.password);
     } catch (err) {
-        Admin.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+        loginAttempts(Admin, existingUser._id, existingUser.status.loginAttempts + 1);
 
         return next(new HttpError(
             'Could not log you in, please check your credentials and try again',
@@ -41,14 +42,14 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
     try {
         if (!isValidPassword) {
-            Admin.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+            loginAttempts(Admin, existingUser._id, existingUser.status.loginAttempts + 1);
 
             return next(new HttpError(
                 'Could not log you in, please check your credentials and try again',
                 401
             ));
         } else {
-            Admin.loginAttempts(existingUser._id, 0);
+            loginAttempts(Admin, existingUser._id, 0);
         }
     } catch (e) {
         console.log('FAILED', e);
@@ -56,7 +57,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
     let token;
     try {
-        token = jwt.sign({ userId: existingUser.id, email: existingUser.email },
+        token = jwt.sign({ userId: existingUser._id, email: existingUser.email },
             process.env?.JWT_KEY || '',
             { expiresIn: '24h' }
         );

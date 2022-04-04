@@ -3,7 +3,7 @@ import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
-export interface AdminModel {
+export interface AdminModel extends Document {
     name: string;
     email: string;
     password: string;
@@ -15,10 +15,6 @@ export interface AdminModel {
     };
 }
 
-export interface AdminDocument extends AdminModel, Document {
-    loginAttempts: (id: string, num: number) => Document;
-}
-
 const adminSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
@@ -28,13 +24,10 @@ const adminSchema = new Schema({
     status: {
         loginAttempts: { type: Number, required: false, default: 0 },
         isBlocked: { type: Boolean, required: false, default: false }
-    }
+    },
+    timestamps: { type: Boolean, default: true }
 });
-
-adminSchema.methods.loginAttempts = function (id: string, num: number) {
-    return this.updateOne({ _id: id }, { status: { loginAttempts: num } });
-};
 
 adminSchema.plugin(uniqueValidator);
 
-export default mongoose.model<AdminDocument>('Admin', adminSchema);
+export default mongoose.model<AdminModel>('Admin', adminSchema);
