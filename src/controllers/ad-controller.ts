@@ -2,9 +2,10 @@ import { HttpError } from '@models/libs/http-error';
 import Ad, { AdDocument } from '@models/ad';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
+import { CRequest } from './libs/interfaces';
 
 // filters and pagination to implement. avoid redis for it.
-export const getAllAds = async (req: any, res: any, next: NextFunction) => {
+export const getAllAds = async (req: CRequest, res: any, next: NextFunction) => {
     let ads: AdDocument[];
 
     try {
@@ -19,7 +20,7 @@ export const getAllAds = async (req: any, res: any, next: NextFunction) => {
     res.status(200).json({ ads });
 };
 
-export const getById = async (req: any, res: any, next: NextFunction) => {
+export const getById = async (req: CRequest, res: any, next: NextFunction) => {
     let ad: AdDocument[];
 
     try {
@@ -35,7 +36,7 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
     res.status(200).json({ ad });
 };
 
-export const createNewAd = async (req: any, res: any, next: NextFunction) => {
+export const createNewAd = async (req: CRequest, res: any, next: NextFunction) => {
     const createdAd: any = new Ad(req.body as AdDocument);
 
     try {
@@ -50,7 +51,7 @@ export const createNewAd = async (req: any, res: any, next: NextFunction) => {
     res.status(201).json({ message: 'New ad has been successfully added' });
 };
 
-export const updateAd = async (req: any, res: any, next: NextFunction) => {
+export const updateAd = async (req: CRequest, res: any, next: NextFunction) => {
     let updatedAd: AdDocument;
 
     try {
@@ -65,7 +66,7 @@ export const updateAd = async (req: any, res: any, next: NextFunction) => {
     res.status(200).json({ updatedAd, message: 'Successfully updated.' });
 };
 
-export const deleteAd = async (req: any, res: any, next: NextFunction) => {
+export const deleteAd = async (req: CRequest, res: any, next: NextFunction) => {
     try {
         await Ad.deleteAd(req.params.adId);
     } catch (err) {
