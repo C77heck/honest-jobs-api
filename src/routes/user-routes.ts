@@ -4,19 +4,12 @@ import {
     getUserData,
     updateUserData
 } from '../controllers/user-controller';
+import { recruiterAuth, simpleUserAuth } from '../middleware/check-auth';
 
 const express = require('express');
 const { check, body } = require('express-validator');
 const { login, signup } = require('../controllers/user-controller');
 const router = express.Router();
-
-router.get('/get-job-seekers', [], getJobSeekers);
-
-router.get('/get-recruiters', [], getRecruiters);
-
-router.get('/get-user-data/:userId', [], getUserData);
-
-router.get('/get-security-question/:userId', [], getSecurityQuestion);
 
 router.post('/login',
     [
@@ -38,6 +31,14 @@ router.post('/signup', [
 
 ], signup);
 
+router.use(simpleUserAuth);
+
+router.get('/get-recruiters', [], getRecruiters);
+
+router.get('/get-user-data/:userId', [], getUserData);
+
+router.get('/get-security-question/:userId', [], getSecurityQuestion);
+
 router.put('/update/:userId', [
     body('*').trim().escape(),
     check('name').not().isEmpty(),
@@ -55,5 +56,9 @@ router.put('/update/:userId', [
 router.delete('/delete-account/:userId', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
+
+router.use(recruiterAuth);
+
+router.get('/get-job-seekers', [], getJobSeekers);
 
 export default router;

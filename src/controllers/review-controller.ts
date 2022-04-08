@@ -2,9 +2,8 @@ import { HttpError } from '@models/libs/http-error';
 import Review, { ReviewDocument } from '@models/review';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
-import { CRequest } from './libs/interfaces';
 
-export const getById = async (req: CRequest, res: any, next: NextFunction) => {
+export const getById = async (req: any, res: any, next: NextFunction) => {
     let review: ReviewDocument;
 
     try {
@@ -20,7 +19,7 @@ export const getById = async (req: CRequest, res: any, next: NextFunction) => {
     res.status(200).json({ review });
 };
 
-export const getByEmployer = async (req: CRequest, res: any, next: NextFunction) => {
+export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
     let reviews: ReviewDocument[];
 
     try {
@@ -36,7 +35,7 @@ export const getByEmployer = async (req: CRequest, res: any, next: NextFunction)
     res.status(200).json({ reviews });
 };
 
-export const createNewReview = async (req: CRequest, res: any, next: NextFunction) => {
+export const createNewReview = async (req: any, res: any, next: NextFunction) => {
     const createdReview: any = new Review(req.body as ReviewDocument);
 
     try {
@@ -51,7 +50,7 @@ export const createNewReview = async (req: CRequest, res: any, next: NextFunctio
     res.status(201).json({ message: 'New review has been successfully added' });
 };
 
-export const updateReview = async (req: CRequest, res: any, next: NextFunction) => {
+export const updateReview = async (req: any, res: any, next: NextFunction) => {
     let updatedReview: ReviewDocument;
 
     try {
@@ -66,7 +65,7 @@ export const updateReview = async (req: CRequest, res: any, next: NextFunction) 
     res.status(200).json({ updatedReview, message: 'Successfully updated.' });
 };
 
-export const deleteReview = async (req: CRequest, res: any, next: NextFunction) => {
+export const deleteReview = async (req: any, res: any, next: NextFunction) => {
     try {
         await Review.deleteReview(req.params.reviewId);
     } catch (err) {
