@@ -1,9 +1,10 @@
+import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
-export interface AdModel extends Document {
+export interface AdDocument extends Document {
     title: string;
     description: string;
     salary: string;
@@ -26,4 +27,22 @@ adSchema.set('timestamps', true);
 
 adSchema.plugin(uniqueValidator);
 
-export default mongoose.model<AdModel>('Ad', adSchema);
+interface AdModel extends Mongoose.Model<any> {
+    getAllAds(this: Mongoose.Model<any>): Promise<AdDocument[]>;
+    updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
+    deleteAd(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+}
+
+adSchema.static('getAllAds', async function (this: Mongoose.Model<any>): Promise<AdDocument[]> {
+    return await this.find({});
+});
+
+adSchema.static('updateAd', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
+    return await this.updateOne({ _id: adId }, adData);
+});
+
+adSchema.static('deleteAd', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
+    return await this.updateOne({ _id: adId }, adData);
+});
+
+export default mongoose.model<AdDocument, AdModel>('Ad', adSchema);

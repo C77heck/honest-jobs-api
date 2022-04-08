@@ -40,7 +40,7 @@ interface UserModel extends Mongoose.Model<any> {
 
     getUserSecurityQuestion(this: Mongoose.Model<any>, userId: string): Promise<string>;
 
-    delete(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
+    deleteUser(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
 
     updateUser(this: Mongoose.Model<any>, userData: UserDocument, userId: string): Promise<any>;
 
@@ -55,7 +55,7 @@ userSchema.static('getUserSecurityQuestion', async function (this: Mongoose.Mode
     return (await this.findOne({ _id: userId }))?.securityQuestion;
 });
 
-userSchema.static('delete', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
+userSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
     const response = await this.deleteOne({ _id: userId });
 
     return !!response?.acknowledged;

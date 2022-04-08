@@ -1,12 +1,6 @@
 import './pre-start'; // Must be the first import
-import logger from 'jet-logger';
 import mongoose from 'mongoose';
 import server from './server';
-
-// // Start server
-// server.listen(port, () => {
-//     logger.info(serverStartMsg + port);
-// });
 
 (async () => {
     try {

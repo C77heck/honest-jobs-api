@@ -1,9 +1,9 @@
-import { getUserSecurityQuestion, loginAttempts } from '@models/libs/helpers';
 import { NextFunction } from 'express';
 
 import bcrypt from 'bcryptjs';
 import { HttpError } from '@models/libs/http-error';
 import User, { UserDocument } from '@models/user';
+import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
 
@@ -149,7 +149,7 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
         securityQuestion = await User.getUserSecurityQuestion(req.params.userId);
     } catch (e) {
         return next(new HttpError(
-            'Something went wrong, please try again later.',
+            ERROR_MESSAGES.GENERIC,
             500
         ));
     }
@@ -164,7 +164,7 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
         await User.updateUser(req.body, req.params.userId);
     } catch (e) {
         return next(new HttpError(
-            'Something went wrong, please try again later.',
+            ERROR_MESSAGES.GENERIC,
             500
         ));
     }
@@ -175,11 +175,12 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
 export const getUserData = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     let userData: UserDocument;
+
     try {
         userData = await User.getUser(req.params.userId);
     } catch (e) {
         return next(new HttpError(
-            'Something went wrong, please try again later.',
+            ERROR_MESSAGES.GENERIC,
             500
         ));
     }
@@ -188,12 +189,11 @@ export const getUserData = async (req: any, res: any, next: NextFunction) => {
 };
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
-
     try {
-        await User.delete(req.params.userId);
+        await User.deleteUser(req.params.userId);
     } catch (e) {
         return next(new HttpError(
-            'Something went wrong, please try again later.',
+            ERROR_MESSAGES.GENERIC,
             500
         ));
     }

@@ -1,3 +1,4 @@
+import adRoutes from '@routes/ad-routes';
 import { Router } from 'express';
 import userRoutes from './user-routes';
 
@@ -6,6 +7,7 @@ const baseRouter = Router();
 
 // Setup routers
 baseRouter.use('/user', userRoutes);
+baseRouter.use('/ads', adRoutes);
 
 // Export default.
 export default baseRouter;
