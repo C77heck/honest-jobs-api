@@ -1,3 +1,4 @@
+import User from '@models/user';
 import { NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken';
@@ -12,7 +13,7 @@ interface CustomRequest extends Request {
     userData: any;
 }
 
-export const auth = (req: CustomRequest, res: Response, next: NextFunction): any => {
+export const auth = async (req: CustomRequest, res: Response, next: NextFunction): any => {
     if (req.method === 'OPTIONS') {
         return next();
     }
@@ -25,7 +26,11 @@ export const auth = (req: CustomRequest, res: Response, next: NextFunction): any
         }
 
         const decodedToken: any = jwt.verify(token, process.env?.JWT_KEY || '');
-        req.userData = { userId: decodedToken.userId };
+        req.userData = {
+            userId: decodedToken.userId,
+            isRecruiter: await User.getUser(decodedToken.userId)
+        };
+
         next();
     } catch (err) {
         return next(new HttpError(
