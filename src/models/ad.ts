@@ -11,6 +11,8 @@ export interface AdDocument extends Document {
     location: string;
     expiresOn: Date;
     isPremium: boolean;
+    meta?: string[],
+    images?: string[];
 }
 
 const adSchema = new Schema({
@@ -20,7 +22,8 @@ const adSchema = new Schema({
     location: { type: String, required: true },
     expiresOn: { type: String, required: true },
     isPremium: { type: String, required: true },
-    timestamps: { type: Boolean, default: true },
+    meta: [{ type: String }],
+    images: [{ type: String }],
 });
 
 adSchema.set('timestamps', true);
@@ -29,8 +32,12 @@ adSchema.plugin(uniqueValidator);
 
 interface AdModel extends Mongoose.Model<any> {
     getAllAds(this: Mongoose.Model<any>): Promise<AdDocument[]>;
+
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
+
     deleteAd(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+
+    getById(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
 }
 
 adSchema.static('getAllAds', async function (this: Mongoose.Model<any>): Promise<AdDocument[]> {
@@ -42,7 +49,11 @@ adSchema.static('updateAd', async function (this: Mongoose.Model<any>, adId: str
 });
 
 adSchema.static('deleteAd', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
-    return await this.updateOne({ _id: adId }, adData);
+    return await this.deleteOne({ _id: adId });
+});
+
+adSchema.static('getById', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
+    return await this.findOne({ _id: adId });
 });
 
 export default mongoose.model<AdDocument, AdModel>('Ad', adSchema);

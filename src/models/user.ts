@@ -16,6 +16,11 @@ export interface UserDocument extends Document {
         loginAttempts: number;
         isBlocked: boolean;
     };
+    description?: string,
+    // TODO -> we will need an attachment service for this. CDN setup
+    logo?: string,
+    meta?: string[],
+    images?: string[];
 }
 
 const userSchema = new Schema({
@@ -29,6 +34,10 @@ const userSchema = new Schema({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isEmployer: { type: Boolean, required: true },
+    description: { type: String },
+    logo: { type: String },
+    meta: [{ type: String }],
+    images: [{ type: String }],
 });
 
 userSchema.set('timestamps', true);

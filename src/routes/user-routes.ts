@@ -23,7 +23,11 @@ router.post('/signup', [
     check('password').isLength({ min: 6 }),
     check('securityQuestion').not().isEmpty().escape(),
     check('securityAnswer').isLength({ min: 4 }),
-    check('isEmployer').isBoolean()
+    check('isEmployer').isBoolean(),
+    check('description').escape(),
+    check('meta').escape(),
+    check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
+
 ], signup);
 
 router.get('/get-user-data/:userId', [], getUserData);
@@ -37,7 +41,11 @@ router.put('/update/:userId', [
     check('password').isLength({ min: 6 }),
     check('securityQuestion').not().isEmpty().escape(),
     check('securityAnswer').isLength({ min: 4 }),
-    check('isEmployer').isBoolean()
+    check('isEmployer').isBoolean(),
+    check('description').escape(),
+    check('meta').escape(),
+    check('logo').escape(),
+    check('images').escape(),
 ], updateUserData);
 
 router.delete('/delete-account/:userId', [
