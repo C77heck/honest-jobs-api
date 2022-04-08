@@ -7,6 +7,32 @@ import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
 
+export const getJobSeekers = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const recruiters = await User.getJobSeekers();
+
+        res.status(200).json({ recruiters });
+    } catch (e) {
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
+};
+
+export const getRecruiters = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const recruiters = await User.getRecruiters();
+
+        res.status(200).json({ recruiters });
+    } catch (e) {
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
+};
+
 export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;

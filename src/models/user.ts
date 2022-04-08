@@ -11,7 +11,7 @@ export interface UserDocument extends Document {
     password: string;
     securityQuestion: string;
     securityAnswer: string;
-    isEmployer: boolean;
+    isRecruiter: boolean;
     status: {
         loginAttempts: number;
         isBlocked: boolean;
@@ -33,7 +33,7 @@ const userSchema = new Schema({
         loginAttempts: { type: Number, required: false, default: 0 },
         isBlocked: { type: Boolean, required: false, default: false }
     },
-    isEmployer: { type: Boolean, required: true },
+    isRecruiter: { type: Boolean, required: true },
     description: { type: String },
     logo: { type: String },
     meta: [{ type: String }],
@@ -45,6 +45,10 @@ userSchema.set('timestamps', true);
 userSchema.plugin(uniqueValidator);
 
 interface UserModel extends Mongoose.Model<any> {
+    getRecruiters(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+
+    getJobSeekers(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+
     loginAttempts(this: Mongoose.Model<any>, id: string, num: number): Promise<number>;
 
     getUserSecurityQuestion(this: Mongoose.Model<any>, userId: string): Promise<string>;
@@ -56,8 +60,16 @@ interface UserModel extends Mongoose.Model<any> {
     getUser(this: Mongoose.Model<any>, userId: string): Promise<UserDocument>;
 }
 
+userSchema.static('getRecruiters', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
+    return await this.find({ isRecruiter: true });
+});
+
+userSchema.static('getJobSeekers', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
+    return await this.find({ isRecruiter: false });
+});
+
 userSchema.static('loginAttempts', async function (this: Mongoose.Model<any>, id: string, num: number): Promise<number> {
-    return this.updateOne({ _id: id }, { status: { loginAttempts: num } });
+    return await this.updateOne({ _id: id }, { status: { loginAttempts: num } });
 });
 
 userSchema.static('getUserSecurityQuestion', async function (this: Mongoose.Model<any>, userId: string): Promise<string> {

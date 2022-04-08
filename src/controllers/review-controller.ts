@@ -19,6 +19,22 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
     res.status(200).json({ review });
 };
 
+export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
+    let reviews: ReviewDocument[];
+
+    try {
+        reviews = await Review.getReviewsForEmployer(req.params.reviewId);
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
+
+    res.status(200).json({ reviews });
+};
+
 export const createNewReview = async (req: any, res: any, next: NextFunction) => {
     const createdReview: any = new Review(req.body as ReviewDocument);
 

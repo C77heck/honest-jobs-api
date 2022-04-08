@@ -51,6 +51,10 @@ interface ReviewModel extends Mongoose.Model<any> {
     getReviewById(this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument>;
 }
 
+reviewSchema.static('getReviewsForEmployer', async function (this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument[]> {
+    return await this.find({ _id: employerId });
+});
+
 reviewSchema.static('updateAd', async function (this: Mongoose.Model<any>, employerId: string | number, adData: ReviewDocument): Promise<ReviewDocument> {
     return await this.updateOne({ _id: employerId }, adData);
 });
