@@ -3,6 +3,7 @@ import Ad, { AdDocument } from '@models/ad';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 
+// filters and pagination to implement. avoid redis for it.
 export const getAllAds = async (req: any, res: any, next: NextFunction) => {
     let ads: AdDocument[];
 
