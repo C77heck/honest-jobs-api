@@ -41,7 +41,7 @@ reviewSchema.set('timestamps', true);
 
 reviewSchema.plugin(uniqueValidator);
 
-interface AdModel extends Mongoose.Model<any> {
+interface ReviewModel extends Mongoose.Model<any> {
     getReviewsForEmployer(this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument[]>;
 
     updateReview(this: Mongoose.Model<any>, employerId: string | number, reviewData: ReviewDocument): Promise<ReviewDocument>;
@@ -55,12 +55,12 @@ reviewSchema.static('updateAd', async function (this: Mongoose.Model<any>, emplo
     return await this.updateOne({ _id: employerId }, adData);
 });
 
-reviewSchema.static('deleteAd', async function (this: Mongoose.Model<any>, employerId: string | number, adData: ReviewDocument): Promise<ReviewDocument> {
+reviewSchema.static('deleteAd', async function (this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument> {
     return await this.deleteOne({ _id: employerId });
 });
 
-reviewSchema.static('getById', async function (this: Mongoose.Model<any>, employerId: string | number, adData: ReviewDocument): Promise<ReviewDocument> {
+reviewSchema.static('getReviewById', async function (this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument> {
     return await this.findOne({ _id: employerId });
 });
 
-export default mongoose.model<ReviewDocument, AdModel>('Review', reviewSchema);
+export default mongoose.model<ReviewDocument, ReviewModel>('Review', reviewSchema);

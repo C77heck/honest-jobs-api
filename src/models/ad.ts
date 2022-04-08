@@ -48,11 +48,11 @@ adSchema.static('updateAd', async function (this: Mongoose.Model<any>, adId: str
     return await this.updateOne({ _id: adId }, adData);
 });
 
-adSchema.static('deleteAd', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
+adSchema.static('deleteAd', async function (this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument> {
     return await this.deleteOne({ _id: adId });
 });
 
-adSchema.static('getById', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
+adSchema.static('getById', async function (this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument> {
     return await this.findOne({ _id: adId });
 });
 
