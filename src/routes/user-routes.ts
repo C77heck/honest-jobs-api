@@ -28,7 +28,6 @@ router.post('/signup', [
     check('description').escape(),
     check('meta').escape(),
     check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
-
 ], signup);
 
 router.use(simpleUserAuth);

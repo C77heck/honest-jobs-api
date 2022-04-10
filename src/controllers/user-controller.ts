@@ -6,9 +6,8 @@ import User, { UserDocument } from '@models/user';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
 import jwt from 'jsonwebtoken';
-import { CRequest } from './libs/interfaces';
 
-export const getJobSeekers = async (req: CRequest, res: any, next: NextFunction) => {
+export const getJobSeekers = async (req: any, res: any, next: NextFunction) => {
     try {
         const recruiters = await User.getJobSeekers();
 
@@ -21,7 +20,7 @@ export const getJobSeekers = async (req: CRequest, res: any, next: NextFunction)
     }
 };
 
-export const getRecruiters = async (req: CRequest, res: any, next: NextFunction) => {
+export const getRecruiters = async (req: any, res: any, next: NextFunction) => {
     try {
         const recruiters = await User.getRecruiters();
 
@@ -34,7 +33,7 @@ export const getRecruiters = async (req: CRequest, res: any, next: NextFunction)
     }
 };
 
-export const login = async (req: CRequest, res: any, next: NextFunction) => {
+export const login = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     const { email, password } = req.body;
 
@@ -104,12 +103,9 @@ export const login = async (req: CRequest, res: any, next: NextFunction) => {
     });
 };
 
-export const signup = async (req: CRequest, res: any, next: NextFunction) => {
+export const signup = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
-    const {
-        name, email, password, securityQuestion,
-        securityAnswer, isEmployer
-    } = req.body;
+    const { email, password } = req.body;
 
     let existingUser;
     try {
@@ -137,11 +133,7 @@ export const signup = async (req: CRequest, res: any, next: NextFunction) => {
     }
 
     const createdUser: any = new User({
-        name,
-        email,
-        securityQuestion,
-        securityAnswer,
-        isEmployer,
+        ...req.body as UserDocument,
         password: hashedPassword
     });
     try {
@@ -169,7 +161,7 @@ export const signup = async (req: CRequest, res: any, next: NextFunction) => {
     res.status(201).json({ userData: { userId: createdUser.id, token: token } });
 };
 
-export const getSecurityQuestion = async (req: CRequest, res: any, next: NextFunction) => {
+export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
     let securityQuestion;
 
     try {
@@ -184,7 +176,7 @@ export const getSecurityQuestion = async (req: CRequest, res: any, next: NextFun
     res.status(200).json({ securityQuestion });
 };
 
-export const updateUserData = async (req: CRequest, res: any, next: NextFunction) => {
+export const updateUserData = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
 
     try {
@@ -199,7 +191,7 @@ export const updateUserData = async (req: CRequest, res: any, next: NextFunction
     res.status(201).json({ message: 'User data has been successfully updated.' });
 };
 
-export const getUserData = async (req: CRequest, res: any, next: NextFunction) => {
+export const getUserData = async (req: any, res: any, next: NextFunction) => {
     handleError(req, next);
     let userData: UserDocument;
 
@@ -215,7 +207,7 @@ export const getUserData = async (req: CRequest, res: any, next: NextFunction) =
     res.status(201).json({ userData });
 };
 
-export const deleteAccount = async (req: CRequest, res: any, next: NextFunction) => {
+export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     try {
         await User.deleteUser(req.params.userId);
     } catch (e) {
