@@ -11,11 +11,10 @@ const { check, body } = require('express-validator');
 const { login, signup } = require('../controllers/user-controller');
 const router = express.Router();
 
-router.post('/login',
-    [
-        check('email').not().isEmpty().escape().trim(),
-        check('password').not().isEmpty()
-    ], login);
+router.post('/login', [
+    check('email').not().isEmpty().escape().trim(),
+    check('password').not().isEmpty()
+], login);
 
 router.post('/signup', [
     body('*').trim().escape(),
@@ -30,7 +29,7 @@ router.post('/signup', [
     check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
 ], signup);
 
-router.use(simpleUserAuth);
+// router.use(simpleUserAuth);
 
 router.get('/get-recruiters', [], getRecruiters);
 
@@ -56,7 +55,7 @@ router.delete('/delete-account/:userId', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
 
-router.use(recruiterAuth);
+// router.use(recruiterAuth);
 
 router.get('/get-job-seekers', [], getJobSeekers);
 

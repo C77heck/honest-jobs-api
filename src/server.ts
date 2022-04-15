@@ -1,3 +1,4 @@
+import userRoutes from '@routes/user-routes';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -5,9 +6,11 @@ import helmet from 'helmet';
 import express, { NextFunction, Request, Response } from 'express';
 import StatusCodes from 'http-status-codes';
 import 'express-async-errors';
+import baseRouter from './routes/api';
 
 import apiRouter from './routes/api';
 import logger from 'jet-logger';
+import cors from 'cors';
 
 // Constants
 const app = express();
@@ -15,7 +18,8 @@ const app = express();
 /***********************************************************************************
  *                                  Middlewares
  **********************************************************************************/
-
+// // { origin: ['http://localhost:3000'] }
+app.use(cors());
 // Common middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,7 +40,7 @@ if (process.env.NODE_ENV === 'production') {
  **********************************************************************************/
 
 // Add api router
-app.use('/api', apiRouter);
+app.use('/api', baseRouter);
 
 // Error handling
 app.use((err: Error, _: Request, res: Response, __: NextFunction) => {

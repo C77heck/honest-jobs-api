@@ -131,12 +131,12 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
             500
         ));
     }
-
-    const createdUser: any = new User({
-        ...req.body as UserDocument,
-        password: hashedPassword
-    });
+    let createdUser: any;
     try {
+        createdUser = new User({
+            ...req.body as UserDocument,
+            password: hashedPassword
+        });
         await createdUser.save();
     } catch (err) {
         return next(new HttpError(

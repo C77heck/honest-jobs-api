@@ -4,9 +4,8 @@ import userRoutes from './user-routes';
 
 // Export the base-router
 const baseRouter = Router();
-
 // Setup routers
-baseRouter.use('/user', userRoutes);
+baseRouter.use('/users', userRoutes);
 baseRouter.use('/ads', adRoutes);
 
 // Export default.
