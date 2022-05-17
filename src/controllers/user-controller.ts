@@ -212,7 +212,7 @@ export const getUserData = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ userData: new SafeUserData(userData) });
+    res.status(201).json({ meta: new SafeUserData(userData) });
 };
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
@@ -232,7 +232,7 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
     try {
         const userData = await User.findById(req.params.userId);
 
-        res.status(200).json({ userData: { meta: new SafeUserData(userData) } });
+        res.status(200).json({ meta: new SafeUserData(userData) });
     } catch (e) {
         return next(new HttpError(
             ERROR_MESSAGES.GENERIC,
