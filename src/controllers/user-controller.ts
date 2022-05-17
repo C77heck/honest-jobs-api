@@ -1,11 +1,12 @@
-import { NextFunction } from 'express';
-
-import bcrypt from 'bcryptjs';
 import { HttpError } from '@models/libs/http-error';
 import User, { UserDocument } from '@models/user';
+
+import bcrypt from 'bcryptjs';
+import { NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
-import jwt from 'jsonwebtoken';
+import { SafeUserData } from './libs/safe.user.data';
 
 export const getJobSeekers = async (req: any, res: any, next: NextFunction) => {
     try {
@@ -97,6 +98,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
     await res.json({
         userData: {
+            meta: new SafeUserData(existingUser),
             userId: existingUser.id,
             token: token,
         }
@@ -158,7 +160,13 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ userData: { userId: createdUser.id, token: token } });
+    res.status(201).json({
+        userData: {
+            meta: new SafeUserData(createdUser),
+            userId: createdUser.id,
+            token: token
+        }
+    });
 };
 
 export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
@@ -204,7 +212,7 @@ export const getUserData = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ userData });
+    res.status(201).json({ userData: new SafeUserData(userData) });
 };
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
@@ -218,4 +226,17 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     }
 
     res.status(200).json({ message: 'Account has been successfully deleted.' });
+};
+
+export const whoami = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const userData = await User.findById(req.params.userId);
+
+        res.status(200).json({ userData: { meta: new SafeUserData(userData) } });
+    } catch (e) {
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
 };

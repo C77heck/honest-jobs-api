@@ -6,7 +6,8 @@ import uniqueValidator from 'mongoose-unique-validator';
 const Schema = mongoose.Schema;
 
 export interface UserDocument extends Document {
-    name: string;
+    first_name: string;
+    last_name: string;
     email: string;
     password: string;
     securityQuestion: string;
@@ -19,12 +20,13 @@ export interface UserDocument extends Document {
     description?: string,
     // TODO -> we will need an attachment service for this. CDN setup
     logo?: string,
-    meta?: string[],
+    meta?: string,
     images?: string[];
 }
 
 const userSchema = new Schema({
-    name: { type: String, required: true },
+    first_name: { type: String, required: true },
+    last_name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
     securityQuestion: { type: String, required: true },
@@ -36,7 +38,7 @@ const userSchema = new Schema({
     isRecruiter: { type: Boolean, required: true },
     description: { type: String },
     logo: { type: String },
-    meta: [{ type: String }],
+    meta: { type: String },
     images: [{ type: String }],
 });
 

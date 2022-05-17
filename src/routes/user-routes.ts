@@ -1,10 +1,12 @@
 import {
-    deleteAccount, getJobSeekers, getRecruiters,
+    deleteAccount,
+    getJobSeekers,
+    getRecruiters,
     getSecurityQuestion,
     getUserData,
-    updateUserData
+    updateUserData,
+    whoami
 } from '../controllers/user-controller';
-import { recruiterAuth, simpleUserAuth } from '../middleware/check-auth';
 
 const express = require('express');
 const { check, body } = require('express-validator');
@@ -18,7 +20,8 @@ router.post('/login', [
 
 router.post('/signup', [
     body('*').trim().escape(),
-    check('name').not().isEmpty(),
+    check('first_name').not().isEmpty(),
+    check('last_name').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 }),
     check('securityQuestion').not().isEmpty().escape(),
@@ -30,6 +33,8 @@ router.post('/signup', [
 ], signup);
 
 // router.use(simpleUserAuth);
+
+router.get('/whoami/:userId', [], whoami);
 
 router.get('/get-recruiters', [], getRecruiters);
 
