@@ -1,7 +1,4 @@
 import axios from 'axios';
-import { CONSTANTS } from './constants';
-
-const { CURRENCY } = CONSTANTS;
 
 export const fetch = async () => {
     return await new Promise((resolve, reject) => {
@@ -13,7 +10,6 @@ export const fetch = async () => {
                     'Accept-Encoding': 'deflate, gzip',
                 },
                 params: {
-                    convert: CURRENCY,
                     limit: 5000,
                 }
             });
