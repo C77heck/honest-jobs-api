@@ -106,7 +106,6 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 };
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
-    console.log('got in there');
     handleError(req, next);
     const { email, password } = req.body;
 

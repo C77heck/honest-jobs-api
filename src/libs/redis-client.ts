@@ -1,7 +1,7 @@
 import Redis from "ioredis";
-import { numArray, json } from "./helpers";
 
 import { CONSTANTS } from './constants';
+import { json, numArray } from "./helpers";
 
 const { REDIS } = CONSTANTS;
 
@@ -11,7 +11,7 @@ const redis = new Redis({
     password: '',
 });
 
-const get = async (key: string): any => {
+const get = async (key: string): Promise<any> => {
     try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         const val = await redis.get(key);

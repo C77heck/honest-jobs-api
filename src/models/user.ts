@@ -22,6 +22,7 @@ export interface UserDocument extends Document {
     logo?: string,
     meta?: string,
     images?: string[];
+    resume?: string;
 }
 
 const userSchema = new Schema({
@@ -40,6 +41,7 @@ const userSchema = new Schema({
     logo: { type: String },
     meta: { type: String },
     images: [{ type: String }],
+    resume: { type: String },
 });
 
 userSchema.set('timestamps', true);

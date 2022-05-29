@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, check } from 'express-validator';
-import mongoose from 'mongoose';
 import {
     createNewReview,
     deleteReview, getByEmployer,
