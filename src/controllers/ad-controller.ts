@@ -1,5 +1,5 @@
 import Ad, { AdDocument } from '@models/ad';
-import { HttpError } from '@models/libs/http-error';
+import { HttpError } from '@models/libs/error-models/errors';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 

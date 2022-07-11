@@ -1,5 +1,5 @@
 import Ad, { AdDocument } from '@models/ad';
-import { HttpError } from '@models/libs/http-error';
+import { HttpError } from '@models/libs/error-models/errors';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 
@@ -9,6 +9,7 @@ export const createNewAd = async (req: any, res: any, next: NextFunction) => {
     try {
         await createdAd.save();
     } catch (err) {
+        console.log(err);
         return next(new HttpError(
             'Could not create Ad, please try again.',
             500

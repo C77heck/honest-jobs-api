@@ -1,9 +1,15 @@
-import { HttpError } from '@models/libs/http-error';
+import {
+    BadRequest,
+    Forbidden,
+    HttpError,
+    InternalServerError
+} from '@models/libs/error-models/errors';
 import User, { UserDocument } from '@models/user';
 
 import bcrypt from 'bcryptjs';
 import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
 import { SafeUserData } from './libs/safe.user.data';
@@ -14,10 +20,7 @@ export const getJobSeekers = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json({ recruiters });
     } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(e);
     }
 };
 
@@ -35,194 +38,144 @@ export const getRecruiters = async (req: any, res: any, next: NextFunction) => {
 };
 
 export const login = async (req: any, res: any, next: NextFunction) => {
-    handleError(req, next);
-    const { email, password } = req.body;
-
-    let existingUser: UserDocument | null;
-
     try {
-        existingUser = await User.findOne({ email: email });
-    } catch (err) {
-        return next(new HttpError(
-            `Login failed, please try again later.`,
-            500
-        ));
-    }
+        handleError(req, next);
 
-    if (!existingUser) {
-        return next(new HttpError(
-            'Invalid credentials, please try again.',
-            401
-        ));
-    }
-    let isValidPassword = false;
+        const { email, password } = req.body;
 
-    try {
-        isValidPassword = await bcrypt.compare(password, existingUser.password);
-    } catch (err) {
-        User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+        const existingUser = await User.findOne({ email: email });
 
-        return next(new HttpError(
-            'Could not log you in, please check your credentials and try again',
-            401
-        ));
-    }
+        if (!existingUser) {
+            throw new Forbidden('Invalid credentials, please try again.');
+        }
 
-    try {
+        let isValidPassword = false;
+        try {
+            isValidPassword = await bcrypt.compare(password, existingUser.password);
+        } catch (err) {
+            User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+
+            throw new Forbidden('Could not log you in, please check your credentials and try again');
+        }
+
         if (!isValidPassword) {
             User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
 
-            return next(new HttpError(
-                'Could not log you in, please check your credentials and try again',
-                401
-            ));
-        } else {
-            await User.loginAttempts(existingUser._id, 0);
+            throw new Forbidden('Could not log you in, please check your credentials and try again');
         }
+
+        await User.loginAttempts(existingUser._id, 0);
+
+        let token;
+        try {
+            token = jwt.sign({ userId: existingUser._id, email: existingUser.email },
+                process.env?.JWT_KEY || '',
+                { expiresIn: '24h' }
+            );
+        } catch (err) {
+            throw new InternalServerError('Login failed, please try again');
+        }
+
+        await res.json({
+            userData: {
+                meta: new SafeUserData(existingUser),
+                userId: existingUser.id,
+                token: token,
+            }
+        });
     } catch (e) {
-        console.log('FAILED', e);
+        return next(e);
     }
-
-    let token;
-    try {
-        token = jwt.sign({ userId: existingUser._id, email: existingUser.email },
-            process.env?.JWT_KEY || '',
-            { expiresIn: '24h' }
-        );
-    } catch (err) {
-        return next(new HttpError(
-            'Login failed, please try again',
-            500
-        ));
-    }
-
-    await res.json({
-        userData: {
-            meta: new SafeUserData(existingUser),
-            userId: existingUser.id,
-            token: token,
-        }
-    });
 };
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
-    handleError(req, next);
-    const { email, password } = req.body;
+    const session = await startSession();
+    session.startTransaction();
 
-    let existingUser;
     try {
-        existingUser = await User.findOne({ email: email });
-    } catch (err) {
-        existingUser = null;
-    }
+        handleError(req);
+        const { email, password } = req.body;
 
-    if (existingUser) {
-        return next(new HttpError(
-            'The email you entered, is already in use',
-            400
-        ));
-    }
+        const existingUser = await User.findOne({ email: email });
 
-    let hashedPassword;
-    try {
-        hashedPassword = await bcrypt.hash(password, 12);
-    } catch (err) {
-
-        return next(new HttpError(
-            'Could not create user, please try again.',
-            500
-        ));
-    }
-    let createdUser: any;
-    try {
-        createdUser = new User({
-            ...req.body as UserDocument,
-            password: hashedPassword
-        });
-        await createdUser.save();
-    } catch (err) {
-        return next(new HttpError(
-            'Could not create user, please try again.',
-            500
-        ));
-    }
-
-    let token;
-    try {
-        token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
-            process.env?.JWT_KEY || '',
-            { expiresIn: '24h' }
-        );
-    } catch (err) {
-        return next(new HttpError(
-            'Login failed, please try again',
-            500
-        ));
-    }
-
-    res.status(201).json({
-        userData: {
-            meta: new SafeUserData(createdUser),
-            userId: createdUser.id,
-            token: token
+        if (existingUser) {
+            throw new BadRequest('The email you entered, is already in use', { session });
         }
-    });
+
+        let hashedPassword: string;
+
+        try {
+            hashedPassword = await bcrypt.hash(password, 12);
+        } catch (err) {
+            throw new InternalServerError('Could not create user, please try again.', { session });
+        }
+
+        let createdUser: any;
+        try {
+            createdUser = new User({
+                ...req.body as UserDocument,
+                password: hashedPassword
+            });
+
+            await createdUser.save();
+        } catch (err) {
+            throw new InternalServerError('Could not create user, please try again.', { session });
+        }
+
+        await session.commitTransaction();
+        await session.endSession();
+
+        await login(req, res, next);
+    } catch (e) {
+        await e.payload.session.abortTransaction();
+        await e.payload.session.endSession();
+        return next(e);
+    }
 };
 
 export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
-    let securityQuestion;
-
     try {
-        securityQuestion = await User.getUserSecurityQuestion(req.params.userId);
-    } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
+        const securityQuestion = await User.getUserSecurityQuestion(req.params.userId);
 
-    res.status(200).json({ securityQuestion });
+        if (!securityQuestion) {
+            throw new InternalServerError(ERROR_MESSAGES.GENERIC);
+        }
+
+        res.status(200).json({ securityQuestion });
+    } catch (e) {
+        return next(e);
+    }
 };
 
 export const updateUserData = async (req: any, res: any, next: NextFunction) => {
-    handleError(req, next);
-
     try {
-        await User.updateUser(req.body, req.params.userId);
-    } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
+        handleError(req, next);
 
-    res.status(201).json({ message: 'User data has been successfully updated.' });
+        await User.updateUser(req.body, req.params.userId);
+
+        res.status(201).json({ message: 'User data has been successfully updated.' });
+    } catch (e) {
+        return next(e);
+    }
 };
 
 export const getUserData = async (req: any, res: any, next: NextFunction) => {
-    handleError(req, next);
-    let userData: UserDocument;
-
     try {
-        userData = await User.getUser(req.params.userId);
-    } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
+        handleError(req, next);
 
-    res.status(201).json({ meta: new SafeUserData(userData) });
+        const userData = await User.getUser(req.params.userId);
+
+        res.status(201).json({ meta: new SafeUserData(userData) });
+    } catch (e) {
+        return next(e);
+    }
 };
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     try {
         await User.deleteUser(req.params.userId);
     } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(e);
     }
 
     res.status(200).json({ message: 'Account has been successfully deleted.' });
@@ -234,9 +187,6 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json({ meta: new SafeUserData(userData) });
     } catch (e) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(e);
     }
 };

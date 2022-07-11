@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, check } from 'express-validator';
-import { createNewAd, deleteAd, getAllAds, getById, updateAd } from '../controllers/ad-controller';
+import { getAllAds, getById } from '../controllers/ad-controller';
+import { createNewAd, deleteAd, updateAd } from '../controllers/recruiter.controller';
 
 const router = express.Router();
 

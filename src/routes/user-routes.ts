@@ -27,10 +27,8 @@ router.post('/signup', [
     check('securityQuestion').not().isEmpty().escape(),
     check('securityAnswer').isLength({ min: 4 }),
     check('isRecruiter').isBoolean(),
-    check('description').escape(),
-    check('meta').escape(),
-    check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
-    check('resume').escape(),
+    // check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
+    // check('resume').escape(), // TODO -> we will need the cdn return here
 ], signup);
 
 // router.use(simpleUserAuth);

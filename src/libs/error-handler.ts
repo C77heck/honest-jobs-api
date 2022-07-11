@@ -1,13 +1,10 @@
+import { UnprocessableEntity } from '@models/libs/error-models/errors';
 import { validationResult } from "express-validator";
-import { HttpError } from "@models/libs/http-error";
 
-export const handleError = (req: Request, next: (error?: HttpError) => void): any => {
+export const handleError = (req: Request, next?: Function): void => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
-        return next(new HttpError(
-            `Invalid inputs passed, please check your data`,
-            422
-        ));
+        throw new UnprocessableEntity(`Invalid inputs passed, please check your data`);
     }
 };
