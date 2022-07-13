@@ -10,7 +10,7 @@ export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) =
 
         const postedJobs = await user.getPostedJobs();
 
-        res.status(200).json({ postedJobs });
+        res.status(200).json({ items: postedJobs });
     } catch (err) {
         return next(new HttpError(
             ERROR_MESSAGES.GENERIC,

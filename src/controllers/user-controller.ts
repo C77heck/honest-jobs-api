@@ -12,6 +12,7 @@ import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
+import { extractUser } from './libs/helpers';
 import { SafeUserData } from './libs/safe.user.data';
 
 export const getJobSeekers = async (req: any, res: any, next: NextFunction) => {
@@ -43,32 +44,32 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
         const { email, password } = req.body;
 
-        const existingUser = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email });
 
-        if (!existingUser) {
+        if (!user) {
             throw new Forbidden('Invalid credentials, please try again.');
         }
 
         let isValidPassword = false;
         try {
-            isValidPassword = await bcrypt.compare(password, existingUser.password);
+            isValidPassword = await bcrypt.compare(password, user.password);
         } catch (err) {
-            User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+            user.loginAttempts(user.status.loginAttempts + 1);
 
             throw new Forbidden('Could not log you in, please check your credentials and try again');
         }
 
         if (!isValidPassword) {
-            User.loginAttempts(existingUser._id, existingUser.status.loginAttempts + 1);
+            user.loginAttempts(user.status.loginAttempts + 1);
 
             throw new Forbidden('Could not log you in, please check your credentials and try again');
         }
 
-        await User.loginAttempts(existingUser._id, 0);
+        await user.loginAttempts(0);
 
         let token;
         try {
-            token = jwt.sign({ userId: existingUser._id, email: existingUser.email },
+            token = jwt.sign({ userId: user._id, email: user.email },
                 process.env?.JWT_KEY || '',
                 { expiresIn: '24h' }
             );
@@ -78,8 +79,8 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
         await res.json({
             userData: {
-                meta: new SafeUserData(existingUser),
-                userId: existingUser.id,
+                meta: new SafeUserData(user),
+                userId: user.id,
                 token: token,
             }
         });
@@ -135,7 +136,8 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
 
 export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
     try {
-        const securityQuestion = await User.getUserSecurityQuestion(req.params.userId);
+        const user = await extractUser(req);
+        const securityQuestion = await user.getUserSecurityQuestion();
 
         if (!securityQuestion) {
             throw new InternalServerError(ERROR_MESSAGES.GENERIC);

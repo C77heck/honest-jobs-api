@@ -56,6 +56,10 @@ const userSchema = new Schema({
     resume: { type: String },
 });
 
+userSchema.set('timestamps', true);
+
+userSchema.plugin(uniqueValidator);
+
 userSchema.methods.addPostedJobs = function (job: string) {
     this.postedJobs = [...this.postedJobs, job];
 
@@ -88,7 +92,7 @@ userSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]> {
     return Ad.find({ $in: this.appliedForJobs });
 };
 
-userSchema.methods.loginAttempts = async function (loginAttempts:): Promise<void> {
+userSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<void> {
     this.status.loginAttempts = loginAttempts;
 
     return this.save({ validateModifiedOnly: true });
@@ -97,10 +101,6 @@ userSchema.methods.loginAttempts = async function (loginAttempts:): Promise<void
 userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> {
     return this.securityQuestion;
 };
-
-userSchema.set('timestamps', true);
-
-userSchema.plugin(uniqueValidator);
 
 interface UserModel extends Mongoose.Model<any> {
     getRecruiters(this: Mongoose.Model<any>): Promise<UserDocument[]>;
