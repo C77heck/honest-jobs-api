@@ -53,9 +53,17 @@ userSchema.set('timestamps', true);
 userSchema.plugin(uniqueValidator);
 
 interface UserModel extends Mongoose.Model<any> {
-    getPostedJobs(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+    addPostedJobs(this: Mongoose.Model<any>, user: string, postedJob: string): Promise<any>;
 
-    getAppliedJobs(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+    removePostedJobs(this: Mongoose.Model<any>, user: string, postedJob: string): Promise<any>;
+
+    addAppliedJobs(this: Mongoose.Model<any>, user: string, appliedJob: string): Promise<any>;
+
+    removeAppliedJobs(this: Mongoose.Model<any>, user: string, appliedJob: string): Promise<any>;
+
+    getPostedJobs(this: Mongoose.Model<any>, user: string): Promise<any>;
+
+    getAppliedJobs(this: Mongoose.Model<any>, user: string): Promise<any>;
 
     getRecruiters(this: Mongoose.Model<any>): Promise<UserDocument[]>;
 
@@ -72,12 +80,48 @@ interface UserModel extends Mongoose.Model<any> {
     getUser(this: Mongoose.Model<any>, userId: string): Promise<UserDocument>;
 }
 
-userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument> {
+userSchema.static('addPostedJobs', async function (this: Mongoose.Model<any>, userId: string, postedJob: string): Promise<any> {
+    const user = await this.findOne({ _id: userId });
+
+    user.postedJobs = [...user.postedJobs, postedJob];
+
+    return user.save();
+});
+
+userSchema.static('removePostedJobs', async function (this: Mongoose.Model<any>, userId: string, postedJob: string): Promise<any> {
+    const user = await this.findOne({ _id: userId });
+
+    user.postedJobs = user.postedJobs.filter((job: string) => job !== postedJob);
+
+    return user.save();
+});
+
+userSchema.static('addAppliedJobs', async function (this: Mongoose.Model<any>, userId: string, appliedJob: string): Promise<any> {
+    const user = await this.findOne({ _id: userId });
+
+    user.postedJobs = [...user.appliedForJobs, appliedJob];
+
+    return user.save();
+});
+
+userSchema.static('removeAppliedJobs', async function (this: Mongoose.Model<any>, userId: string, appliedJob: string): Promise<any> {
+    const user = await this.findOne({ _id: userId });
+
+    user.postedJobs = user.appliedForJobs.filter((job: string) => job !== appliedJob);
+
+    return user.save();
+});
+
+userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
     return this.findOne({ _id: userId }).populate('postedJobs');
 });
 
-userSchema.static('getAppliedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument[]> {
+userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
     return this.findOne({ _id: userId }).populate('postedJobs');
+});
+
+userSchema.static('getAppliedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
+    return this.findOne({ _id: userId }).populate('appliedjobs');
 });
 
 userSchema.static('getRecruiters', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
