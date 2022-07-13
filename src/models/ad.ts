@@ -37,8 +37,6 @@ interface AdModel extends Mongoose.Model<any> {
 
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
 
-    deleteAd(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
-
     getById(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
 }
 
@@ -52,10 +50,6 @@ adSchema.static('getAdsByEmployer', async function (this: Mongoose.Model<any>, u
 
 adSchema.static('updateAd', async function (this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument> {
     return await this.updateOne({ _id: adId }, adData);
-});
-
-adSchema.static('deleteAd', async function (this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument> {
-    return await this.deleteOne({ _id: adId });
 });
 
 adSchema.static('getById', async function (this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument> {

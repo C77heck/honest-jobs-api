@@ -1,13 +1,12 @@
-import User from '@models/user';
+import User, { UserDocument } from '@models/user';
 import jwt from 'jsonwebtoken';
-import { SafeUserData } from './safe.user.data';
 
-export const getToken = (headers: any): string => {
-    if (headers?.authorization) {
+export const getToken = (req: any): string => {
+    if (!req?.headers?.authorization) {
         return '';
     }
 
-    return headers?.authorization.split(' ')?.[1] || '';
+    return (req?.headers?.authorization || '').split(' ')?.[1] || '';
 };
 
 export const getUserId = async (req: any): Promise<string> => {
@@ -16,9 +15,8 @@ export const getUserId = async (req: any): Promise<string> => {
     return decodedToken.userId;
 };
 
-export const extractUser = async (req: any): Promise<SafeUserData> => {
-    const token = getToken(req.headers);
-    const user = await User.findById(getUserId(token));
+export const extractUser = async (req: any): Promise<UserDocument> => {
+    const userId = await getUserId(req);
 
-    return new SafeUserData(user);
+    return User.findById(userId);
 };

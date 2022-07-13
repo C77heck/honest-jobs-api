@@ -1,4 +1,4 @@
-import { loginAttempts } from '@models/libs/helpers';
+import Ad, { AdDocument } from '@models/ad';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
@@ -25,6 +25,14 @@ export interface UserDocument extends Document {
     meta?: string,
     images?: string[];
     resume?: string;
+    addPostedJobs: (job: string) => Promise<void>;
+    removePostedJob: (job: string) => Promise<void>;
+    getPostedJobs: () => Promise<AdDocument[]>;
+    addAppliedJobs: (job: string) => Promise<void>;
+    removeAppliedJob: (job: string) => Promise<void>;
+    getAppliedJobs: () => Promise<AdDocument[]>;
+    loginAttempts: () => Promise<void>;
+    getUserSecurityQuestion: () => Promise<string>;
 }
 
 const userSchema = new Schema({
@@ -48,30 +56,56 @@ const userSchema = new Schema({
     resume: { type: String },
 });
 
+userSchema.methods.addPostedJobs = function (job: string) {
+    this.postedJobs = [...this.postedJobs, job];
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.removePostedJob = function (job: string) {
+    this.postedJobs = this.postedJobs.filter((postedJob: any) => postedJob.toString() !== job);
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.getPostedJobs = async function (): Promise<AdDocument[]> {
+    return Ad.find({ $in: this.postedJobs });
+};
+
+userSchema.methods.addAppliedJobs = function (job: string) {
+    this.appliedForJobs = [...this.appliedForJobs, job];
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.removeAppliedJob = function (job: string) {
+    this.appliedForJobs = this.appliedForJobs.filter((appliedJob: any) => appliedJob.toString() !== job);
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]> {
+    return Ad.find({ $in: this.appliedForJobs });
+};
+
+userSchema.methods.loginAttempts = async function (loginAttempts:): Promise<void> {
+    this.status.loginAttempts = loginAttempts;
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> {
+    return this.securityQuestion;
+};
+
 userSchema.set('timestamps', true);
 
 userSchema.plugin(uniqueValidator);
 
 interface UserModel extends Mongoose.Model<any> {
-    addPostedJobs(this: Mongoose.Model<any>, user: string, postedJob: string): Promise<any>;
-
-    removePostedJobs(this: Mongoose.Model<any>, user: string, postedJob: string): Promise<any>;
-
-    addAppliedJobs(this: Mongoose.Model<any>, user: string, appliedJob: string): Promise<any>;
-
-    removeAppliedJobs(this: Mongoose.Model<any>, user: string, appliedJob: string): Promise<any>;
-
-    getPostedJobs(this: Mongoose.Model<any>, user: string): Promise<any>;
-
-    getAppliedJobs(this: Mongoose.Model<any>, user: string): Promise<any>;
-
     getRecruiters(this: Mongoose.Model<any>): Promise<UserDocument[]>;
 
     getJobSeekers(this: Mongoose.Model<any>): Promise<UserDocument[]>;
-
-    loginAttempts(this: Mongoose.Model<any>, id: string, num: number): Promise<number>;
-
-    getUserSecurityQuestion(this: Mongoose.Model<any>, userId: string): Promise<string>;
 
     deleteUser(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
 
@@ -80,66 +114,12 @@ interface UserModel extends Mongoose.Model<any> {
     getUser(this: Mongoose.Model<any>, userId: string): Promise<UserDocument>;
 }
 
-userSchema.static('addPostedJobs', async function (this: Mongoose.Model<any>, userId: string, postedJob: string): Promise<any> {
-    const user = await this.findOne({ _id: userId });
-
-    user.postedJobs = [...user.postedJobs, postedJob];
-
-    return user.save();
-});
-
-userSchema.static('removePostedJobs', async function (this: Mongoose.Model<any>, userId: string, postedJob: string): Promise<any> {
-    const user = await this.findOne({ _id: userId });
-
-    user.postedJobs = user.postedJobs.filter((job: string) => job !== postedJob);
-
-    return user.save();
-});
-
-userSchema.static('addAppliedJobs', async function (this: Mongoose.Model<any>, userId: string, appliedJob: string): Promise<any> {
-    const user = await this.findOne({ _id: userId });
-
-    user.postedJobs = [...user.appliedForJobs, appliedJob];
-
-    return user.save();
-});
-
-userSchema.static('removeAppliedJobs', async function (this: Mongoose.Model<any>, userId: string, appliedJob: string): Promise<any> {
-    const user = await this.findOne({ _id: userId });
-
-    user.postedJobs = user.appliedForJobs.filter((job: string) => job !== appliedJob);
-
-    return user.save();
-});
-
-userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
-    return this.findOne({ _id: userId }).populate('postedJobs');
-});
-
-userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
-    return this.findOne({ _id: userId }).populate('postedJobs');
-});
-
-userSchema.static('getAppliedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<any> {
-    return this.findOne({ _id: userId }).populate('appliedjobs');
-});
-
 userSchema.static('getRecruiters', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
     return this.find({ isRecruiter: true });
 });
 
 userSchema.static('getJobSeekers', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
     return this.find({ isRecruiter: false });
-});
-
-userSchema.static('loginAttempts', async function (this: Mongoose.Model<any>, id: string, num: number): Promise<number> {
-    return this.updateOne({ _id: id }, { status: { loginAttempts: num } });
-});
-
-userSchema.static('getUserSecurityQuestion', async function (this: Mongoose.Model<any>, userId: string): Promise<string> {
-    const response = await this.findOne({ _id: userId });
-
-    return response?.securityQuestion;
 });
 
 userSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {

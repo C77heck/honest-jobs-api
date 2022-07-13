@@ -2,16 +2,16 @@ import Ad, { AdDocument } from '@models/ad';
 import { HttpError } from '@models/libs/error-models/errors';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
-import { getUserId } from './libs/helpers';
+import { extractUser } from './libs/helpers';
 
 export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
     try {
-        const userId = await getUserId(req);
-        const reviews = await Ad.getAdsByEmployer(userId);
+        const user = await extractUser(req);
 
-        res.status(200).json({ reviews });
+        const postedJobs = await user.getPostedJobs();
+
+        res.status(200).json({ postedJobs });
     } catch (err) {
-        console.log(err);
         return next(new HttpError(
             ERROR_MESSAGES.GENERIC,
             500
@@ -20,10 +20,16 @@ export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) =
 };
 
 export const createNewAd = async (req: any, res: any, next: NextFunction) => {
-    const createdAd: any = new Ad(req.body as AdDocument);
-
     try {
+        const createdAd: any = new Ad(req.body as AdDocument);
+
         await createdAd.save();
+
+        const user = await extractUser(req);
+
+        await user.addPostedJobs(createdAd?._id);
+
+        res.status(201).json({ message: 'New ad has been successfully added' });
     } catch (err) {
         console.log(err);
         return next(new HttpError(
@@ -32,27 +38,32 @@ export const createNewAd = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ message: 'New ad has been successfully added' });
 };
 
 export const updateAd = async (req: any, res: any, next: NextFunction) => {
-    let updatedAd: AdDocument;
-
     try {
-        updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
+        const updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
+
+        res.status(200).json({ updatedAd, message: 'Successfully updated.' });
     } catch (err) {
         return next(new HttpError(
             ERROR_MESSAGES.GENERIC,
             500
         ));
     }
-
-    res.status(200).json({ updatedAd, message: 'Successfully updated.' });
 };
 
 export const deleteAd = async (req: any, res: any, next: NextFunction) => {
     try {
-        await Ad.deleteAd(req.params.adId);
+        const ad = await Ad.findById(req.params.adId);
+
+        const user = await extractUser(req);
+
+        await user.removePostedJob(ad?._id);
+
+        await ad.remove();
+
+        res.status(201).json({ message: 'Ad has been successfully deleted' });
     } catch (err) {
         return next(new HttpError(
             'Could not create Ad, please try again.',
@@ -60,5 +71,4 @@ export const deleteAd = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(201).json({ message: 'New ad has been successfully added' });
 };
