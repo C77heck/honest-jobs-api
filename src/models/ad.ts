@@ -47,7 +47,7 @@ adSchema.static('updateAd', async function (this: Mongoose.Model<any>, adId: str
 });
 
 adSchema.static('getById', async function (this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument> {
-    return await this.findOne({ _id: adId });
+    return await this.findById(adId);
 });
 
 export default mongoose.model<AdDocument, AdModel>('Ad', adSchema);
