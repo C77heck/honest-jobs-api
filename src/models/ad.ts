@@ -33,6 +33,8 @@ adSchema.plugin(uniqueValidator);
 interface AdModel extends Mongoose.Model<any> {
     getAllAds(this: Mongoose.Model<any>): Promise<AdDocument[]>;
 
+    getAdsByEmployer(this: Mongoose.Model<any>, userId: string): Promise<AdDocument[]>;
+
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
 
     deleteAd(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
@@ -41,6 +43,10 @@ interface AdModel extends Mongoose.Model<any> {
 }
 
 adSchema.static('getAllAds', async function (this: Mongoose.Model<any>): Promise<AdDocument[]> {
+    return await this.find({});
+});
+
+adSchema.static('getAdsByEmployer', async function (this: Mongoose.Model<any>, userId: string): Promise<AdDocument[]> {
     return await this.find({});
 });
 

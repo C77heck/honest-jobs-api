@@ -2,6 +2,7 @@ import { HttpError } from '@models/libs/error-models/errors';
 import Review, { ReviewDocument } from '@models/review';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
+import { getUserId } from './libs/helpers';
 
 export const getById = async (req: any, res: any, next: NextFunction) => {
     let review: ReviewDocument;
@@ -18,12 +19,12 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
 
     res.status(200).json({ review });
 };
-
 export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
-    let reviews: ReviewDocument[];
-
     try {
-        reviews = await Review.getReviewsForEmployer(req.params.employerId);
+        const userId = await getUserId(req);
+        const reviews = await Review.getReviewsForEmployer(userId);
+
+        res.status(200).json({ reviews });
     } catch (err) {
         console.log(err);
         return next(new HttpError(
@@ -31,10 +32,7 @@ export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
             500
         ));
     }
-
-    res.status(200).json({ reviews });
 };
-
 export const createNewReview = async (req: any, res: any, next: NextFunction) => {
     const createdReview: any = new Review(req.body as ReviewDocument);
 

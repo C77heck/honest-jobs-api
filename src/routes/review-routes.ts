@@ -2,7 +2,8 @@ import express from 'express';
 import { body, check } from 'express-validator';
 import {
     createNewReview,
-    deleteReview, getByEmployer,
+    deleteReview,
+    getByEmployer,
     getById,
     updateReview
 } from '../controllers/review-controller';
@@ -11,7 +12,7 @@ const router = express.Router();
 
 router.get('/get-by-id/:reviewId', [], getById);
 
-router.get('/get-by-employer/:employerId', [], getByEmployer);
+router.get('/get-by-employer', [], getByEmployer);
 // TODO -> auth for the employer
 router.post('/create-new-review/:employerId', [
     body('*').trim().escape(),

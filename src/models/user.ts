@@ -13,6 +13,8 @@ export interface UserDocument extends Document {
     securityQuestion: string;
     securityAnswer: string;
     isRecruiter: boolean;
+    postedJobs?: string[];
+    appliedForJobs?: string[];
     status: {
         loginAttempts: number;
         isBlocked: boolean;
@@ -37,6 +39,8 @@ const userSchema = new Schema({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true },
+    postedJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
+    appliedForJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
     description: { type: String },
     logo: { type: String },
     meta: { type: String },
@@ -49,6 +53,10 @@ userSchema.set('timestamps', true);
 userSchema.plugin(uniqueValidator);
 
 interface UserModel extends Mongoose.Model<any> {
+    getPostedJobs(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+
+    getAppliedJobs(this: Mongoose.Model<any>): Promise<UserDocument[]>;
+
     getRecruiters(this: Mongoose.Model<any>): Promise<UserDocument[]>;
 
     getJobSeekers(this: Mongoose.Model<any>): Promise<UserDocument[]>;
@@ -64,20 +72,30 @@ interface UserModel extends Mongoose.Model<any> {
     getUser(this: Mongoose.Model<any>, userId: string): Promise<UserDocument>;
 }
 
+userSchema.static('getPostedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument> {
+    return this.findOne({ _id: userId }).populate('postedJobs');
+});
+
+userSchema.static('getAppliedJobs', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument[]> {
+    return this.findOne({ _id: userId }).populate('postedJobs');
+});
+
 userSchema.static('getRecruiters', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
-    return await this.find({ isRecruiter: true });
+    return this.find({ isRecruiter: true });
 });
 
 userSchema.static('getJobSeekers', async function (this: Mongoose.Model<any>): Promise<UserDocument[]> {
-    return await this.find({ isRecruiter: false });
+    return this.find({ isRecruiter: false });
 });
 
 userSchema.static('loginAttempts', async function (this: Mongoose.Model<any>, id: string, num: number): Promise<number> {
-    return await this.updateOne({ _id: id }, { status: { loginAttempts: num } });
+    return this.updateOne({ _id: id }, { status: { loginAttempts: num } });
 });
 
 userSchema.static('getUserSecurityQuestion', async function (this: Mongoose.Model<any>, userId: string): Promise<string> {
-    return (await this.findOne({ _id: userId }))?.securityQuestion;
+    const response = await this.findOne({ _id: userId });
+
+    return response?.securityQuestion;
 });
 
 userSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
@@ -87,11 +105,11 @@ userSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userI
 });
 
 userSchema.static('updateUser', async function (this: Mongoose.Model<any>, userData: UserDocument, userId: string): Promise<any> {
-    return await this.updateOne({ _id: userId }, { ...userData });
+    return this.updateOne({ _id: userId }, { ...userData });
 });
 
 userSchema.static('getUser', async function (this: Mongoose.Model<any>, userId: string): Promise<UserDocument> {
-    return await this.findOne({ _id: userId });
+    return this.findOne({ _id: userId });
 });
 
 export default mongoose.model<UserDocument, UserModel>('User', userSchema);

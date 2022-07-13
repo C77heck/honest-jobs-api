@@ -2,6 +2,22 @@ import Ad, { AdDocument } from '@models/ad';
 import { HttpError } from '@models/libs/error-models/errors';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
+import { getUserId } from './libs/helpers';
+
+export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const userId = await getUserId(req);
+        const reviews = await Ad.getAdsByEmployer(userId);
+
+        res.status(200).json({ reviews });
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
+};
 
 export const createNewAd = async (req: any, res: any, next: NextFunction) => {
     const createdAd: any = new Ad(req.body as AdDocument);
