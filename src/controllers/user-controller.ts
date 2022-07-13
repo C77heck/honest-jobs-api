@@ -153,7 +153,9 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     try {
         handleError(req, next);
 
-        await User.updateUser(req.body, req.params.userId);
+        const user = await extractUser(req);
+
+        user.update(req.body);
 
         res.status(201).json({ message: 'User data has been successfully updated.' });
     } catch (e) {
@@ -175,17 +177,18 @@ export const getUserData = async (req: any, res: any, next: NextFunction) => {
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     try {
-        await User.deleteUser(req.params.userId);
+        const user = await extractUser(req);
+        await user.remove();
+
+        res.status(200).json({ message: 'Account has been successfully deleted.' });
     } catch (e) {
         return next(e);
     }
-
-    res.status(200).json({ message: 'Account has been successfully deleted.' });
 };
 
 export const whoami = async (req: any, res: any, next: NextFunction) => {
     try {
-        const userData = await User.findById(req.params.userId);
+        const userData = await extractUser(req);
 
         res.status(200).json({ meta: new SafeUserData(userData) });
     } catch (e) {

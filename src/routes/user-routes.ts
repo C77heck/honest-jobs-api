@@ -33,15 +33,15 @@ router.post('/signup', [
 
 // router.use(simpleUserAuth);
 
-router.get('/whoami/:userId', [], whoami);
+router.get('/whoami', [], whoami);
 
 router.get('/get-recruiters', [], getRecruiters);
 
 router.get('/get-user-data/:userId', [], getUserData);
 
-router.get('/get-security-question/:userId', [], getSecurityQuestion);
+router.get('/get-security-question', [], getSecurityQuestion);
 
-router.put('/update/:userId', [
+router.put('/update', [
     body('*').trim().escape(),
     check('first_name').not().isEmpty(),
     check('last_name').not().isEmpty(),
@@ -51,7 +51,7 @@ router.put('/update/:userId', [
     check('resume').escape(),
 ], updateUserData);
 
-router.delete('/delete-account/:userId', [
+router.delete('/delete-account', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
 
