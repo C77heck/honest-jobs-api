@@ -11,7 +11,9 @@ export interface AdDocument extends Document {
     location: string;
     expiresOn: Date;
     isPremium: boolean;
-    meta?: string[],
+    meta?: string,
+    company?: string;
+    logo?: string;
     images?: string[];
 }
 
@@ -22,7 +24,8 @@ const adSchema = new Schema({
     location: { type: String, required: true },
     expiresOn: { type: String, required: true },
     isPremium: { type: String, required: true },
-    meta: [{ type: String }],
+    logo: String,
+    meta: String,
     images: [{ type: String }],
 });
 

@@ -18,7 +18,6 @@ router.get('/get-ads-by-employer', [], getAdsByEmployer);
 router.get('/get-by-id/:adId', [], getById);
 // TODO -> auth for the employer
 router.post('/create-new-ad', [
-    body('*').trim().escape(),
     check('title').not().isEmpty().escape(),
     check('description').not().isEmpty().escape(),
     check('meta').escape(),

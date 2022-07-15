@@ -2,7 +2,8 @@ import {
     BadRequest,
     Forbidden,
     HttpError,
-    InternalServerError
+    InternalServerError,
+    Unauthorized
 } from '@models/libs/error-models/errors';
 import User, { UserDocument } from '@models/user';
 
@@ -192,6 +193,10 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json({ meta: new SafeUserData(userData) });
     } catch (e) {
+        if (e.message === 'jwt expired') {
+            return next(new Unauthorized('JWTExpired'));
+        }
+
         return next(e);
     }
 };

@@ -11,6 +11,7 @@ import {
 const express = require('express');
 const { check, body } = require('express-validator');
 const { login, signup } = require('../controllers/user-controller');
+
 const router = express.Router();
 
 router.post('/login', [
