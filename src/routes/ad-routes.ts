@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, check } from 'express-validator';
+import { check } from 'express-validator';
 import { getAllAds, getById } from '../controllers/ad-controller';
 import {
     createNewAd,
@@ -25,11 +25,10 @@ router.post('/create-new-ad', [
     check('location').not().isEmpty().escape(),
     check('expiresOn').isString().not().isEmpty().escape(),
     check('isPremium').isBoolean(),
-    check('images').escape(),
+    check('images'),
 ], createNewAd);
 
 router.put('/update-ad/:adId', [
-    body('*').trim().escape(),
     check('title').not().isEmpty().escape(),
     check('description').not().isEmpty().escape(),
     check('meta').escape(),
@@ -37,7 +36,7 @@ router.put('/update-ad/:adId', [
     check('location').not().isEmpty().escape(),
     check('expiresOn').isString().not().isEmpty().escape(),
     check('isPremium').isBoolean(),
-    check('images').escape(),
+    check('images'),
 ], updateAd);
 
 router.delete('/delete-ad/:adId', [], deleteAd);
