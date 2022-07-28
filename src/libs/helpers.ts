@@ -3,7 +3,7 @@
  * @param obj
  * @returns
  */
-export const json = (obj: any, defaultReturn: any = ''): any => {
+export const json = <T>(obj: T, defaultReturn: any = ''): string => {
     if (typeof obj === 'string') {
         try {
             return JSON.parse(obj);
@@ -19,11 +19,11 @@ export const json = (obj: any, defaultReturn: any = ''): any => {
     }
 };
 
-export const removeDuplicates = (array: any[]): any[] => {
+export const removeDuplicates = <T>(array: T[]): T[] => {
     return Array.from(new Set(array));
 };
 
-export const objectToArray = (object: any): any => {
+export const objectToArray = <T>(object: T) => {
     const arr = [];
     for (const prop in object) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
