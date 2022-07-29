@@ -15,7 +15,6 @@ export class SafeUserData implements SafeUserData {
     public first_name;
     public last_name;
     public email;
-    public isRecruiter;
     public description;
     public logo;
     public meta;
@@ -25,7 +24,6 @@ export class SafeUserData implements SafeUserData {
         this.first_name = userData.first_name;
         this.last_name = userData.last_name;
         this.email = userData.email;
-        this.isRecruiter = userData.isRecruiter;
         this.description = userData?.description || '';
         this.logo = userData?.logo || '';
         this.meta = userData?.meta || '';
