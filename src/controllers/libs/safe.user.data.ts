@@ -1,8 +1,9 @@
 import { UserDocument } from '@models/user';
 
 export interface SafeUserData {
-    first_name: string;
-    last_name: string;
+    company_name?: string;
+    first_name?: string;
+    last_name?: string;
     email: string;
     isRecruiter: boolean;
     description: string,
@@ -12,15 +13,8 @@ export interface SafeUserData {
 }
 
 export class SafeUserData implements SafeUserData {
-    public first_name;
-    public last_name;
-    public email;
-    public description;
-    public logo;
-    public meta;
-    public images;
-
     public constructor(userData: UserDocument) {
+        this.company_name = userData?.company_name;
         this.first_name = userData.first_name;
         this.last_name = userData.last_name;
         this.email = userData.email;
@@ -28,5 +22,6 @@ export class SafeUserData implements SafeUserData {
         this.logo = userData?.logo || '';
         this.meta = userData?.meta || '';
         this.images = userData?.images || [''];
+        this.isRecruiter = userData?.isRecruiter;
     }
 }

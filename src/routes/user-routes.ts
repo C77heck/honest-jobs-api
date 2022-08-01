@@ -20,16 +20,17 @@ router.post('/login', [
 ], login);
 
 router.post('/signup', [
-    body('*').trim().escape(),
-    check('first_name').not().isEmpty(),
-    check('last_name').not().isEmpty(),
+    body('*').trim(),
+    check('company_name'),
+    check('first_name'),
+    check('last_name'),
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 }),
     check('securityQuestion').not().isEmpty().escape(),
     check('securityAnswer').isLength({ min: 4 }),
     check('isRecruiter').isBoolean(),
-    // check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
-    // check('resume').escape(), // TODO -> we will need the cdn return here
+    check('images'),
+    check('resume'),
 ], signup);
 
 // router.use(simpleUserAuth);
@@ -43,13 +44,14 @@ router.get('/get-user-data/:userId', [], getUserData);
 router.get('/get-security-question', [], getSecurityQuestion);
 
 router.put('/update', [
-    body('*').trim().escape(),
+    body('*').trim(),
+    check('company_name'),
     check('first_name').not().isEmpty(),
     check('last_name').not().isEmpty(),
     check('description').escape(),
     check('meta').escape(),
-    check('images').escape(), // TODO -> we will need a cdn microservice here to return a string url
-    check('resume').escape(),
+    check('images'),
+    check('resume'),
 ], updateUserData);
 
 router.delete('/delete-account', [

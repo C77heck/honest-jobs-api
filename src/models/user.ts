@@ -6,6 +6,7 @@ import uniqueValidator from 'mongoose-unique-validator';
 const Schema = mongoose.Schema;
 
 export interface UserDocument extends Document {
+    company_name?: string;
     first_name: string;
     last_name: string;
     email: string;
