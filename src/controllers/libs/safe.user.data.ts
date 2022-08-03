@@ -14,6 +14,7 @@ export interface SafeUserData {
 
 export class SafeUserData implements SafeUserData {
     public constructor(userData: UserDocument) {
+        console.log(userData);
         this.company_name = userData?.company_name;
         this.first_name = userData.first_name;
         this.last_name = userData.last_name;

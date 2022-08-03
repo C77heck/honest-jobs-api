@@ -1,16 +1,14 @@
 import {
     deleteAccount,
-    getJobSeekers,
-    getRecruiters,
     getSecurityQuestion,
-    getUserData,
+    login,
+    signup,
     updateUserData,
     whoami
-} from '../controllers/user-controller';
+} from '../controllers/job-seeker.controller';
 
 const express = require('express');
 const { check, body } = require('express-validator');
-const { login, signup } = require('../controllers/user-controller');
 
 const router = express.Router();
 
@@ -19,47 +17,35 @@ router.post('/login', [
     check('password').not().isEmpty()
 ], login);
 
+// perhaps split this between roles.
 router.post('/signup', [
     body('*').trim(),
-    check('company_name'),
     check('first_name'),
     check('last_name'),
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 }),
     check('securityQuestion').not().isEmpty().escape(),
     check('securityAnswer').isLength({ min: 4 }),
-    check('isRecruiter').isBoolean(),
-    check('images'),
-    check('resume'),
 ], signup);
 
 // router.use(simpleUserAuth);
-
-router.get('/whoami', [], whoami);
-
-router.get('/get-recruiters', [], getRecruiters);
-
-router.get('/get-user-data/:userId', [], getUserData);
-
-router.get('/get-security-question', [], getSecurityQuestion);
-
 router.put('/update', [
     body('*').trim(),
-    check('company_name'),
-    check('first_name').not().isEmpty(),
-    check('last_name').not().isEmpty(),
+    check('first_name').escape(),
+    check('last_name').escape(),
     check('description').escape(),
     check('meta').escape(),
     check('images'),
     check('resume'),
+    check('other_uploads'),
 ], updateUserData);
+
+router.get('/whoami', [], whoami);
+
+router.get('/get-security-question', [], getSecurityQuestion);
 
 router.delete('/delete-account', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
-
-// router.use(recruiterAuth);
-
-router.get('/get-job-seekers', [], getJobSeekers);
 
 export default router;

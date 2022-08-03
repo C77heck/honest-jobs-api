@@ -1,19 +1,19 @@
-import Ad, { AdDocument } from '@models/ad';
+import JobSeeker from '@models/job-seeker';
 import {
     BadRequest,
     Forbidden,
-    HttpError,
     InternalServerError,
     Unauthorized
 } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
+
 import bcrypt from 'bcryptjs';
 import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
-import { handleError } from '../libs/error-handler';
-import { extractRecruiter } from './libs/helpers';
+import { handleError } from "../libs/error-handler";
+import { extractJobSeeker } from './libs/helpers';
 import { SafeUserData } from './libs/safe.user.data';
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
@@ -24,7 +24,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         handleError(req);
         const { email, password } = req.body;
 
-        const existingUser = await Recruiter.findOne({ email: email });
+        const existingUser = await JobSeeker.findOne({ email: email });
 
         if (existingUser) {
             throw new BadRequest('The email you entered, is already in use', { session });
@@ -40,7 +40,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
 
         let createdUser: any;
         try {
-            createdUser = new Recruiter({
+            createdUser = new JobSeeker({
                 ...req.body,
                 password: hashedPassword
             });
@@ -65,7 +65,7 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     try {
         handleError(req, next);
 
-        const user = await extractRecruiter(req);
+        const user = await extractJobSeeker(req);
 
         user.update(req.body);
 
@@ -75,71 +75,15 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     }
 };
 
-export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
+export const getUserData = async (req: any, res: any, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        handleError(req, next);
 
-        const postedJobs = await user.getPostedJobs();
-
-        res.status(200).json({ items: postedJobs });
-    } catch (err) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
-};
-
-export const createNewAd = async (req: any, res: any, next: NextFunction) => {
-    try {
-        const createdAd: any = new Ad(req.body as AdDocument);
-
-        await createdAd.save();
-
-        const user = await extractRecruiter(req);
-
-        await user.addPostedJobs(createdAd?._id);
-
-        res.status(201).json({ message: 'New ad has been successfully added' });
-    } catch (err) {
-        console.log(err);
-        return next(new HttpError(
-            'Could not create Ad, please try again.',
-            500
-        ));
-    }
-
-};
-
-export const updateAd = async (req: any, res: any, next: NextFunction) => {
-    try {
-        const updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
-
-        res.status(200).json({ updatedAd, message: 'Successfully updated.' });
-    } catch (err) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
-};
-
-export const deleteAd = async (req: any, res: any, next: NextFunction) => {
-    try {
-        const ad = await Ad.findById(req.params.adId);
-
-        const user = await extractRecruiter(req);
-
-        await user.removePostedJob(ad?._id);
-
-        await ad.remove();
-
-        res.status(201).json({ message: 'Ad has been successfully deleted' });
-    } catch (err) {
-        return next(new HttpError(
-            'Could not create Ad, please try again.',
-            500
-        ));
+        const userData = await JobSeeker.getUser(req.params.userId);
+        // TODO -> perhaps a fix is needed with the dto
+        res.status(201).json({ meta: new SafeUserData(userData) });
+    } catch (e) {
+        return next(e);
     }
 };
 
@@ -149,7 +93,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
 
         const { email, password } = req.body;
 
-        const user = await Recruiter.findOne({ email: email });
+        const user = await JobSeeker.findOne({ email: email });
 
         if (!user) {
             throw new Forbidden('Invalid credentials, please try again.');
@@ -220,7 +164,7 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
 
 export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const user = await extractJobSeeker(req);
 
         await user.remove();
 
@@ -232,7 +176,7 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
 
 export const whoami = async (req: any, res: any, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const user = await extractJobSeeker(req);
         // todo need other dto
         res.status(200).json({ meta: new SafeUserData(user) });
     } catch (e) {

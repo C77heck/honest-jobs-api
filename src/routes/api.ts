@@ -1,11 +1,13 @@
-import adRoutes from '@routes/ad-routes';
+import adRoutes from '@routes/ad.routes';
+import jobSeekerRoutes from '@routes/job-seeker.routes';
+import recruiterRoutes from '@routes/recruiter.routes';
 import { Router } from 'express';
-import userRoutes from './user-routes';
 
 // Export the base-router
 const baseRouter = Router();
 // Setup routers
-baseRouter.use('/users', userRoutes);
+baseRouter.use('/users/recruiter', recruiterRoutes);
+baseRouter.use('/users/job-seeker', jobSeekerRoutes);
 baseRouter.use('/ads', adRoutes);
 
 // Export default.
