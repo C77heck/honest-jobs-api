@@ -14,7 +14,7 @@ import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from "../libs/error-handler";
 import { extractJobSeeker } from './libs/helpers';
-import { SafeUserData } from './libs/safe.user.data';
+import { SafeJobSeekerData } from './libs/safe-job-seeker.data';
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
     const session = await startSession();
@@ -81,7 +81,7 @@ export const getUserData = async (req: any, res: any, next: NextFunction) => {
 
         const userData = await JobSeeker.getUser(req.params.userId);
         // TODO -> perhaps a fix is needed with the dto
-        res.status(201).json({ meta: new SafeUserData(userData) });
+        res.status(201).json({ meta: new SafeJobSeekerData(userData) });
     } catch (e) {
         return next(e);
     }
@@ -125,10 +125,10 @@ export const login = async (req: any, res: any, next: NextFunction) => {
         } catch (err) {
             throw new InternalServerError('Login failed, please try again');
         }
-
+        const userData = new SafeJobSeekerData(user);
         await res.json({
             userData: {
-                meta: new SafeUserData(user),
+                ...userData,
                 userId: user.id,
                 token: token,
             }
@@ -178,7 +178,7 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
     try {
         const user = await extractJobSeeker(req);
         // todo need other dto
-        res.status(200).json({ meta: new SafeUserData(user) });
+        res.status(200).json({ userData: new SafeJobSeekerData(user) });
     } catch (e) {
         if (e.message === 'jwt expired') {
             return next(new Unauthorized('JWTExpired'));
