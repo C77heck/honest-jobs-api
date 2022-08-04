@@ -7,7 +7,8 @@ import uniqueValidator from 'mongoose-unique-validator';
 const Schema = mongoose.Schema;
 
 export interface RecruiterDocument extends BaseUserDocument {
-    company_name?: string;
+    company_name: string;
+    address: string;
     postedJobs?: string[];
     logo?: string,
     addPostedJobs: (job: string) => Promise<RecruiterDocument>;
@@ -17,6 +18,7 @@ export interface RecruiterDocument extends BaseUserDocument {
 
 const recruiterSchema = new Schema<RecruiterDocument>({
     company_name: { type: String, required: true },
+    address: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
     securityQuestion: { type: String, required: true },

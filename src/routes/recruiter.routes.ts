@@ -32,6 +32,7 @@ router.put('/update', [
     body('*').trim(),
     check('company_name').escape(),
     check('description').escape(),
+    check('address').escape(),
     check('meta').escape(),
     check('images'),
     check('logo'),

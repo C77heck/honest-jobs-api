@@ -13,7 +13,7 @@ import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/error-handler';
-import { extractRecruiter } from './libs/helpers';
+import { extractRecruiter, getUserId } from './libs/helpers';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
@@ -65,9 +65,9 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     try {
         handleError(req, next);
 
-        const user = await extractRecruiter(req);
+        const userId = await getUserId(req);
 
-        user.update(req.body);
+        await Recruiter.updateUser(req.body, userId);
 
         res.status(201).json({ message: 'User data has been successfully updated.' });
     } catch (e) {
@@ -236,7 +236,7 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
 export const whoami = async (req: any, res: any, next: NextFunction) => {
     try {
         const user = await extractRecruiter(req);
-        // todo need other dto
+
         res.status(200).json({ userData: new SafeRecruiterData(user) });
     } catch (e) {
         if (e.message === 'jwt expired') {
