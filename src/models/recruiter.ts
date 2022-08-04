@@ -52,7 +52,9 @@ recruiterSchema.methods.removePostedJob = function (job: string): Promise<Recrui
 };
 
 recruiterSchema.methods.getPostedJobs = async function (): Promise<AdDocument[]> {
-    return Ad.find({ $in: this.postedJobs });
+    console.log({ postedJobs: this.postedJobs });
+    // TODO -> this does not work at all.
+    return Ad.find({ _id: { $in: this.postedJobs } });
 };
 
 recruiterSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<RecruiterDocument> {

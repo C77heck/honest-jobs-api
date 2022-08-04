@@ -2,6 +2,7 @@ import {
     createNewAd,
     deleteAccount,
     deleteAd,
+    getAds,
     getSecurityQuestion,
     login,
     signup,
@@ -14,6 +15,7 @@ const express = require('express');
 const { check, body } = require('express-validator');
 
 const router = express.Router();
+
 router.post('/login', [
     check('email').not().isEmpty().escape().trim(),
     check('password').not().isEmpty()
@@ -39,6 +41,8 @@ router.put('/update', [
 ], updateUserData);
 
 router.get('/whoami', [], whoami);
+
+router.get('/get-ads', [], getAds);
 
 // router.use(simpleUserAuth);
 

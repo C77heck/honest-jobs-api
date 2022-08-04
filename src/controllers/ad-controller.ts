@@ -1,5 +1,6 @@
 import Ad, { AdDocument } from '@models/ad';
 import { HttpError } from '@models/libs/error-models/errors';
+import Recruiter from '@models/recruiter';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 
@@ -33,4 +34,21 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
     }
 
     res.status(200).json({ ad });
+};
+
+export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const recruiterId = req?.params?.recruiterId;
+
+        const recruiter = await Recruiter.findById(recruiterId);
+
+        const postedJobs = await recruiter.getPostedJobs();
+
+        res.status(200).json({ items: postedJobs });
+    } catch (err) {
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
 };

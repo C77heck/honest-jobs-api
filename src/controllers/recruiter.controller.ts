@@ -75,11 +75,11 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     }
 };
 
-export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
+export const getAds = async (req: any, res: any, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const recruiter = await extractRecruiter(req);
 
-        const postedJobs = await user.getPostedJobs();
+        const postedJobs = await recruiter.getPostedJobs();
 
         res.status(200).json({ items: postedJobs });
     } catch (err) {
@@ -92,11 +92,11 @@ export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) =
 
 export const createNewAd = async (req: any, res: any, next: NextFunction) => {
     try {
-        const createdAd: any = new Ad(req.body as AdDocument);
+        const user = await extractRecruiter(req);
+
+        const createdAd: any = new Ad({ ...req.body, logo: user.logo } as AdDocument);
 
         await createdAd.save();
-
-        const user = await extractRecruiter(req);
 
         await user.addPostedJobs(createdAd?._id);
 
