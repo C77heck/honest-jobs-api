@@ -18,7 +18,6 @@ export interface RecruiterDocument extends BaseUserDocument {
 
 const recruiterSchema = new Schema<RecruiterDocument>({
     company_name: { type: String, required: true },
-    address: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
     securityQuestion: { type: String, required: true },
@@ -30,6 +29,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     isRecruiter: { type: Boolean, required: true, default: false },
     postedJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
     description: { type: String },
+    address: { type: String },
     logo: { type: String },
     meta: { type: String },
     images: [{ type: String }],

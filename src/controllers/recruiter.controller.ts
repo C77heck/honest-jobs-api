@@ -47,6 +47,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
 
             await createdUser.save();
         } catch (err) {
+            console.log(err);
             throw new InternalServerError('Could not create user, please try again.', { session });
         }
 
