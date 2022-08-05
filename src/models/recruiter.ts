@@ -3,6 +3,7 @@ import { BaseUserDocument } from '@models/user';
 import Mongoose from 'mongoose';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import { PaginationOptions } from '../controllers/libs/query';
 
 const Schema = mongoose.Schema;
 
@@ -13,7 +14,7 @@ export interface RecruiterDocument extends BaseUserDocument {
     logo?: string,
     addPostedJobs: (job: string) => Promise<RecruiterDocument>;
     removePostedJob: (job: string) => Promise<RecruiterDocument>;
-    getPostedJobs: () => Promise<AdDocument[]>;
+    getPostedJobs: (pagination: PaginationOptions, filters?: {}, sort?: {}) => Promise<AdDocument[]>;
 }
 
 const recruiterSchema = new Schema<RecruiterDocument>({
@@ -51,10 +52,16 @@ recruiterSchema.methods.removePostedJob = function (job: string): Promise<Recrui
     return this.save({ validateModifiedOnly: true });
 };
 
-recruiterSchema.methods.getPostedJobs = async function (): Promise<AdDocument[]> {
-    console.log({ postedJobs: this.postedJobs });
-    // TODO -> this does not work at all.
-    return Ad.find({ _id: { $in: this.postedJobs } });
+recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOptions, filters = {}, sort = {}): Promise<AdDocument[]> {
+    console.log(pagination, filters, sort);
+
+    return Ad.find({
+        ...filters,
+        _id: { $in: this.postedJobs }
+    })
+        .limit(pagination.limit)
+        .skip(pagination.page)
+        .sort(sort);
 };
 
 recruiterSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<RecruiterDocument> {

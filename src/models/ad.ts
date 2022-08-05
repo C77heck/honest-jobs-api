@@ -1,3 +1,4 @@
+import { JobSeekerDocument } from '@models/job-seeker';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
@@ -15,6 +16,9 @@ export interface AdDocument extends Document {
     company?: string;
     logo?: string;
     images?: string[];
+    viewedAsRegistered?: JobSeekerDocument[];
+    viewedAsGuest?: { session: string, views: number }[];
+    appliedFor?: JobSeekerDocument[];
 }
 
 const adSchema = new Schema({
@@ -23,7 +27,9 @@ const adSchema = new Schema({
     salary: { type: String, required: true },
     location: { type: String, required: true },
     expiresOn: { type: String, required: true },
-    isPremium: { type: String, required: true },
+    isPremium: { type: Boolean, required: true },
+    viewedAsRegistered: { type: String, required: true },
+    viewedAsGuest: { type: String, required: true },
     logo: String,
     meta: String,
     images: [{ type: String }],

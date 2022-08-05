@@ -14,6 +14,7 @@ import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/error-handler';
 import { extractRecruiter, getUserId } from './libs/helpers';
+import { extractQuery, getMongoSortOptions, getPaginationFromRequest } from './libs/query';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
 export const signup = async (req: any, res: any, next: NextFunction) => {
@@ -80,7 +81,11 @@ export const getAds = async (req: any, res: any, next: NextFunction) => {
     try {
         const recruiter = await extractRecruiter(req);
 
-        const postedJobs = await recruiter.getPostedJobs();
+        const filters = extractQuery(req);
+        const sort = getMongoSortOptions(req);
+        const pagination = getPaginationFromRequest(req);
+
+        const postedJobs = await recruiter.getPostedJobs(pagination, filters, sort,);
 
         res.status(200).json({ items: postedJobs });
     } catch (err) {

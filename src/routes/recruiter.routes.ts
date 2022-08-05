@@ -17,7 +17,7 @@ const { check, body } = require('express-validator');
 const router = express.Router();
 
 router.post('/login', [
-    check('email').not().isEmpty().escape().trim(),
+    check('email').not().isEmpty().trim(),
     check('password').not().isEmpty()
 ], login);
 
@@ -26,16 +26,16 @@ router.post('/signup', [
     check('company_name'),
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 }),
-    check('securityQuestion').not().isEmpty().escape(),
+    check('securityQuestion').not().isEmpty(),
     check('securityAnswer').isLength({ min: 4 }),
 ], signup);
 
 router.put('/update', [
     body('*').trim(),
-    check('company_name').escape(),
-    check('description').escape(),
-    check('address').escape(),
-    check('meta').escape(),
+    check('company_name'),
+    check('description'),
+    check('address'),
+    check('meta'),
     check('images'),
     check('logo'),
 ], updateUserData);
@@ -53,23 +53,23 @@ router.delete('/delete-account', [
 ], deleteAccount);
 
 router.post('/create-new-ad', [
-    check('title').not().isEmpty().escape(),
-    check('description').not().isEmpty().escape(),
-    check('meta').escape(),
-    check('salary').not().isEmpty().escape(),
-    check('location').not().isEmpty().escape(),
-    check('expiresOn').isString().not().isEmpty().escape(),
+    check('title').not().isEmpty(),
+    check('description').not().isEmpty(),
+    check('meta'),
+    check('salary').not().isEmpty(),
+    check('location').not().isEmpty(),
+    check('expiresOn').isString().not().isEmpty(),
     check('isPremium').isBoolean(),
     check('images'),
 ], createNewAd);
 
 router.put('/update-ad/:adId', [
-    check('title').not().isEmpty().escape(),
-    check('description').not().isEmpty().escape(),
-    check('meta').escape(),
-    check('salary').not().isEmpty().escape(),
-    check('location').not().isEmpty().escape(),
-    check('expiresOn').isString().not().isEmpty().escape(),
+    check('title').not().isEmpty(),
+    check('description').not().isEmpty(),
+    check('meta'),
+    check('salary').not().isEmpty(),
+    check('location').not().isEmpty(),
+    check('expiresOn').isString().not().isEmpty(),
     check('isPremium').isBoolean(),
     check('images'),
 ], updateAd);
