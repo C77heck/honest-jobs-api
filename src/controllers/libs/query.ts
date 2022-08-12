@@ -38,8 +38,8 @@ export interface PaginationOptions {
 
 export const getPaginationFromRequest = (req: express.Request): PaginationOptions => {
     const defaultPage = 0;
-    const defaultLimit = 10;
-
+    const defaultLimit = 5;
+    console.log(req.query);
     const rawPage = (req.query?.page) as string || defaultPage.toString();
     const rawLimit = (req.query?.limit) as string || defaultLimit.toString();
 

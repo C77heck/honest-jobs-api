@@ -1,10 +1,5 @@
 import JobSeeker from '@models/job-seeker';
-import {
-    BadRequest,
-    Forbidden,
-    InternalServerError,
-    Unauthorized
-} from '@models/libs/error-models/errors';
+import { BadRequest, Forbidden, InternalServerError } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 
 import bcrypt from 'bcryptjs';
@@ -12,7 +7,8 @@ import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
-import { handleError } from "../libs/error-handler";
+import { handleError } from '../libs/handle-error';
+import { handleValidation } from "../libs/handle-validation";
 import { extractJobSeeker, getUserId } from './libs/helpers';
 import { SafeJobSeekerData } from './libs/safe-job-seeker.data';
 
@@ -21,7 +17,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     session.startTransaction();
 
     try {
-        handleError(req);
+        handleValidation(req);
         const { email, password } = req.body;
 
         const existingUser = await JobSeeker.findOne({ email: email });
@@ -54,42 +50,43 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
         await session.endSession();
 
         await login(req, res, next);
-    } catch (e) {
-        await e.payload.session.abortTransaction();
-        await e.payload.session.endSession();
-        return next(e);
+    } catch (err) {
+        await err.payload.session.abortTransaction();
+        await err.payload.session.endSession();
+        
+        return next(handleError(err));
     }
 };
 
 export const updateUserData = async (req: any, res: any, next: NextFunction) => {
     try {
-        handleError(req, next);
+        handleValidation(req, next);
 
         const userId = await getUserId(req);
 
         await JobSeeker.updateUser(req.body, userId);
 
         res.status(201).json({ message: 'User data has been successfully updated.' });
-    } catch (e) {
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };
 
 export const getUserData = async (req: any, res: any, next: NextFunction) => {
     try {
-        handleError(req, next);
+        handleValidation(req, next);
 
         const userData = await JobSeeker.getUser(req.params.userId);
         // TODO -> perhaps a fix is needed with the dto
         res.status(201).json({ meta: new SafeJobSeekerData(userData) });
-    } catch (e) {
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };
 
 export const login = async (req: any, res: any, next: NextFunction) => {
     try {
-        handleError(req, next);
+        handleValidation(req, next);
 
         const { email, password } = req.body;
 
@@ -133,8 +130,8 @@ export const login = async (req: any, res: any, next: NextFunction) => {
                 token: token,
             }
         });
-    } catch (e) {
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };
 
@@ -157,8 +154,8 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
         }
 
         res.status(200).json({ securityQuestion });
-    } catch (e) {
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };
 
@@ -169,8 +166,8 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
         await user.remove();
 
         res.status(200).json({ message: 'Account has been successfully deleted.' });
-    } catch (e) {
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };
 
@@ -179,11 +176,7 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
         const user = await extractJobSeeker(req);
 
         res.status(200).json({ userData: new SafeJobSeekerData(user) });
-    } catch (e) {
-        if (e.message === 'jwt expired') {
-            return next(new Unauthorized('JWTExpired'));
-        }
-
-        return next(e);
+    } catch (err) {
+        return next(handleError(err));
     }
 };

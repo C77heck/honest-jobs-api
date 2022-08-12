@@ -1,23 +1,18 @@
 import { HttpError } from '@models/libs/error-models/errors';
 import Review, { ReviewDocument } from '@models/review';
 import { NextFunction } from 'express';
-import { ERROR_MESSAGES } from '../libs/constants';
+import { handleError } from '../libs/handle-error';
 import { getUserId } from './libs/helpers';
 
 export const getById = async (req: any, res: any, next: NextFunction) => {
-    let review: ReviewDocument;
-
     try {
-        review = await Review.getReviewById(req.params.reviewId);
+        const review = await Review.getReviewById(req.params.reviewId);
+
+        res.status(200).json({ review });
     } catch (err) {
-        console.log(err);
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(handleError(err));
     }
 
-    res.status(200).json({ review });
 };
 export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
     try {
@@ -26,11 +21,7 @@ export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json({ reviews });
     } catch (err) {
-        console.log(err);
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(handleError(err));
     }
 };
 export const createNewReview = async (req: any, res: any, next: NextFunction) => {
@@ -49,28 +40,20 @@ export const createNewReview = async (req: any, res: any, next: NextFunction) =>
 };
 
 export const updateReview = async (req: any, res: any, next: NextFunction) => {
-    let updatedReview: ReviewDocument;
-
     try {
-        updatedReview = await Review.updateReview(req.params.reviewId, req.body as ReviewDocument);
-    } catch (err) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
-    }
+        const updatedReview = await Review.updateReview(req.params.reviewId, req.body as ReviewDocument);
 
-    res.status(200).json({ updatedReview, message: 'Successfully updated.' });
+        res.status(200).json({ updatedReview, message: 'Successfully updated.' });
+    } catch (err) {
+        return next(handleError(err));
+    }
 };
 
 export const deleteReview = async (req: any, res: any, next: NextFunction) => {
     try {
         await Review.deleteReview(req.params.reviewId);
     } catch (err) {
-        return next(new HttpError(
-            'Could not create Review, please try again.',
-            500
-        ));
+        return next(handleError(err));
     }
 
     res.status(201).json({ message: 'New review has been successfully added' });

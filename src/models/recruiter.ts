@@ -1,4 +1,5 @@
 import Ad, { AdDocument } from '@models/ad';
+import { PaginationInterface } from '@models/libs/pagination.interface';
 import { BaseUserDocument } from '@models/user';
 import Mongoose from 'mongoose';
 import mongoose from 'mongoose';
@@ -14,7 +15,7 @@ export interface RecruiterDocument extends BaseUserDocument {
     logo?: string,
     addPostedJobs: (job: string) => Promise<RecruiterDocument>;
     removePostedJob: (job: string) => Promise<RecruiterDocument>;
-    getPostedJobs: (pagination: PaginationOptions, filters?: {}, sort?: {}) => Promise<AdDocument[]>;
+    getPostedJobs: (pagination: PaginationOptions, filters?: {}, sort?: {}) => Promise<PaginationInterface<AdDocument>>;
 }
 
 const recruiterSchema = new Schema<RecruiterDocument>({
@@ -52,16 +53,29 @@ recruiterSchema.methods.removePostedJob = function (job: string): Promise<Recrui
     return this.save({ validateModifiedOnly: true });
 };
 
-recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOptions, filters = {}, sort = {}): Promise<AdDocument[]> {
-    console.log(pagination, filters, sort);
+recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {
+    const limit = pagination?.limit || 5;
+    const page = pagination?.page || 0;
 
-    return Ad.find({
+    const items = await Ad.find({
         ...filters,
         _id: { $in: this.postedJobs }
     })
-        .limit(pagination.limit)
-        .skip(pagination.page)
+        .limit(limit)
+        .skip(page)
         .sort(sort);
+
+    const all = await Ad.find({
+        ...filters,
+        _id: { $in: this.postedJobs }
+    }).count();
+
+    return {
+        items,
+        limit: limit,
+        total: Math.ceil(all / limit),
+        page: page
+    };
 };
 
 recruiterSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<RecruiterDocument> {

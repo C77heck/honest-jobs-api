@@ -1,5 +1,5 @@
 import JobSeeker, { JobSeekerDocument } from '@models/job-seeker';
-import { BadRequest } from '@models/libs/error-models/errors';
+import { BadRequest, Unauthorized } from '@models/libs/error-models/errors';
 import Recruiter, { RecruiterDocument } from '@models/recruiter';
 
 import jwt from 'jsonwebtoken';
@@ -14,9 +14,13 @@ export const getToken = (req: any): string => {
 };
 
 export const getUserId = async (req: any): Promise<string> => {
-    const token = getToken(req);
-    const decodedToken: any = jwt.verify(token, process.env?.JWT_KEY || '');
-    return decodedToken.userId;
+    try {
+        const token = getToken(req);
+        const decodedToken: any = jwt.verify(token, process.env?.JWT_KEY || '');
+        return decodedToken.userId;
+    } catch (e) {
+        throw new Unauthorized(ERROR_MESSAGES.INVALID_TOKEN);
+    }
 };
 
 export const extractJobSeeker = async (req: any): Promise<JobSeekerDocument> => {

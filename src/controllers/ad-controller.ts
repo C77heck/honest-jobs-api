@@ -3,6 +3,7 @@ import { HttpError } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
+import { handleError } from '../libs/handle-error';
 
 // filters and pagination to implement. avoid redis for it.
 export const getAllAds = async (req: any, res: any, next: NextFunction) => {
@@ -46,9 +47,6 @@ export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) =
 
         res.status(200).json({ items: postedJobs });
     } catch (err) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(handleError(err));
     }
 };
