@@ -62,7 +62,7 @@ recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOp
         _id: { $in: this.postedJobs }
     })
         .limit(limit)
-        .skip(page)
+        .skip(page * limit)
         .sort(sort);
 
     const all = await Ad.find({
