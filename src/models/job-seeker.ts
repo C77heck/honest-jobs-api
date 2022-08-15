@@ -71,6 +71,10 @@ userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> 
 };
 
 userSchema.methods.addView = async function (adId: string): Promise<JobSeekerDocument> {
+    if (!this.viewedAd) {
+        this.viewedAd = [{ adId, date: new Date() }];
+    }
+
     this.viewedAd.push({ adId, date: new Date() });
 
     return this.save();
@@ -85,7 +89,6 @@ export interface JobSeekerModel extends Mongoose.Model<any> {
 
     getUser(this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
 
-    addViewedJobs(this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
 }
 
 userSchema.static('getUsers', async function (this: Mongoose.Model<any>): Promise<JobSeekerDocument[]> {
