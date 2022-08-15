@@ -83,7 +83,7 @@ export const getAds = async (req: any, res: any, next: NextFunction) => {
         const filters = extractQuery(req);
         const sort = getMongoSortOptions(req);
         const pagination = getPaginationFromRequest(req);
-        console.log(req.query);
+
         const postedJobs = await recruiter.getPostedJobs(pagination, filters, sort,);
 
         res.status(200).json(postedJobs);

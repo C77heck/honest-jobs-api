@@ -1,10 +1,9 @@
 import Ad, { AdDocument } from '@models/ad';
 import { BaseUserDocument } from '@models/user';
-import Mongoose from 'mongoose';
-import mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
+import Mongoose from 'Mongoose';
+import uniqueValidator from 'Mongoose-unique-validator';
 
-const Schema = mongoose.Schema;
+const Schema = Mongoose.Schema;
 
 export interface JobSeekerDocument extends BaseUserDocument {
     first_name: string;
@@ -12,9 +11,11 @@ export interface JobSeekerDocument extends BaseUserDocument {
     images?: string[];
     resume?: string;
     other_uploads?: string[];
+    viewedAd?: { adId: string, date: Date }[];
     addAppliedJobs: (job: string) => Promise<JobSeekerDocument>;
     removeAppliedJob: (job: string) => Promise<JobSeekerDocument>;
     getAppliedJobs: () => Promise<AdDocument[]>;
+    addView: (adId: string) => Promise<JobSeekerDocument>;
 }
 
 const userSchema = new Schema<JobSeekerDocument>({
@@ -29,7 +30,8 @@ const userSchema = new Schema<JobSeekerDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    appliedForJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
+    appliedForJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
+    viewedAd: { type: [], ref: 'Ad' },
     description: { type: String },
     logo: { type: String },
     meta: { type: String },
@@ -68,6 +70,12 @@ userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> 
     return this.securityQuestion;
 };
 
+userSchema.methods.addView = async function (adId: string): Promise<JobSeekerDocument> {
+    this.viewedAd.push({ adId, date: new Date() });
+
+    return this.save();
+};
+
 export interface JobSeekerModel extends Mongoose.Model<any> {
     getUsers(this: Mongoose.Model<any>): Promise<JobSeekerDocument[]>;
 
@@ -76,6 +84,8 @@ export interface JobSeekerModel extends Mongoose.Model<any> {
     updateUser(this: Mongoose.Model<any>, userData: JobSeekerDocument, userId: string): Promise<any>;
 
     getUser(this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
+
+    addViewedJobs(this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
 }
 
 userSchema.static('getUsers', async function (this: Mongoose.Model<any>): Promise<JobSeekerDocument[]> {
@@ -96,4 +106,4 @@ userSchema.static('getUser', async function (this: Mongoose.Model<any>, userId: 
     return this.findOne({ _id: userId });
 });
 
-export default mongoose.model<JobSeekerDocument, JobSeekerModel>('JobSeeker', userSchema);
+export default Mongoose.model<JobSeekerDocument, JobSeekerModel>('JobSeeker', userSchema);

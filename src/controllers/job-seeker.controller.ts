@@ -1,5 +1,11 @@
+import Ad, { AdDocument } from '@models/ad';
 import JobSeeker from '@models/job-seeker';
-import { BadRequest, Forbidden, InternalServerError } from '@models/libs/error-models/errors';
+import {
+    BadRequest,
+    Forbidden,
+    HttpError,
+    InternalServerError
+} from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 
 import bcrypt from 'bcryptjs';
@@ -53,7 +59,7 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     } catch (err) {
         await err.payload.session.abortTransaction();
         await err.payload.session.endSession();
-        
+
         return next(handleError(err));
     }
 };
@@ -176,6 +182,38 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
         const user = await extractJobSeeker(req);
 
         res.status(200).json({ userData: new SafeJobSeekerData(user) });
+    } catch (err) {
+        return next(handleError(err));
+    }
+};
+
+export const addJobView = async (req: any, res: any, next: NextFunction) => {
+    const user = await extractJobSeeker(req);
+
+    user.addViewedJobs(req.params.adId);
+
+    let ad: AdDocument[];
+
+    try {
+        ad = await Ad.addView(req.params.adId);
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
+    }
+};
+
+export const addAppliedFor = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const recruiterId = req?.params?.recruiterId;
+
+        const recruiter = await Recruiter.findById(recruiterId);
+
+        const postedJobs = await recruiter.getPostedJobs();
+
+        res.status(200).json({ items: postedJobs });
     } catch (err) {
         return next(handleError(err));
     }

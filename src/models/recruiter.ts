@@ -74,6 +74,7 @@ recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOp
         items,
         limit: limit,
         total: Math.ceil(all / limit),
+        totalItems: all,
         page: page
     };
 };
