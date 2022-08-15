@@ -7,7 +7,7 @@ import {
 } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 import bcrypt from 'bcryptjs';
-import { NextFunction } from 'express';
+import express, { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
@@ -17,12 +17,12 @@ import { extractRecruiter, getUserId } from './libs/helpers';
 import { extractQuery, getMongoSortOptions, getPaginationFromRequest } from './libs/query';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
-export const signup = async (req: any, res: any, next: NextFunction) => {
+export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        handleValidation(req);
+        handleValidation(req as any);
         const { email, password } = req.body;
 
         const existingUser = await Recruiter.findOne({ email: email });
@@ -62,9 +62,9 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const updateUserData = async (req: any, res: any, next: NextFunction) => {
+export const updateUserData = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        handleValidation(req, next);
+        handleValidation(req as any);
 
         const userId = await getUserId(req);
 
@@ -76,7 +76,7 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     }
 };
 
-export const getAds = async (req: any, res: any, next: NextFunction) => {
+export const getAds = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const recruiter = await extractRecruiter(req);
 
@@ -92,7 +92,7 @@ export const getAds = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const createNewAd = async (req: any, res: any, next: NextFunction) => {
+export const createNewAd = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const user = await extractRecruiter(req);
 
@@ -108,7 +108,7 @@ export const createNewAd = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const updateAd = async (req: any, res: any, next: NextFunction) => {
+export const updateAd = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
 
@@ -118,7 +118,7 @@ export const updateAd = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const deleteAd = async (req: any, res: any, next: NextFunction) => {
+export const deleteAd = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const ad = await Ad.findById(req.params.adId);
 
@@ -137,9 +137,9 @@ export const deleteAd = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const login = async (req: any, res: any, next: NextFunction) => {
+export const login = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        handleValidation(req, next);
+        handleValidation(req as any);
 
         const { email, password } = req.body;
 
@@ -191,7 +191,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
+export const getSecurityQuestion = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         if (!req.body.email) {
             throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
@@ -215,7 +215,7 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
     }
 };
 
-export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
+export const deleteAccount = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const user = await extractRecruiter(req);
 
@@ -227,7 +227,7 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const whoami = async (req: any, res: any, next: NextFunction) => {
+export const whoami = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const user = await extractRecruiter(req);
 

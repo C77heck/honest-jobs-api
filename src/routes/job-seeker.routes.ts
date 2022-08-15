@@ -48,4 +48,6 @@ router.delete('/delete-account', [
     check('answer').not().isEmpty(),
 ], deleteAccount);
 
+// TODO -> APPLYING LOGIC
+
 export default router;

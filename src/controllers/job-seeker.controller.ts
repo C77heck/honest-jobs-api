@@ -200,6 +200,7 @@ export const addViewToUser = async (req: express.Request) => {
 export const addJobView = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         await addViewToUser(req);
+        
         return Ad.addView(req.params.adId);
     } catch (err) {
         handleError(new HttpError(
