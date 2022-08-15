@@ -1,4 +1,4 @@
-import Ad, { AdDocument } from '@models/ad';
+import Ad from '@models/ad';
 import JobSeeker from '@models/job-seeker';
 import {
     BadRequest,
@@ -9,7 +9,7 @@ import {
 import Recruiter from '@models/recruiter';
 
 import bcrypt from 'bcryptjs';
-import { NextFunction } from 'express';
+import express, { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
@@ -18,12 +18,12 @@ import { handleValidation } from "../libs/handle-validation";
 import { extractJobSeeker, getUserId } from './libs/helpers';
 import { SafeJobSeekerData } from './libs/safe-job-seeker.data';
 
-export const signup = async (req: any, res: any, next: NextFunction) => {
+export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        handleValidation(req);
+        handleValidation(req as any as any);
         const { email, password } = req.body;
 
         const existingUser = await JobSeeker.findOne({ email: email });
@@ -64,9 +64,9 @@ export const signup = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const updateUserData = async (req: any, res: any, next: NextFunction) => {
+export const updateUserData = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        handleValidation(req, next);
+        handleValidation(req as any);
 
         const userId = await getUserId(req);
 
@@ -78,21 +78,21 @@ export const updateUserData = async (req: any, res: any, next: NextFunction) => 
     }
 };
 
-export const getUserData = async (req: any, res: any, next: NextFunction) => {
+export const getUserData = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        handleValidation(req, next);
+        handleValidation(req as any);
 
         const userData = await JobSeeker.getUser(req.params.userId);
-        // TODO -> perhaps a fix is needed with the dto
+
         res.status(201).json({ meta: new SafeJobSeekerData(userData) });
     } catch (err) {
         return next(handleError(err));
     }
 };
 
-export const login = async (req: any, res: any, next: NextFunction) => {
+export const login = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        handleValidation(req, next);
+        handleValidation(req as any);
 
         const { email, password } = req.body;
 
@@ -141,7 +141,7 @@ export const login = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const getSecurityQuestion = async (req: any, res: any, next: NextFunction) => {
+export const getSecurityQuestion = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         if (!req.body.email) {
             throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
@@ -165,7 +165,7 @@ export const getSecurityQuestion = async (req: any, res: any, next: NextFunction
     }
 };
 
-export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
+export const deleteAccount = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const user = await extractJobSeeker(req);
 
@@ -177,7 +177,7 @@ export const deleteAccount = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const whoami = async (req: any, res: any, next: NextFunction) => {
+export const whoami = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const user = await extractJobSeeker(req);
 
@@ -187,34 +187,39 @@ export const whoami = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const addJobView = async (req: any, res: any, next: NextFunction) => {
+export const addViewToUser = async (req: express.Request) => {
     const user = await extractJobSeeker(req);
 
-    user.addViewedJobs(req.params.adId);
+    if (!user) {
+        return;
+    }
 
-    let ad: AdDocument[];
+    return user.addView(req.params.adId);
+};
 
+export const addJobView = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        ad = await Ad.addView(req.params.adId);
+        await addViewToUser(req);
+        return Ad.addView(req.params.adId);
     } catch (err) {
-        console.log(err);
-        return next(new HttpError(
+        handleError(new HttpError(
             ERROR_MESSAGES.GENERIC,
             500
         ));
     }
 };
 
-export const addAppliedFor = async (req: any, res: any, next: NextFunction) => {
+export const addAppliedFor = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const recruiterId = req?.params?.recruiterId;
+        const user = await extractJobSeeker(req);
 
-        const recruiter = await Recruiter.findById(recruiterId);
+        await user.addAppliedJobs(req.params.adId);
 
-        const postedJobs = await recruiter.getPostedJobs();
-
-        res.status(200).json({ items: postedJobs });
+        return Ad.addAppliedFor(req.params.adId);
     } catch (err) {
-        return next(handleError(err));
+        handleError(new HttpError(
+            ERROR_MESSAGES.GENERIC,
+            500
+        ));
     }
 };

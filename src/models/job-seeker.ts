@@ -11,7 +11,8 @@ export interface JobSeekerDocument extends BaseUserDocument {
     images?: string[];
     resume?: string;
     other_uploads?: string[];
-    viewedAd?: { adId: string, date: Date }[];
+    appliedForJobs?: { id: string, appliedAt: Date }[];
+    viewedAd?: { id: string, viewedAt: Date }[];
     addAppliedJobs: (job: string) => Promise<JobSeekerDocument>;
     removeAppliedJob: (job: string) => Promise<JobSeekerDocument>;
     getAppliedJobs: () => Promise<AdDocument[]>;
@@ -30,8 +31,8 @@ const userSchema = new Schema<JobSeekerDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    appliedForJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
-    viewedAd: { type: [], ref: 'Ad' },
+    appliedForJobs: { type: [{ id: Mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
+    viewedAd: { type: [{ id: Mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
     description: { type: String },
     logo: { type: String },
     meta: { type: String },
@@ -45,13 +46,13 @@ userSchema.set('timestamps', true);
 userSchema.plugin(uniqueValidator);
 
 userSchema.methods.addAppliedJobs = function (job: string) {
-    this.appliedForJobs = [...(this.appliedForJobs || []), job];
+    this.appliedForJobs = [...(this.appliedForJobs || []), { id: job, appliedAt: new Date() }];
 
     return this.save({ validateModifiedOnly: true });
 };
 
 userSchema.methods.removeAppliedJob = function (job: string) {
-    this.appliedForJobs = (this.appliedForJobs || []).filter((appliedJob: any) => appliedJob.toString() !== job);
+    this.appliedForJobs = (this.appliedForJobs || []).filter((appliedJob: any) => appliedJob.id.toString() !== job);
 
     return this.save({ validateModifiedOnly: true });
 };
@@ -72,10 +73,10 @@ userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> 
 
 userSchema.methods.addView = async function (adId: string): Promise<JobSeekerDocument> {
     if (!this.viewedAd) {
-        this.viewedAd = [{ adId, date: new Date() }];
+        this.viewedAd = [{ id: adId, viewedAt: new Date() }];
     }
 
-    this.viewedAd.push({ adId, date: new Date() });
+    this.viewedAd.push({ id: adId, viewedAt: new Date() });
 
     return this.save();
 };
