@@ -1,7 +1,9 @@
 import { JobSeekerDocument } from '@models/job-seeker';
+import { PaginationInterface } from '@models/libs/pagination.interface';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import { PaginationOptions } from '../controllers/libs/query';
 
 const Schema = mongoose.Schema;
 
@@ -54,7 +56,7 @@ adSchema.set('timestamps', true);
 adSchema.plugin(uniqueValidator);
 
 interface AdModel extends Mongoose.Model<any> {
-    getAllAds(this: Mongoose.Model<any>): Promise<AdDocument[]>;
+    getAllAds(pagination: PaginationOptions, filters?: {}, sort?: {}): Promise<PaginationInterface<AdDocument>>;
 
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
 
@@ -67,8 +69,28 @@ interface AdModel extends Mongoose.Model<any> {
     switchAdCategory(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
 }
 
-adSchema.static('getAllAds', async function (this: Mongoose.Model<AdDocument>): Promise<AdDocument[]> {
-    return this.find({});
+adSchema.static('getAllAds', async function (this: Mongoose.Model<AdDocument>, pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {
+    const limit = pagination?.limit || 5;
+    const page = pagination?.page || 0;
+
+    const items = await this.find({
+        ...filters,
+    })
+        .limit(limit)
+        .skip(page * limit)
+        .sort(sort);
+
+    const all = await this.find({
+        ...filters,
+    }).count();
+
+    return {
+        items,
+        limit: limit,
+        total: Math.ceil(all / limit),
+        totalItems: all,
+        page: page
+    };
 });
 
 adSchema.static('updateAd', async function (this: Mongoose.Model<AdDocument>, adId: string | number, adData: AdDocument): Promise<AdDocument> {

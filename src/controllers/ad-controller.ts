@@ -4,21 +4,24 @@ import Recruiter from '@models/recruiter';
 import { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
+import { extractQuery, getMongoSortOptions, getPaginationFromRequest } from './libs/query';
 
 // filters and pagination to implement. avoid redis for it.
 export const getAllAds = async (req: any, res: any, next: NextFunction) => {
-    let ads: AdDocument[];
-
     try {
-        ads = await Ad.getAllAds();
+        const pagination = getPaginationFromRequest(req);
+        const filters = extractQuery(req);
+        const sort = getMongoSortOptions(req);
+
+        const paginatedData = await Ad.getAllAds(pagination, filters, sort);
+
+        res.status(200).json(paginatedData);
     } catch (err) {
         return next(new HttpError(
             ERROR_MESSAGES.GENERIC,
             500
         ));
     }
-
-    res.status(200).json({ ads });
 };
 
 export const getById = async (req: any, res: any, next: NextFunction) => {
