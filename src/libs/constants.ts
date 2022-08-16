@@ -5,4 +5,6 @@ export const ERROR_MESSAGES = {
     MISSING_EMAIL: 'Email is missing!',
     USER_NOT_FOUND: 'User not found!',
     INVALID_TOKEN: 'Invalid token!',
+    MISSING_SESSION_ID: 'Missing session id',
+    AD_ID: 'Missing ad id',
 };

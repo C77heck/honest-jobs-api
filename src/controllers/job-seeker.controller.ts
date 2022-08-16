@@ -187,21 +187,27 @@ export const whoami = async (req: express.Request, res: express.Response, next: 
     }
 };
 
-export const addViewToUser = async (req: express.Request) => {
-    const user = await extractJobSeeker(req);
-
-    if (!user) {
-        return;
-    }
-
-    return user.addView(req.params.adId);
-};
-
 export const addJobView = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        await addViewToUser(req);
-        
-        return Ad.addView(req.params.adId);
+        const user = await extractJobSeeker(req);
+        const { sessionId, adId } = req.body;
+
+        if (!adId) {
+            throw new BadRequest(ERROR_MESSAGES.AD_ID);
+        }
+
+        await user.addView(req.body.adId);
+
+        if (!user) {
+
+            if (!sessionId) {
+                throw new BadRequest(ERROR_MESSAGES.MISSING_SESSION_ID);
+            }
+
+            return Ad.addGuestView(sessionId, adId);
+        }
+
+        return Ad.addRegisteredUserView(user?._id, adId);
     } catch (err) {
         handleError(new HttpError(
             ERROR_MESSAGES.GENERIC,

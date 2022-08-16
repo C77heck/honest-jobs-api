@@ -1,4 +1,3 @@
-import { JobSeekerDocument } from '@models/job-seeker';
 import { PaginationInterface } from '@models/libs/pagination.interface';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
@@ -18,11 +17,10 @@ export interface AdDocument extends Document {
     company?: string;
     logo?: string;
     images?: string[];
-    viewedAsRegistered?: JobSeekerDocument[];
-    viewedAsGuest?: { session: string, views: number }[];
-    appliedFor?: JobSeekerDocument[];
+    appliedFor?: { jobSeeker: string, views: Date[] }[];
     analytics: {
-        viewed: number;
+        viewedAsRegistered?: { userId: string, views: Date[] }[];
+        viewedAsGuest?: { sessionId: string, views: Date[] }[];
         appliedFor: number;
         standard: boolean;
         featured: boolean;
@@ -37,14 +35,18 @@ const adSchema = new Schema({
     location: { type: String, required: true },
     expiresOn: { type: String, required: true },
     isPremium: { type: Boolean, required: true },
-    viewedAsRegistered: { type: String },
-    viewedAsGuest: { type: String },
     logo: String,
     meta: String,
     images: [{ type: String }],
     analytics: {
-        viewed: { type: Number, default: 0 },
-        appliedFor: { type: Number, default: 0 },
+        viewedAsRegistered: [{
+            userId: { type: [mongoose.Types.ObjectId], ref: 'JobSeeker' },
+            views: [Date]
+        }],
+        viewedAsGuest: [{
+            sessionId: String,
+            views: [Date]
+        }], appliedFor: { type: Number, default: 0 },
         standard: { type: Boolean, default: false },
         featured: { type: Boolean, default: false },
         premium: { type: Boolean, default: false }
@@ -62,7 +64,9 @@ interface AdModel extends Mongoose.Model<any> {
 
     getById(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
 
-    addView(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+    addGuestView(this: Mongoose.Model<any>, sessionId: string, adId: string | number): Promise<any>;
+
+    addRegisteredUserView(this: Mongoose.Model<any>, userId: string, adId: string | number): Promise<any>;
 
     addAppliedFor(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
 
@@ -101,14 +105,38 @@ adSchema.static('getById', async function (this: Mongoose.Model<AdDocument>, adI
     return this.findById(adId);
 });
 
-adSchema.static('addView', async function (this: Mongoose.Model<AdDocument>, adId: string | number): Promise<AdDocument | void> {
+adSchema.static('addGuestView', async function (this: Mongoose.Model<AdDocument>, sessionId: string, adId: string | number): Promise<AdDocument | void> {
     const ad = await this.findById(adId);
 
     if (!ad) {
         return;
     }
 
-    ad.analytics.viewed += 1;
+    const view = (ad.analytics?.viewedAsGuest || []).find(view => view.sessionId === sessionId);
+
+    if (!view) {
+        ad.analytics.viewedAsGuest = [{ sessionId, views: [new Date()] }];
+    } else {
+        view.views.push(new Date());
+    }
+
+    return ad.save();
+});
+
+adSchema.static('addRegisteredUserView', async function (this: Mongoose.Model<AdDocument>, userId: string, adId: string | number): Promise<AdDocument | void> {
+    const ad = await this.findById(adId);
+
+    if (!ad) {
+        return;
+    }
+
+    const view = (ad.analytics?.viewedAsRegistered || []).find(view => view.userId === userId);
+
+    if (!view) {
+        ad.analytics.viewedAsRegistered = [{ userId, views: [new Date()] }];
+    } else {
+        view.views.push(new Date());
+    }
 
     return ad.save();
 });

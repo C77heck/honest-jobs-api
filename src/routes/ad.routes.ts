@@ -11,6 +11,6 @@ router.get('/get-ads-by-employer/:recruiterId', [], getAdsByEmployer);
 
 router.get('/get-by-id/:adId', [], getById);
 
-router.get('/view/:adId', [], addJobView);
+router.post('/add-view', [], addJobView);
 
 export default router;
