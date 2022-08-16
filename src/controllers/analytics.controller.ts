@@ -1,13 +1,13 @@
 import { randomUUID } from 'crypto';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
 
-export const getSessionId = (req: express.Request, res: express.Response) => {
+export const getSessionId = (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         const sessionId = randomUUID();
 
         res.json({ sessionId });
     } catch (e) {
-        handleError(e);
+        next(handleError(e));
     }
 };

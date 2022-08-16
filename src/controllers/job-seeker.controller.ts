@@ -1,11 +1,6 @@
 import Ad from '@models/ad';
 import JobSeeker from '@models/job-seeker';
-import {
-    BadRequest,
-    Forbidden,
-    HttpError,
-    InternalServerError
-} from '@models/libs/error-models/errors';
+import { BadRequest, Forbidden, InternalServerError } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 
 import bcrypt from 'bcryptjs';
@@ -188,31 +183,34 @@ export const whoami = async (req: express.Request, res: express.Response, next: 
 };
 
 export const addJobView = async (req: express.Request, res: express.Response, next: NextFunction) => {
+    let user;
     try {
-        const user = await extractJobSeeker(req);
+        user = await extractJobSeeker(req);
+    } catch (e) {
+        console.log({ e });
+    }
+
+    try {
         const { sessionId, adId } = req.body;
 
         if (!adId) {
             throw new BadRequest(ERROR_MESSAGES.AD_ID);
         }
 
-        await user.addView(req.body.adId);
-
         if (!user) {
-
             if (!sessionId) {
                 throw new BadRequest(ERROR_MESSAGES.MISSING_SESSION_ID);
             }
-
-            return Ad.addGuestView(sessionId, adId);
+            await Ad.addGuestView(sessionId, adId);
+        } else {
+            await Ad.addRegisteredUserView(user?._id, adId);
+            await user.addView(req.body.adId);
         }
+        console.log({ FUCKING_HITIT: 'FDASFDSAFDSAFDSAFDSAFDSA' });
 
-        return Ad.addRegisteredUserView(user?._id, adId);
+        res.status(200);
     } catch (err) {
-        handleError(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        next(handleError(err));
     }
 };
 
@@ -224,9 +222,6 @@ export const addAppliedFor = async (req: express.Request, res: express.Response,
 
         return Ad.addAppliedFor(req.params.adId);
     } catch (err) {
-        handleError(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        next(handleError(err));
     }
 };

@@ -111,7 +111,7 @@ adSchema.static('addGuestView', async function (this: Mongoose.Model<AdDocument>
     if (!ad) {
         return;
     }
-
+    // TODO THE ISSUE IS PROPABLY HERE...
     const view = (ad.analytics?.viewedAsGuest || []).find(view => view.sessionId === sessionId);
 
     if (!view) {
@@ -120,7 +120,7 @@ adSchema.static('addGuestView', async function (this: Mongoose.Model<AdDocument>
         view.views.push(new Date());
     }
 
-    return ad.save();
+    return ad.save({ validateModifiedOnly: true });
 });
 
 adSchema.static('addRegisteredUserView', async function (this: Mongoose.Model<AdDocument>, userId: string, adId: string | number): Promise<AdDocument | void> {
