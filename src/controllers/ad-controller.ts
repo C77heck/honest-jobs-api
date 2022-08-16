@@ -1,4 +1,4 @@
-import Ad, { AdDocument } from '@models/ad';
+import Ad from '@models/ad';
 import { HttpError } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 import { NextFunction } from 'express';
@@ -25,10 +25,10 @@ export const getAllAds = async (req: any, res: any, next: NextFunction) => {
 };
 
 export const getById = async (req: any, res: any, next: NextFunction) => {
-    let ad: AdDocument[];
-
     try {
-        ad = await Ad.getById(req.params.adId);
+        const ad = await Ad.getById(req.params.adId);
+
+        res.status(200).json({ payload: ad });
     } catch (err) {
         console.log(err);
         return next(new HttpError(
@@ -37,7 +37,6 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
         ));
     }
 
-    res.status(200).json({ ad });
 };
 
 export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {
