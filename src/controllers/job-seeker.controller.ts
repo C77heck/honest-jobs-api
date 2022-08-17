@@ -206,9 +206,8 @@ export const addJobView = async (req: express.Request, res: express.Response, ne
             await Ad.addRegisteredUserView(user?._id, adId);
             await user.addView(req.body.adId);
         }
-        console.log({ FUCKING_HITIT: 'FDASFDSAFDSAFDSAFDSAFDSA' });
 
-        res.status(200);
+        res.json({ message: 'Success' });
     } catch (err) {
         next(handleError(err));
     }

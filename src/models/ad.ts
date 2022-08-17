@@ -111,7 +111,7 @@ adSchema.static('addGuestView', async function (this: Mongoose.Model<AdDocument>
     if (!ad) {
         return;
     }
-    // TODO THE ISSUE IS PROPABLY HERE...
+
     const view = (ad.analytics?.viewedAsGuest || []).find(view => view.sessionId === sessionId);
 
     if (!view) {
