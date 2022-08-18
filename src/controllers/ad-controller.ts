@@ -1,8 +1,6 @@
 import Ad from '@models/ad';
-import { HttpError } from '@models/libs/error-models/errors';
 import Recruiter from '@models/recruiter';
 import { NextFunction } from 'express';
-import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 
@@ -16,10 +14,7 @@ export const getAllAds = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json(paginatedData);
     } catch (err) {
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(handleError(err));
     }
 };
 
@@ -29,13 +24,23 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
 
         res.status(200).json({ payload: ad });
     } catch (err) {
-        console.log(err);
-        return next(new HttpError(
-            ERROR_MESSAGES.GENERIC,
-            500
-        ));
+        return next(handleError(err));
     }
+};
 
+export const getFilters = async (req: any, res: any, next: NextFunction) => {
+    try {
+
+        // TODO -> need a filters document that is being created by a cronjob
+        const location = false || [];
+        const companyType = false || [];
+        const postedAt = false || [];
+        const relatedRoles = false || [];
+
+        res.status(200).json({ location, companyType, postedAt, relatedRoles });
+    } catch (err) {
+        return next(handleError(err));
+    }
 };
 
 export const getAdsByEmployer = async (req: any, res: any, next: NextFunction) => {

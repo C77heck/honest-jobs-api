@@ -14,7 +14,7 @@ import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
 import { extractRecruiter, getUserId } from './libs/helpers';
-import { extractQuery, getMongoSortOptions, getPaginationFromRequest } from './libs/query';
+import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
 export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
@@ -80,9 +80,7 @@ export const getAds = async (req: express.Request, res: express.Response, next: 
     try {
         const recruiter = await extractRecruiter(req);
 
-        const filters = extractQuery(req);
-        const sort = getMongoSortOptions(req);
-        const pagination = getPaginationFromRequest(req);
+        const { filters, pagination, sort } = new AdQueryHandler(req);
 
         const postedJobs = await recruiter.getPostedJobs(pagination, filters, sort,);
 

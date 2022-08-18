@@ -4,7 +4,7 @@ import { BaseUserDocument } from '@models/user';
 import Mongoose from 'mongoose';
 import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import { PaginationOptions } from '../controllers/libs/query';
+import { PaginationOptions } from '../controllers/libs/mongo-query-handlers/base-query.handler';
 
 const Schema = mongoose.Schema;
 
