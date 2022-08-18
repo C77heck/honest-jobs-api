@@ -8,21 +8,26 @@ export class BaseQueryHandler {
     public sort: any;
 
     public constructor(req: express.Request) {
-        this.query = this.extractMongoQuery(req);
-        this.filters = this.customQueryHandler();
+        this.filters = this.extractFilters(req);
         this.pagination = getPaginationFromRequest(req);
         this.sort = getMongoSortOptions(req);
     }
 
-    protected extractMongoQuery(req: express.Request) {
+    protected extractFilters(req: express.Request) {
         if (!req.query?.filters) {
             return {};
         }
 
-        return { ...(req.query?.filters as any || {}) };
+        const customFilters = this.customQueryHandler();
+
+        if (!customFilters) {
+            return { ...(req.query?.filters as any || {}) };
+        }
+
+        return customFilters;
     }
 
     public customQueryHandler() {
-        return this.query;
+        return null;
     }
 }

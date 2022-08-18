@@ -2,22 +2,22 @@ import { BaseQueryHandler } from './base-query.handler';
 
 export class AdQueryHandler extends BaseQueryHandler {
     public customQueryHandler(): any {
-        const rawQuery = this.query;
-        const query: any = {};
-        for (const key in rawQuery) {
+        const rawFilters = this.filters;
+        const filters: any = {};
+        for (const key in rawFilters) {
             switch (key) {
                 case 'what':
-                    query.title = { $regex: rawQuery[key], $options: 'is' };
+                    filters.title = { $regex: rawFilters[key], $options: 'is' };
                     break;
                 case 'where':
-                    query.location = { $regex: rawQuery[key], $options: 'is' };
+                    filters.location = { $regex: rawFilters[key], $options: 'is' };
                     break;
                 default:
-                    query[key] = { $regex: rawQuery[key], $options: 'is' };
+                    filters[key] = { $regex: rawFilters[key], $options: 'is' };
                     break;
             }
         }
 
-        return query;
+        return filters;
     }
 }
