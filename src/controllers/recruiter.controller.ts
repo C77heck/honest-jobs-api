@@ -1,15 +1,9 @@
 import Ad, { AdDocument } from '@models/ad';
-import {
-    BadRequest,
-    Forbidden,
-    HttpError,
-    InternalServerError
-} from '@models/libs/error-models/errors';
-import Recruiter from '@models/recruiter';
-import bcrypt from 'bcryptjs';
+import { JobSeekerDocument } from '@models/job-seeker';
+import { BadRequest, HttpError, InternalServerError } from '@models/libs/error-models/errors';
+import Recruiter, { RecruiterDocument } from '@models/recruiter';
+import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
@@ -18,46 +12,36 @@ import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
 export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
-    const session = await startSession();
-    session.startTransaction();
+    try {
+        const userService = new UserService<JobSeekerDocument>(Recruiter);
 
+        handleValidation(req as any as any);
+
+        const result = await userService.signup(req);
+
+        res.json({ result });
+    } catch (err) {
+        return next(handleError(err));
+    }
+};
+
+export const login = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
         handleValidation(req as any);
-        const { email, password } = req.body;
 
-        const existingUser = await Recruiter.findOne({ email: email });
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        if (existingUser) {
-            throw new BadRequest('The email you entered, is already in use', { session });
-        }
+        const { user, token } = await userService.login(req);
 
-        let hashedPassword: string;
-
-        try {
-            hashedPassword = await bcrypt.hash(password, 12);
-        } catch (err) {
-            throw new InternalServerError('Could not create user, please try again.', { session });
-        }
-
-        let createdUser: any;
-        try {
-            createdUser = new Recruiter({
-                ...req.body,
-                password: hashedPassword
-            });
-
-            await createdUser.save();
-        } catch (err) {
-            throw new InternalServerError('Could not create user, please try again.', { session });
-        }
-
-        await session.commitTransaction();
-        await session.endSession();
-
-        await login(req, res, next);
+        const userData = new SafeRecruiterData(user);
+        res.json({
+            userData: {
+                ...userData,
+                userId: user.id,
+                token: token,
+            }
+        });
     } catch (err) {
-        await err.payload.session.abortTransaction();
-        await err.payload.session.endSession();
         return next(handleError(err));
     }
 };
@@ -132,60 +116,6 @@ export const deleteAd = async (req: express.Request, res: express.Response, next
             'Could not delete Ad, please try again.',
             500
         ));
-    }
-};
-
-export const login = async (req: express.Request, res: express.Response, next: NextFunction) => {
-    try {
-        handleValidation(req as any);
-
-        const { email, password } = req.body;
-
-        const user = await Recruiter.findOne({ email: email });
-
-        if (!user) {
-            throw new Forbidden('Invalid credentials, please try again.');
-        }
-
-        let isValidPassword = false;
-        try {
-            isValidPassword = await bcrypt.compare(password, user.password);
-        } catch (err) {
-            user.loginAttempts(user.status.loginAttempts + 1);
-
-            throw new Forbidden('Could not log you in, please check your credentials and try again');
-        }
-
-        if (!isValidPassword) {
-            user.loginAttempts(user.status.loginAttempts + 1);
-
-            throw new Forbidden('Could not log you in, please check your credentials and try again');
-        }
-
-        await user.loginAttempts(0);
-
-        let token;
-        try {
-            token = jwt.sign({ userId: user._id, email: user.email },
-                process.env?.JWT_KEY || '',
-                { expiresIn: '24h' }
-            );
-        } catch (err) {
-            throw new InternalServerError('Login failed, please try again');
-        }
-
-        const userData = new SafeRecruiterData(user);
-
-        res.json({
-            userData: {
-                ...userData,
-                userId: user.id,
-                token: token,
-                type: 'recruiter',
-            }
-        });
-    } catch (err) {
-        return next(handleError(err));
     }
 };
 

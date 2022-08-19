@@ -4,7 +4,6 @@ import { AdService } from '@services/ad.service';
 import { DocumentService } from '@services/libs/document.service';
 import { handleError } from '../libs/handle-error';
 
-// connect document
 export class FilterService extends DocumentService<FilterDocument> {
     public adService = new AdService(Ad);
 

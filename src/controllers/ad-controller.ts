@@ -6,12 +6,10 @@ import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
 import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 
-// filters and pagination to implement. avoid redis for it.
 export const getAllAds = async (req: any, res: any, next: NextFunction) => {
     try {
         const { filters, pagination, sort } = new AdQueryHandler(req);
 
-        console.log(new AdQueryHandler(req));
         const paginatedData = await Ad.getAllAds(pagination, filters, sort);
 
         res.status(200).json(paginatedData);
@@ -41,6 +39,7 @@ export const getFilters = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
+// todo -> will need  to move this to a cluster module
 export const createFilters = async (req: any, res: any, next: NextFunction) => {
     try {
         const filterService = new FilterService(Filter);
