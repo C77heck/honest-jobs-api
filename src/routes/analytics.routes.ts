@@ -1,9 +1,11 @@
-import express from 'express';
+import { ExpressRouter } from '@routes/libs/express.router';
+
 import { getSessionId } from '../controllers/analytics.controller';
 
-const router = express.Router();
+class AnalyticsRouter extends ExpressRouter {
+    public initializeRouter() {
+        this.router.get('/', [], getSessionId);
+    }
+}
 
-// we will need to add the filtering properties
-router.get('/', [], getSessionId);
-
-export default router;
+export default new AnalyticsRouter();

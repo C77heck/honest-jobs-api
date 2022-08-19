@@ -1,53 +1,47 @@
-import {
-    deleteAccount,
-    getSecurityQuestion,
-    login,
-    signup,
-    updateUserData,
-    whoami
-} from '../controllers/job-seeker.controller';
+import { ExpressRouter } from '@routes/libs/express.router';
+import { JobSeekerController } from '../controllers/job-seeker.controller';
 
-const express = require('express');
 const { check, body } = require('express-validator');
 
-const router = express.Router();
+class JobSeekerRouter extends ExpressRouter {
+    public jobSeekerController = new JobSeekerController();
 
-router.post('/login', [
-    check('email').not().isEmpty().escape().trim(),
-    check('password').not().isEmpty()
-], login);
+    public initializeRouter() {
+        this.router.post('/login', [
+            check('email').not().isEmpty().escape().trim(),
+            check('password').not().isEmpty()
+        ], this.jobSeekerController.login);
 
-// perhaps split this between roles.
-router.post('/signup', [
-    body('*').trim(),
-    check('first_name'),
-    check('last_name'),
-    check('email').normalizeEmail().isEmail(),
-    check('password').isLength({ min: 6 }),
-    check('securityQuestion').not().isEmpty().escape(),
-    check('securityAnswer').isLength({ min: 4 }),
-], signup);
+        this.router.post('/signup', [
+            body('*').trim(),
+            check('first_name'),
+            check('last_name'),
+            check('email').normalizeEmail().isEmail(),
+            check('password').isLength({ min: 6 }),
+            check('securityQuestion').not().isEmpty().escape(),
+            check('securityAnswer').isLength({ min: 4 }),
+        ], this.jobSeekerController.signup);
 
-// router.use(simpleUserAuth);
-router.put('/update', [
-    body('*').trim(),
-    check('first_name').escape(),
-    check('last_name').escape(),
-    check('description').escape(),
-    check('meta').escape(),
-    check('images'),
-    check('resume'),
-    check('other_uploads'),
-], updateUserData);
+// this.router.use(simpleUserAuth);
+        this.router.put('/update', [
+            body('*').trim(),
+            check('first_name').escape(),
+            check('last_name').escape(),
+            check('description').escape(),
+            check('meta').escape(),
+            check('images'),
+            check('resume'),
+            check('other_uploads'),
+        ], this.jobSeekerController.updateUserData);
 
-router.get('/whoami', [], whoami);
+        this.router.get('/whoami', [], this.jobSeekerController.whoami);
 
-router.get('/get-security-question', [], getSecurityQuestion);
+        this.router.get('/get-security-question', [], this.jobSeekerController.getSecurityQuestion);
 
-router.delete('/delete-account', [
-    check('answer').not().isEmpty(),
-], deleteAccount);
+        this.router.delete('/delete-account', [
+            check('answer').not().isEmpty(),
+        ], this.jobSeekerController.deleteAccount);
+    }
+}
 
-// TODO -> APPLYING LOGIC
-
-export default router;
+export default new JobSeekerRouter();

@@ -1,8 +1,9 @@
 import { HttpError } from '@models/libs/error-models/errors';
+import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import Review, { ReviewDocument } from '@models/review';
+import { UserService } from '@services/user.service';
 import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
-import { getUserId } from './libs/helpers';
 
 export const getById = async (req: any, res: any, next: NextFunction) => {
     try {
@@ -16,7 +17,10 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
 };
 export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
     try {
-        const userId = await getUserId(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
+
+        const userId = userService.getUserId(req);
+
         const reviews = await Review.getReviewsForEmployer(userId);
 
         res.status(200).json({ reviews });
@@ -25,9 +29,9 @@ export const getByEmployer = async (req: any, res: any, next: NextFunction) => {
     }
 };
 export const createNewReview = async (req: any, res: any, next: NextFunction) => {
-    const createdReview: any = new Review(req.body as ReviewDocument);
-
     try {
+        const createdReview: any = new Review(req.body as ReviewDocument);
+
         await createdReview.save();
     } catch (err) {
         return next(new HttpError(

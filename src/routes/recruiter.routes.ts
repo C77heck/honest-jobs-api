@@ -1,3 +1,4 @@
+import { ExpressRouter } from '@routes/libs/express.router';
 import {
     createNewAd,
     deleteAccount,
@@ -16,64 +17,70 @@ const { check, body } = require('express-validator');
 
 const router = express.Router();
 
-router.post('/login', [
-    check('email').not().isEmpty().trim(),
-    check('password').not().isEmpty()
-], login);
+class RecruiterRouter extends ExpressRouter {
 
-router.post('/signup', [
-    body('*').trim(),
-    check('company_name'),
-    check('email').normalizeEmail().isEmail(),
-    check('password').isLength({ min: 6 }),
-    check('securityQuestion').not().isEmpty(),
-    check('securityAnswer').isLength({ min: 4 }),
-], signup);
+    public initializeRouter() {
 
-router.put('/update', [
-    body('*').trim(),
-    check('company_name'),
-    check('description'),
-    check('address'),
-    check('meta'),
-    check('images'),
-    check('logo'),
-], updateUserData);
+        this.router.post('/login', [
+            check('email').not().isEmpty().trim(),
+            check('password').not().isEmpty()
+        ], login);
 
-router.get('/whoami', [], whoami);
+        this.router.post('/signup', [
+            body('*').trim(),
+            check('company_name'),
+            check('email').normalizeEmail().isEmail(),
+            check('password').isLength({ min: 6 }),
+            check('securityQuestion').not().isEmpty(),
+            check('securityAnswer').isLength({ min: 4 }),
+        ], signup);
 
-router.get('/get-ads', [], getAds);
+        this.router.put('/update', [
+            body('*').trim(),
+            check('company_name'),
+            check('description'),
+            check('address'),
+            check('meta'),
+            check('images'),
+            check('logo'),
+        ], updateUserData);
 
-// router.use(simpleUserAuth);
+        this.router.get('/whoami', [], whoami);
 
-router.get('/get-security-question', [], getSecurityQuestion);
+        this.router.get('/get-ads', [], getAds);
 
-router.delete('/delete-account', [
-    check('answer').not().isEmpty(),
-], deleteAccount);
+// this.router.use(simpleUserAuth);
 
-router.post('/create-new-ad', [
-    check('title').not().isEmpty(),
-    check('description').not().isEmpty(),
-    check('meta'),
-    check('salary').not().isEmpty(),
-    check('location').not().isEmpty(),
-    check('expiresOn').isString().not().isEmpty(),
-    check('isPremium').isBoolean(),
-    check('images'),
-], createNewAd);
+        this.router.get('/get-security-question', [], getSecurityQuestion);
 
-router.put('/update-ad/:adId', [
-    check('title').not().isEmpty(),
-    check('description').not().isEmpty(),
-    check('meta'),
-    check('salary').not().isEmpty(),
-    check('location').not().isEmpty(),
-    check('expiresOn').isString().not().isEmpty(),
-    check('isPremium').isBoolean(),
-    check('images'),
-], updateAd);
+        this.router.delete('/delete-account', [
+            check('answer').not().isEmpty(),
+        ], deleteAccount);
 
-router.delete('/delete-ad/:adId', [], deleteAd);
+        this.router.post('/create-new-ad', [
+            check('title').not().isEmpty(),
+            check('description').not().isEmpty(),
+            check('meta'),
+            check('salary').not().isEmpty(),
+            check('location').not().isEmpty(),
+            check('expiresOn').isString().not().isEmpty(),
+            check('isPremium').isBoolean(),
+            check('images'),
+        ], createNewAd);
 
-export default router;
+        this.router.put('/update-ad/:adId', [
+            check('title').not().isEmpty(),
+            check('description').not().isEmpty(),
+            check('meta'),
+            check('salary').not().isEmpty(),
+            check('location').not().isEmpty(),
+            check('expiresOn').isString().not().isEmpty(),
+            check('isPremium').isBoolean(),
+            check('images'),
+        ], updateAd);
+
+        this.router.delete('/delete-ad/:adId', [], deleteAd);
+    }
+}
+
+export default new RecruiterRouter();

@@ -1,26 +1,30 @@
-import express from 'express';
-import {
-    createFilters,
-    getAdsByEmployer,
-    getAllAds,
-    getById,
-    getFilters
-} from '../controllers/ad-controller';
-import { addJobView } from '../controllers/job-seeker.controller';
+import { ExpressRouter } from '@routes/libs/express.router';
+import { AdController } from '../controllers/ad-controller';
+import { JobSeekerController } from '../controllers/job-seeker.controller';
 
-const router = express.Router();
+class AdRouter extends ExpressRouter {
+    public adController?: AdController;
+    public jobSeekerController?: JobSeekerController;
 
-// we will need to add the filtering properties
-router.get('/get-all-ads', [], getAllAds);
+    public injectControllers() {
+        this.adController = new AdController();
+        this.jobSeekerController = new JobSeekerController();
+    }
 
-router.get('/get-ads-by-employer/:recruiterId', [], getAdsByEmployer);
+    public initializeRouter() {
+        super.initializeRouter();
+        this.router.get('/get-all-ads', [], this.adController.getAllAds.bind(this));
 
-router.get('/get-by-id/:adId', [], getById);
+        this.router.get('/get-ads-by-employer/:recruiterId', [], this.adController.getAdsByEmployer.bind(this));
 
-router.get('/ad-filters', [], getFilters);
+        this.router.get('/get-by-id/:adId', [], this.adController.getById.bind(this));
 
-router.get('/test-filter-creation', [], createFilters);
+        this.router.get('/ad-filters', [], this.adController.getFilters.bind(this));
 
-router.post('/add-view', [], addJobView);
+        this.router.get('/test-filter-creation', [], this.adController.createFilters.bind(this));
 
-export default router;
+        this.router.post('/add-view', [], this.jobSeekerController.addJobView.bind(this));
+    }
+}
+
+export default new AdRouter();

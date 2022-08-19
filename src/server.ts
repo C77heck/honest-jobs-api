@@ -7,7 +7,7 @@ import 'express-async-errors';
 import helmet from 'helmet';
 import logger from 'jet-logger';
 import morgan from 'morgan';
-import baseRouter from './routes/api';
+import api from './routes/api';
 
 // Constants
 const app = express();
@@ -36,10 +36,8 @@ if (process.env.NODE_ENV === 'production') {
  *                         API routes and error handling
  **********************************************************************************/
 
-// Add api router
-app.use('/api', baseRouter);
+app.use('/api', api.router);
 
-// Error handling
 app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
     logger.err(err, true);
     console.log({ errorCode: err.code });

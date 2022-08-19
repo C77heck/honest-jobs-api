@@ -1,8 +1,8 @@
 import { PaginationInterface } from '@models/libs/pagination.interface';
+import { PaginationOptions } from '@services/libs/mongo-query.service';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import { PaginationOptions } from '../controllers/libs/mongo-query-handlers/base-query.handler';
 
 const Schema = mongoose.Schema;
 
