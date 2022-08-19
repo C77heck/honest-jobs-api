@@ -28,14 +28,21 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
+export interface FilterItem {
+    id: string;
+    title: string;
+    property: string;
+    items: number; // how many jobs
+}
+
 export const getFilters = async (req: any, res: any, next: NextFunction) => {
     try {
 
         // TODO -> need a filters document that is being created by a cronjob
-        const location = false || [];
-        const companyType = false || [];
-        const postedAt = false || [];
-        const relatedRoles = false || [];
+        const location: FilterItem[] = false || [];
+        const companyType: FilterItem[] = false || [];
+        const postedAt: FilterItem[] = false || [];
+        const relatedRoles: FilterItem[] = false || [];
 
         res.status(200).json({ location, companyType, postedAt, relatedRoles });
     } catch (err) {
