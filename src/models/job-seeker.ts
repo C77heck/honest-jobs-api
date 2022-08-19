@@ -53,6 +53,19 @@ userSchema.methods.addAppliedJobs = function (job: string) {
     return this.save({ validateModifiedOnly: true });
 };
 
+userSchema.methods.getPublicData = function () {
+    return {
+        first_name: this.first_name,
+        last_name: this.last_name,
+        email: this.email,
+        description: this?.description || '',
+        meta: this?.meta || '',
+        images: this?.images || [''],
+        resume: this?.resume || '',
+        other_uploads: this?.other_uploads || [''],
+    };
+};
+
 userSchema.methods.removeAppliedJob = function (job: string) {
     this.appliedForJobs = (this.appliedForJobs || []).filter((appliedJob: any) => appliedJob.id.toString() !== job);
 

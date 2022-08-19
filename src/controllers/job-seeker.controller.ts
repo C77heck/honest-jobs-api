@@ -1,21 +1,24 @@
 import Ad from '@models/ad';
-import JobSeeker, { JobSeekerDocument } from '@models/job-seeker';
+import JobSeeker from '@models/job-seeker';
 import { BadRequest } from '@models/libs/error-models/errors';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from "../libs/handle-validation";
-import { SafeJobSeekerData } from './libs/safe-job-seeker.data';
+import { ExpressController } from './libs/express.controller';
 
-export class JobSeekerController {
+export class JobSeekerController extends ExpressController {
+    public injectServices() {
+        super.injectServices();
+        this.userServices = new UserService(JobSeeker);
+    }
+
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
             handleValidation(req as any as any);
 
-            const result = await userService.signup(req);
+            const result = await this.userServices.signup(req);
 
             res.json({ result });
         } catch (err) {
@@ -27,11 +30,10 @@ export class JobSeekerController {
         try {
             handleValidation(req as any);
 
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
+            const { user, token } = await this.userServices.login(req);
 
-            const { user, token } = await userService.login(req);
+            const userData = user.getPublicData();
 
-            const userData = new SafeJobSeekerData(user);
             res.json({
                 userData: {
                     ...userData,
@@ -48,9 +50,7 @@ export class JobSeekerController {
         try {
             handleValidation(req as any);
 
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
-            await userService.updateUser(req, req.body);
+            await this.userServices.updateUser(req, req.body);
 
             res.status(201).json({ message: 'User data has been successfully updated.' });
         } catch (err) {
@@ -64,9 +64,7 @@ export class JobSeekerController {
                 throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
             }
 
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
-            const securityQuestion = await userService.getSecurityQuestion(req);
+            const securityQuestion = await this.userServices.getSecurityQuestion(req);
 
             res.status(200).json({ securityQuestion });
         } catch (err) {
@@ -76,9 +74,7 @@ export class JobSeekerController {
 
     public async deleteAccount(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
-            const jobSeeker = await userService.extractUser(req);
+            const jobSeeker = await this.userServices.extractUser(req);
 
             await jobSeeker.remove();
 
@@ -90,11 +86,9 @@ export class JobSeekerController {
 
     public async whoami(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
+            const jobSeeker = await this.userServices.extractUser(req);
 
-            const jobSeeker = await userService.extractUser(req);
-
-            res.status(200).json({ userData: new SafeJobSeekerData(jobSeeker) });
+            res.status(200).json({ userData: jobSeeker.getPublicData() });
         } catch (err) {
             return next(handleError(err));
         }
@@ -103,9 +97,7 @@ export class JobSeekerController {
     public async addJobView(req: express.Request, res: express.Response, next: NextFunction) {
         let jobSeeker;
         try {
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
-            jobSeeker = await userService.extractUser(req);
+            jobSeeker = await this.userServices.extractUser(req);
 
         } catch (e) {
             console.log({ e });
@@ -136,9 +128,7 @@ export class JobSeekerController {
 
     public async addAppliedFor(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userService = new UserService<JobSeekerDocument>(JobSeeker);
-
-            const jobSeeker = await userService.extractUser(req);
+            const jobSeeker = await this.userServices.extractUser(req);
 
             await jobSeeker.addAppliedJobs(req.params.adId);
 

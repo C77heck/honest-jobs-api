@@ -4,8 +4,14 @@ import Review, { ReviewDocument } from '@models/review';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
+import { ExpressController } from './libs/express.controller';
 
-export class ReviewController {
+export class ReviewController extends ExpressController<RecruiterDocument> {
+    public injectServices() {
+        super.injectServices();
+        this.userServices = new UserService(Recruiter);
+    }
+
     public async getById(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             const review = await Review.getReviewById(req.params.reviewId);
@@ -18,9 +24,7 @@ export class ReviewController {
 
     public async getByEmployer(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userService = new UserService<RecruiterDocument>(Recruiter);
-
-            const userId = userService.getUserId(req);
+            const userId = this.userServices.getUserId(req);
 
             const reviews = await Review.getReviewsForEmployer(userId);
 

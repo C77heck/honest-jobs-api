@@ -41,6 +41,18 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     images: [{ type: String }],
 });
 
+recruiterSchema.methods.getPublicData = function () {
+    return {
+        email: this.email,
+        description: this?.description || '',
+        address: this?.address || '',
+        meta: this?.meta || '',
+        images: this?.images || [''],
+        company_name: this?.company_name || '',
+        logo: this?.logo || '',
+    };
+};
+
 recruiterSchema.set('timestamps', true);
 
 recruiterSchema.plugin(uniqueValidator);

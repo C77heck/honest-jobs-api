@@ -18,4 +18,5 @@ export interface BaseUserDocument extends Document {
     images?: string[];
     loginAttempts: (loginAttempts: number) => Promise<JobSeekerDocument | RecruiterDocument>;
     getUserSecurityQuestion: () => Promise<string>;
+    getPublicData: () => any;
 }

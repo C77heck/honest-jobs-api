@@ -61,7 +61,7 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
         }
     }
 
-    public async login(req: express.Request) {
+    public async login(req: express.Request): Promise<{ user: T; token: string }> {
 
         const { email, password } = req.body;
 

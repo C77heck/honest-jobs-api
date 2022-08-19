@@ -12,14 +12,12 @@ export interface SortResult {
 }
 
 export class MongoQueryService {
-    public filters: any;
-    public pagination: any;
-    public sort: any;
-
-    public constructor(req: express.Request) {
-        this.filters = this.extractFilters(req);
-        this.pagination = this.getPaginationFromRequest(req);
-        this.sort = this.getMongoSortOptions(req);
+    public getFormattedData(req: express.Request) {
+        return {
+            filters: this.extractFilters(req),
+            pagination: this.getPaginationFromRequest(req),
+            sort: this.getMongoSortOptions(req)
+        };
     }
 
     protected extractFilters(req: express.Request) {
@@ -27,7 +25,7 @@ export class MongoQueryService {
             return {};
         }
 
-        const customFilters = this.customQueryHandler();
+        const customFilters = this.customQueryHandler(req);
 
         if (!customFilters) {
             return { ...(req.query?.filters as any || {}) };
@@ -36,7 +34,7 @@ export class MongoQueryService {
         return customFilters;
     }
 
-    public customQueryHandler() {
+    public customQueryHandler(req: express.Request) {
         return null;
     }
 
