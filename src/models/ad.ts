@@ -23,7 +23,8 @@ export interface AdDocument extends Document {
     jobType: 'Permanent' | 'Remote' | 'Contract' | 'Part Time' | 'Temporary';
     companyType: 'Agency' | 'Direct Employer';
     industryType?: string[];
-
+    relatedRoles?: string[];
+    createdAt: Date;
     meta?: string,
     company?: string;
     logo?: string;
@@ -58,6 +59,7 @@ const adSchema = new Schema({
             sessionId: String,
             views: [Date]
         }], appliedFor: { type: Number, default: 0 },
+        relatedRoles: { type: [String] },
         standard: { type: Boolean, default: false },
         featured: { type: Boolean, default: false },
         premium: { type: Boolean, default: false }

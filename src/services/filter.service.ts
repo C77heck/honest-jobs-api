@@ -41,16 +41,26 @@ export class FilterService extends DocumentService<FilterDocument> {
         for (const ad of ads) {
             const location = filters.location as any;
             location[ad.location] = location[ad.location] ? location[ad.location] + 1 : 1;
-            const industryType = filters.industryType as any;
-            industryType[ad.industryType] = industryType[ad.industryType] ? industryType[ad.industryType] + 1 : 1;
+
             const companyType = filters.companyType as any;
             companyType[ad.companyType] = companyType[ad.companyType] ? companyType[ad.companyType] + 1 : 1;
+
             const postedAt = filters.postedAt as any;
-            postedAt[ad.postedAt] = postedAt[ad.postedAt] ? postedAt[ad.postedAt] + 1 : 1;
-            const relatedRoles = filters.relatedRoles as any;
-            relatedRoles[ad.relatedRoles] = relatedRoles[ad.relatedRoles] ? relatedRoles[ad.relatedRoles] + 1 : 1;
+            const key = ad.createdAt.toString();
+            postedAt[key] = postedAt[key] ? postedAt[key] + 1 : 1;
+
             const jobType = filters.jobType as any;
             jobType[ad.jobType] = jobType[ad.jobType] ? jobType[ad.jobType] + 1 : 1;
+
+            const relatedRoles = filters.relatedRoles as any;
+            (ad.relatedRoles || []).map(role => {
+                relatedRoles[role] = relatedRoles[role] ? relatedRoles[role] + 1 : 1;
+            });
+
+            const industryType = filters.relatedRoles as any;
+            (ad.industryType || []).map(type => {
+                industryType[type] = relatedRoles[type] ? relatedRoles[type] + 1 : 1;
+            });
         }
 
         return this.collection.create({
