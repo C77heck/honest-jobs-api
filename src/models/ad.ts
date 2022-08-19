@@ -71,7 +71,7 @@ adSchema.set('timestamps', true);
 adSchema.plugin(uniqueValidator);
 
 interface AdModel extends Mongoose.Model<any> {
-    getAllAds(pagination: PaginationOptions, filters?: {}, sort?: {}): Promise<PaginationInterface<AdDocument>>;
+    getAllAds(pagination: any, filters?: {}, sort?: {}): Promise<PaginationInterface<AdDocument>>;
 
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
 

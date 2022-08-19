@@ -15,14 +15,14 @@ export class ExpressRouter {
 
     public constructor() {
         this.router = express.Router();
-        this.initializeRouter();
-    }
-
-    public initializeRouter() {
         this.recruiterController = new RecruiterController();
         this.adController = new AdController();
         this.jobSeekerController = new JobSeekerController();
         this.reviewController = new ReviewController();
         this.analyticsController = new AnalyticsController();
+        this.initializeRouter();
+    }
+
+    public initializeRouter() {
     }
 }
