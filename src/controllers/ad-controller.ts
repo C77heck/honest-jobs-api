@@ -1,5 +1,7 @@
 import Ad from '@models/ad';
+import Filter from '@models/filter';
 import Recruiter from '@models/recruiter';
+import { FilterService } from '@services/filter.service';
 import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
 import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
@@ -28,23 +30,23 @@ export const getById = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export interface FilterItem {
-    id: string;
-    title: string;
-    property: string;
-    items: number; // how many jobs
-}
-
 export const getFilters = async (req: any, res: any, next: NextFunction) => {
     try {
+        const filterService = new FilterService(Filter);
+        const filter = await filterService.getFilters();
 
-        // TODO -> need a filters document that is being created by a cronjob
-        const location: FilterItem[] = false || [];
-        const companyType: FilterItem[] = false || [];
-        const postedAt: FilterItem[] = false || [];
-        const relatedRoles: FilterItem[] = false || [];
+        res.status(200).json({ ...filter });
+    } catch (err) {
+        return next(handleError(err));
+    }
+};
 
-        res.status(200).json({ location, companyType, postedAt, relatedRoles });
+export const createFilters = async (req: any, res: any, next: NextFunction) => {
+    try {
+        const filterService = new FilterService(Filter);
+        await filterService.createFilters();
+
+        res.status(200).json({ message: 'Success' });
     } catch (err) {
         return next(handleError(err));
     }

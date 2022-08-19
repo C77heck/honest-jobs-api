@@ -1,5 +1,11 @@
 import express from 'express';
-import { getAdsByEmployer, getAllAds, getById, getFilters } from '../controllers/ad-controller';
+import {
+    createFilters,
+    getAdsByEmployer,
+    getAllAds,
+    getById,
+    getFilters
+} from '../controllers/ad-controller';
 import { addJobView } from '../controllers/job-seeker.controller';
 
 const router = express.Router();
@@ -12,6 +18,8 @@ router.get('/get-ads-by-employer/:recruiterId', [], getAdsByEmployer);
 router.get('/get-by-id/:adId', [], getById);
 
 router.get('/ad-filters', [], getFilters);
+
+router.get('/test-filter-creation', [], createFilters);
 
 router.post('/add-view', [], addJobView);
 

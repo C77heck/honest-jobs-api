@@ -12,3 +12,12 @@ export const getUserSecurityQuestion = async (Model: Mongoose.Model<any>, userId
     console.log(user);
     return null;
 };
+
+export const getArrayFromObject = <T>(object: any): T[] => {
+    let result: any[] = [];
+    for (const prop in object) {
+        result = [...result, { ...object[prop], id: prop }];
+    }
+
+    return result;
+};
