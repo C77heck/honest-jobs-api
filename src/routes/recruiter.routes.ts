@@ -1,30 +1,14 @@
 import { ExpressRouter } from '@routes/libs/express.router';
-import {
-    createNewAd,
-    deleteAccount,
-    deleteAd,
-    getAds,
-    getSecurityQuestion,
-    login,
-    signup,
-    updateAd,
-    updateUserData,
-    whoami
-} from '../controllers/recruiter.controller';
 
 const express = require('express');
 const { check, body } = require('express-validator');
 
-const router = express.Router();
-
 class RecruiterRouter extends ExpressRouter {
-
     public initializeRouter() {
-
         this.router.post('/login', [
             check('email').not().isEmpty().trim(),
             check('password').not().isEmpty()
-        ], login);
+        ], this.recruiterController.login);
 
         this.router.post('/signup', [
             body('*').trim(),
@@ -33,7 +17,7 @@ class RecruiterRouter extends ExpressRouter {
             check('password').isLength({ min: 6 }),
             check('securityQuestion').not().isEmpty(),
             check('securityAnswer').isLength({ min: 4 }),
-        ], signup);
+        ], this.recruiterController.signup);
 
         this.router.put('/update', [
             body('*').trim(),
@@ -43,19 +27,19 @@ class RecruiterRouter extends ExpressRouter {
             check('meta'),
             check('images'),
             check('logo'),
-        ], updateUserData);
+        ], this.recruiterController.updateUserData);
 
-        this.router.get('/whoami', [], whoami);
+        this.router.get('/whoami', [], this.recruiterController.whoami);
 
-        this.router.get('/get-ads', [], getAds);
+        this.router.get('/get-ads', [], this.recruiterController.getAds);
 
 // this.router.use(simpleUserAuth);
 
-        this.router.get('/get-security-question', [], getSecurityQuestion);
+        this.router.get('/get-security-question', [], this.recruiterController.getSecurityQuestion);
 
         this.router.delete('/delete-account', [
             check('answer').not().isEmpty(),
-        ], deleteAccount);
+        ], this.recruiterController.deleteAccount);
 
         this.router.post('/create-new-ad', [
             check('title').not().isEmpty(),
@@ -66,7 +50,7 @@ class RecruiterRouter extends ExpressRouter {
             check('expiresOn').isString().not().isEmpty(),
             check('isPremium').isBoolean(),
             check('images'),
-        ], createNewAd);
+        ], this.recruiterController.createNewAd);
 
         this.router.put('/update-ad/:adId', [
             check('title').not().isEmpty(),
@@ -77,9 +61,9 @@ class RecruiterRouter extends ExpressRouter {
             check('expiresOn').isString().not().isEmpty(),
             check('isPremium').isBoolean(),
             check('images'),
-        ], updateAd);
+        ], this.recruiterController.updateAd);
 
-        this.router.delete('/delete-ad/:adId', [], deleteAd);
+        this.router.delete('/delete-ad/:adId', [], this.recruiterController.deleteAd);
     }
 }
 

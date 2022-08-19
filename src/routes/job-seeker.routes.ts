@@ -1,11 +1,8 @@
 import { ExpressRouter } from '@routes/libs/express.router';
-import { JobSeekerController } from '../controllers/job-seeker.controller';
 
 const { check, body } = require('express-validator');
 
 class JobSeekerRouter extends ExpressRouter {
-    public jobSeekerController = new JobSeekerController();
-
     public initializeRouter() {
         this.router.post('/login', [
             check('email').not().isEmpty().escape().trim(),

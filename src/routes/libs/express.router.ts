@@ -1,19 +1,25 @@
 import express from 'express';
+import { AdController } from '../../controllers/ad-controller';
+import { JobSeekerController } from '../../controllers/job-seeker.controller';
+import { RecruiterController } from '../../controllers/recruiter.controller';
+import { ReviewController } from '../../controllers/review-controller';
 
 export class ExpressRouter {
     public router: express.Router;
+    public recruiterController: RecruiterController;
+    public adController: AdController;
+    public jobSeekerController: JobSeekerController;
+    public reviewController: ReviewController;
 
-    // figure the  services to be available and controllers being injected
     public constructor() {
         this.router = express.Router();
-        this.injectControllers();
+        this.recruiterController = new RecruiterController();
+        this.adController = new AdController();
+        this.jobSeekerController = new JobSeekerController();
+        this.reviewController = new ReviewController();
         this.initializeRouter();
     }
 
     public initializeRouter() {
-    }
-
-    public injectControllers() {
-
     }
 }
