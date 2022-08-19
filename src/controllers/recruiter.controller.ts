@@ -1,19 +1,17 @@
 import Ad, { AdDocument } from '@models/ad';
-import { JobSeekerDocument } from '@models/job-seeker';
-import { BadRequest, HttpError, InternalServerError } from '@models/libs/error-models/errors';
+import { BadRequest, HttpError } from '@models/libs/error-models/errors';
 import Recruiter, { RecruiterDocument } from '@models/recruiter';
+import { AdQueryService } from '@services/ad-query.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
-import { extractRecruiter, getUserId } from './libs/helpers';
-import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 import { SafeRecruiterData } from './libs/sase-recruiter.data';
 
 export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const userService = new UserService<JobSeekerDocument>(Recruiter);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
         handleValidation(req as any as any);
 
@@ -50,9 +48,9 @@ export const updateUserData = async (req: express.Request, res: express.Response
     try {
         handleValidation(req as any);
 
-        const userId = await getUserId(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        await Recruiter.updateUser(req.body, userId);
+        await userService.updateUser(req, req.body);
 
         res.status(201).json({ message: 'User data has been successfully updated.' });
     } catch (err) {
@@ -62,9 +60,11 @@ export const updateUserData = async (req: express.Request, res: express.Response
 
 export const getAds = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const recruiter = await extractRecruiter(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        const { filters, pagination, sort } = new AdQueryHandler(req);
+        const recruiter = await userService.extractUser(req);
+
+        const { filters, pagination, sort } = new AdQueryService(req);
 
         const postedJobs = await recruiter.getPostedJobs(pagination, filters, sort,);
 
@@ -76,13 +76,15 @@ export const getAds = async (req: express.Request, res: express.Response, next: 
 
 export const createNewAd = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        const createdAd: any = new Ad({ ...req.body, logo: user.logo } as AdDocument);
+        const recruiter = await userService.extractUser(req);
+
+        const createdAd: any = new Ad({ ...req.body, logo: recruiter.logo } as AdDocument);
 
         await createdAd.save();
 
-        await user.addPostedJobs(createdAd?._id);
+        await recruiter.addPostedJobs(createdAd?._id);
 
         res.status(201).json({ message: 'New ad has been successfully added' });
     } catch (err) {
@@ -104,9 +106,11 @@ export const deleteAd = async (req: express.Request, res: express.Response, next
     try {
         const ad = await Ad.findById(req.params.adId);
 
-        const user = await extractRecruiter(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        await user.removePostedJob(ad?._id);
+        const recruiter = await userService.extractUser(req);
+
+        await recruiter.removePostedJob(ad?._id);
 
         await ad.remove();
 
@@ -124,18 +128,9 @@ export const getSecurityQuestion = async (req: express.Request, res: express.Res
         if (!req.body.email) {
             throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
         }
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        const user = await Recruiter.findOne({ email: req.body.email });
-
-        if (!user) {
-            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
-        }
-
-        const securityQuestion = await user.getUserSecurityQuestion();
-
-        if (!securityQuestion) {
-            throw new InternalServerError(ERROR_MESSAGES.GENERIC);
-        }
+        const securityQuestion = await userService.getSecurityQuestion(req);
 
         res.status(200).json({ securityQuestion });
     } catch (err) {
@@ -145,9 +140,11 @@ export const getSecurityQuestion = async (req: express.Request, res: express.Res
 
 export const deleteAccount = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        await user.remove();
+        const recruiter = await userService.extractUser(req);
+
+        await recruiter.remove();
 
         res.status(200).json({ message: 'Account has been successfully deleted.' });
     } catch (err) {
@@ -157,9 +154,11 @@ export const deleteAccount = async (req: express.Request, res: express.Response,
 
 export const whoami = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractRecruiter(req);
+        const userService = new UserService<RecruiterDocument>(Recruiter);
 
-        res.status(200).json({ userData: new SafeRecruiterData(user) });
+        const recruiter = await userService.extractUser(req);
+
+        res.status(200).json({ userData: new SafeRecruiterData(recruiter) });
     } catch (err) {
         return next(handleError(err));
     }

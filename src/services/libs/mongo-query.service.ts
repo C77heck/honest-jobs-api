@@ -11,7 +11,7 @@ export interface SortResult {
     sort?: SortOptions;
 }
 
-export class BaseQueryHandler {
+export class MongoQueryService {
     public filters: any;
     public pagination: any;
     public sort: any;
@@ -39,14 +39,6 @@ export class BaseQueryHandler {
     public customQueryHandler() {
         return null;
     }
-
-    private extractQuery(req: express.Request) {
-        if (!req.query) {
-            return {};
-        }
-
-        return { ...req.query };
-    };
 
     private getMongoSortOptions(req: express.Request): SortResult {
         const rawSort = req.query?.sort;

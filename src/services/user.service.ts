@@ -1,11 +1,17 @@
 import JobSeeker from '@models/job-seeker';
-import { BadRequest, Forbidden, InternalServerError } from '@models/libs/error-models/errors';
+import {
+    BadRequest,
+    Forbidden,
+    InternalServerError,
+    Unauthorized
+} from '@models/libs/error-models/errors';
 import { BaseUserDocument } from '@models/user';
 import { DocumentService } from '@services/libs/document.service';
 import bcrypt from 'bcryptjs';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
+import { ERROR_MESSAGES } from '../libs/constants';
 import { handleValidation } from '../libs/handle-validation';
 
 export class UserService<T extends BaseUserDocument> extends DocumentService<T> {
@@ -93,5 +99,58 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
         }
 
         return { user, token };
+    }
+
+    public getToken(req: express.Request): string {
+        if (!req?.headers?.authorization) {
+            return '';
+        }
+
+        return (req?.headers?.authorization || '').split(' ')?.[1] || '';
+    }
+
+    public getUserId(req: express.Request): string {
+        try {
+            const token = this.getToken(req);
+            const decodedToken: any = jwt.verify(token, process.env?.JWT_KEY || '');
+
+            return decodedToken.userId;
+        } catch (e) {
+            throw new Unauthorized(ERROR_MESSAGES.INVALID_TOKEN);
+        }
+    }
+
+    public async extractUser(req: express.Request): Promise<T> {
+        const userId = this.getUserId(req);
+
+        const user = await this.collection.findById(userId);
+
+        if (!user) {
+            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
+        }
+
+        return user;
+    }
+
+    public async updateUser(req: express.Request, data: T) {
+        const user = await this.extractUser(req);
+
+        return user.update(data);
+    }
+
+    public async getSecurityQuestion(req: express.Request) {
+        const user = await this.collection.findOne({ email: req.body.email });
+
+        if (!user) {
+            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
+        }
+
+        const securityQuestion = await user.getUserSecurityQuestion();
+
+        if (!securityQuestion) {
+            throw new InternalServerError(ERROR_MESSAGES.GENERIC);
+        }
+
+        return securityQuestion;
     }
 }

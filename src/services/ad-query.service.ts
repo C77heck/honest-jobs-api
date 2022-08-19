@@ -1,6 +1,6 @@
-import { BaseQueryHandler } from './base-query.handler';
+import { MongoQueryService } from '@services/libs/mongo-query.service';
 
-export class AdQueryHandler extends BaseQueryHandler {
+export class AdQueryService extends MongoQueryService {
     public customQueryHandler(): any {
         const rawFilters = this.filters;
         const filters: any = {};

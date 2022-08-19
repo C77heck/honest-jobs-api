@@ -1,14 +1,14 @@
 import Ad from '@models/ad';
 import Filter from '@models/filter';
 import Recruiter from '@models/recruiter';
+import { AdQueryService } from '@services/ad-query.service';
 import { FilterService } from '@services/filter.service';
 import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
-import { AdQueryHandler } from './libs/mongo-query-handlers/ad-query.handler';
 
 export const getAllAds = async (req: any, res: any, next: NextFunction) => {
     try {
-        const { filters, pagination, sort } = new AdQueryHandler(req);
+        const { filters, pagination, sort } = new AdQueryService(req);
 
         const paginatedData = await Ad.getAllAds(pagination, filters, sort);
 

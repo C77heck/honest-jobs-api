@@ -1,13 +1,11 @@
 import Ad from '@models/ad';
 import JobSeeker, { JobSeekerDocument } from '@models/job-seeker';
-import { BadRequest, InternalServerError } from '@models/libs/error-models/errors';
-import Recruiter from '@models/recruiter';
+import { BadRequest } from '@models/libs/error-models/errors';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from "../libs/handle-validation";
-import { extractJobSeeker, getUserId } from './libs/helpers';
 import { SafeJobSeekerData } from './libs/safe-job-seeker.data';
 
 export const signup = async (req: express.Request, res: express.Response, next: NextFunction) => {
@@ -49,23 +47,11 @@ export const updateUserData = async (req: express.Request, res: express.Response
     try {
         handleValidation(req as any);
 
-        const userId = await getUserId(req);
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
 
-        await JobSeeker.updateUser(req.body, userId);
+        await userService.updateUser(req, req.body);
 
         res.status(201).json({ message: 'User data has been successfully updated.' });
-    } catch (err) {
-        return next(handleError(err));
-    }
-};
-
-export const getUserData = async (req: express.Request, res: express.Response, next: NextFunction) => {
-    try {
-        handleValidation(req as any);
-
-        const userData = await JobSeeker.getUser(req.params.userId);
-
-        res.status(201).json({ meta: new SafeJobSeekerData(userData) });
     } catch (err) {
         return next(handleError(err));
     }
@@ -77,17 +63,9 @@ export const getSecurityQuestion = async (req: express.Request, res: express.Res
             throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
         }
 
-        const user = await Recruiter.findOne({ email: req.body.email });
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
 
-        if (!user) {
-            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
-        }
-
-        const securityQuestion = await user.getUserSecurityQuestion();
-
-        if (!securityQuestion) {
-            throw new InternalServerError(ERROR_MESSAGES.GENERIC);
-        }
+        const securityQuestion = await userService.getSecurityQuestion(req);
 
         res.status(200).json({ securityQuestion });
     } catch (err) {
@@ -97,9 +75,11 @@ export const getSecurityQuestion = async (req: express.Request, res: express.Res
 
 export const deleteAccount = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractJobSeeker(req);
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
 
-        await user.remove();
+        const jobSeeker = await userService.extractUser(req);
+
+        await jobSeeker.remove();
 
         res.status(200).json({ message: 'Account has been successfully deleted.' });
     } catch (err) {
@@ -109,18 +89,23 @@ export const deleteAccount = async (req: express.Request, res: express.Response,
 
 export const whoami = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractJobSeeker(req);
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
 
-        res.status(200).json({ userData: new SafeJobSeekerData(user) });
+        const jobSeeker = await userService.extractUser(req);
+
+        res.status(200).json({ userData: new SafeJobSeekerData(jobSeeker) });
     } catch (err) {
         return next(handleError(err));
     }
 };
 
 export const addJobView = async (req: express.Request, res: express.Response, next: NextFunction) => {
-    let user;
+    let jobSeeker;
     try {
-        user = await extractJobSeeker(req);
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
+
+        jobSeeker = await userService.extractUser(req);
+
     } catch (e) {
         console.log({ e });
     }
@@ -132,14 +117,14 @@ export const addJobView = async (req: express.Request, res: express.Response, ne
             throw new BadRequest(ERROR_MESSAGES.AD_ID);
         }
 
-        if (!user) {
+        if (!jobSeeker) {
             if (!sessionId) {
                 throw new BadRequest(ERROR_MESSAGES.MISSING_SESSION_ID);
             }
             await Ad.addGuestView(sessionId, adId);
         } else {
-            await Ad.addRegisteredUserView(user?._id, adId);
-            await user.addView(req.body.adId);
+            await Ad.addRegisteredUserView(jobSeeker?._id, adId);
+            await jobSeeker.addView(req.body.adId);
         }
 
         res.json({ message: 'Success' });
@@ -150,9 +135,11 @@ export const addJobView = async (req: express.Request, res: express.Response, ne
 
 export const addAppliedFor = async (req: express.Request, res: express.Response, next: NextFunction) => {
     try {
-        const user = await extractJobSeeker(req);
+        const userService = new UserService<JobSeekerDocument>(JobSeeker);
 
-        await user.addAppliedJobs(req.params.adId);
+        const jobSeeker = await userService.extractUser(req);
+
+        await jobSeeker.addAppliedJobs(req.params.adId);
 
         return Ad.addAppliedFor(req.params.adId);
     } catch (err) {
