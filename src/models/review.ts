@@ -1,10 +1,9 @@
 import Mongoose from 'mongoose';
-import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
-const Schema = mongoose.Schema;
+const Schema = Mongoose.Schema;
 
-export interface ReviewDocument extends Document {
+export interface ReviewDocument extends Mongoose.Document {
     title: string;
     description: string;
     salary: string;
@@ -17,7 +16,7 @@ export interface ReviewDocument extends Document {
     startDate: Date;
     finishDate: Date;
     isCurrentEmployer: boolean;
-    employerId: mongoose.Types.ObjectId;
+    employerId: Mongoose.Types.ObjectId;
 }
 
 const reviewSchema = new Schema({
@@ -34,7 +33,7 @@ const reviewSchema = new Schema({
     startDate: { type: Date, required: true },
     finishDate: { type: Date },
     isCurrentEmployer: { type: Boolean, required: true },
-    employerId: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+    employerId: { type: Mongoose.Types.ObjectId, required: true, ref: 'User' },
 });
 
 reviewSchema.set('timestamps', true);
@@ -67,4 +66,4 @@ reviewSchema.static('getReviewById', async function (this: Mongoose.Model<any>, 
     return this.findById(employerId);
 });
 
-export default mongoose.model<ReviewDocument, ReviewModel>('Review', reviewSchema);
+export default Mongoose.model<ReviewDocument, ReviewModel>('Review', reviewSchema);

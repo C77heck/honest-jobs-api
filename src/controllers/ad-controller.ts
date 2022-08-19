@@ -44,9 +44,9 @@ export const getFilters = async (req: any, res: any, next: NextFunction) => {
 export const createFilters = async (req: any, res: any, next: NextFunction) => {
     try {
         const filterService = new FilterService(Filter);
-        await filterService.createFilters();
+        const result = await filterService.createFilters();
 
-        res.status(200).json({ message: 'Success' });
+        res.status(200).json({ result });
     } catch (err) {
         return next(handleError(err));
     }

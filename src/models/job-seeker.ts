@@ -13,6 +13,7 @@ export interface JobSeekerDocument extends BaseUserDocument {
     other_uploads?: string[];
     appliedForJobs?: { id: string, appliedAt: Date }[];
     viewedAd?: { id: string, viewedAt: Date }[];
+    desiredRoles: string[];
     addAppliedJobs: (job: string) => Promise<JobSeekerDocument>;
     removeAppliedJob: (job: string) => Promise<JobSeekerDocument>;
     getAppliedJobs: () => Promise<AdDocument[]>;
@@ -33,6 +34,7 @@ const userSchema = new Schema<JobSeekerDocument>({
     isRecruiter: { type: Boolean, required: true, default: false },
     appliedForJobs: { type: [{ id: Mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
     viewedAd: { type: [{ id: Mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
+    desiredRoles: { type: [Mongoose.Types.ObjectId], ref: 'Roles' },
     description: { type: String },
     logo: { type: String },
     meta: { type: String },

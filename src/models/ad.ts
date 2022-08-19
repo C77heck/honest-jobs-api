@@ -6,6 +6,12 @@ import { PaginationOptions } from '../controllers/libs/mongo-query-handlers/base
 
 const Schema = mongoose.Schema;
 
+// TODO
+// companyType = need to be implemented
+// postedAt needs just the range to  be implemented perhaps we wont need this.
+// related roles need categories to be implemented on both the front and the backend
+// job types liek full-time part-time ...etc
+
 export interface AdDocument extends Document {
     title: string;
     description: string;
@@ -13,6 +19,11 @@ export interface AdDocument extends Document {
     location: string;
     expiresOn: Date;
     isPremium: boolean;
+
+    jobType: 'Permanent' | 'Remote' | 'Contract' | 'Part Time' | 'Temporary';
+    companyType: 'Agency' | 'Direct Employer';
+    industryType?: string[];
+
     meta?: string,
     company?: string;
     logo?: string;

@@ -12,9 +12,11 @@ export interface FilterItem {
 
 export interface FilterDocument extends Document {
     location: FilterItem[];
+    industryType: FilterItem[];
     companyType: FilterItem[];
     postedAt: FilterItem[];
     relatedRoles: FilterItem[];
+    jobType: FilterItem[];
     updateFilter?: (data: FilterDocument) => Promise<FilterDocument>;
 }
 
@@ -24,11 +26,13 @@ const filterDataSchema = new Schema({
     items: Number
 });
 
-const filterSchema = new Schema({
+const filterSchema = new Schema<FilterDocument>({
     location: { type: [filterDataSchema] },
+    industryType: { type: [filterDataSchema] },
     companyType: { type: [filterDataSchema] },
     postedAt: { type: [filterDataSchema] },
-    relatedRoles: { type: [filterDataSchema] }
+    relatedRoles: { type: [filterDataSchema] },
+    jobType: { type: [filterDataSchema] }
 });
 
 filterSchema.set('timestamps', true);
@@ -41,9 +45,10 @@ interface FilterModel extends Mongoose.Model<any> {
 
 filterSchema.methods.updateFilter = function (data: FilterDocument): Promise<FilterDocument> {
     this.location = data?.location ?? this.location;
-    this.companyType = data?.companyType ?? this.companyType;
+    this.industryType = data?.industryType ?? this.industryType;
     this.postedAt = data?.postedAt ?? this.postedAt;
     this.relatedRoles = data?.relatedRoles ?? this.relatedRoles;
+    this.jobType = data?.jobType ?? this.jobType;
 
     return this.save({ validateModifiedOnly: true });
 };

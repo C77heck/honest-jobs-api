@@ -31,25 +31,35 @@ export class FilterService extends DocumentService<FilterDocument> {
 
         const filters = {
             location: {},
+            industryType: {},
             companyType: {},
             postedAt: {},
-            relatedRoles: {}
+            relatedRoles: {},
+            jobType: {}
         };
-        // TODO
-        // companyType = need to be implemented
-        // postedAt needs just the range to  be implemented perhaps we wont need this.
-        // related roles need categories to be implemented on both the front and the backend
-        // job types liek full-time part-time ...etc
+
         for (const ad of ads) {
             const location = filters.location as any;
             location[ad.location] = location[ad.location] ? location[ad.location] + 1 : 1;
+            const industryType = filters.industryType as any;
+            industryType[ad.industryType] = industryType[ad.industryType] ? industryType[ad.industryType] + 1 : 1;
+            const companyType = filters.companyType as any;
+            companyType[ad.companyType] = companyType[ad.companyType] ? companyType[ad.companyType] + 1 : 1;
+            const postedAt = filters.postedAt as any;
+            postedAt[ad.postedAt] = postedAt[ad.postedAt] ? postedAt[ad.postedAt] + 1 : 1;
+            const relatedRoles = filters.relatedRoles as any;
+            relatedRoles[ad.relatedRoles] = relatedRoles[ad.relatedRoles] ? relatedRoles[ad.relatedRoles] + 1 : 1;
+            const jobType = filters.jobType as any;
+            jobType[ad.jobType] = jobType[ad.jobType] ? jobType[ad.jobType] + 1 : 1;
         }
 
         return this.collection.create({
             location: this.formatFilterData(filters.location),
+            jobType: this.formatFilterData(filters.jobType),
+            industryType: this.formatFilterData(filters.industryType),
             companyType: this.formatFilterData(filters.companyType),
             postedAt: this.formatFilterData(filters.postedAt),
-            relatedRoles: this.formatFilterData(filters.relatedRoles)
+            relatedRoles: this.formatFilterData(filters.relatedRoles) // TODO -> FIGURE HOW TO connect names
         });
     }
 

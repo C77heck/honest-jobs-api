@@ -12,6 +12,8 @@ export interface RecruiterDocument extends BaseUserDocument {
     company_name: string;
     address: string;
     postedJobs?: string[];
+    relatedIndustry?: string[];
+    companyType: 'Agency' | 'Direct Employer';
     logo?: string,
     addPostedJobs: (job: string) => Promise<RecruiterDocument>;
     removePostedJob: (job: string) => Promise<RecruiterDocument>;
@@ -24,6 +26,8 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     password: { type: String, required: true, minlength: 6 },
     securityQuestion: { type: String, required: true },
     securityAnswer: { type: String, required: true },
+    companyType: { type: String, required: true },
+    relatedIndustry: { type: [String], required: true },
     status: {
         loginAttempts: { type: Number, required: false, default: 0 },
         isBlocked: { type: Boolean, required: false, default: false }
