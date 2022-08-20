@@ -4,6 +4,10 @@ import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
 export class AnalyticsController extends ExpressController {
+    public initializeRouters() {
+        this.router.get('/', [], this.getSessionId.bind(this));
+    }
+
     public async getSessionId(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             const sessionId = randomUUID();
@@ -14,3 +18,5 @@ export class AnalyticsController extends ExpressController {
         }
     }
 }
+
+export default new AnalyticsController();

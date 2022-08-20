@@ -3,16 +3,77 @@ import { BadRequest, HttpError } from '@models/libs/error-models/errors';
 import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
+import { body, check } from 'express-validator';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
 import { ExpressController } from './libs/express.controller';
 
 export class RecruiterController extends ExpressController<RecruiterDocument> {
-
     public injectServices() {
         super.injectServices();
         this.userServices = new UserService(Recruiter);
+    }
+
+    public initializeRouters() {
+        this.router.post('/login', [
+            check('email').not().isEmpty().trim(),
+            check('password').not().isEmpty()
+        ], this.login.bind(this));
+
+        this.router.post('/signup', [
+            body('*').trim(),
+            check('company_name'),
+            check('email').normalizeEmail().isEmail(),
+            check('password').isLength({ min: 6 }),
+            check('securityQuestion').not().isEmpty(),
+            check('securityAnswer').isLength({ min: 4 }),
+        ], this.signup.bind(this));
+
+        this.router.put('/update', [
+            body('*').trim(),
+            check('company_name'),
+            check('description'),
+            check('address'),
+            check('meta'),
+            check('images'),
+            check('logo'),
+        ], this.updateUserData.bind(this));
+
+        this.router.get('/whoami', [], this.whoami.bind(this));
+
+        this.router.get('/get-ads', [], this.getAds.bind(this));
+
+        // this.router.use(simpleUserAuth);
+        this.router.get('/get-security-question', [], this.getSecurityQuestion.bind(this));
+
+        this.router.delete('/delete-account', [
+            check('answer').not().isEmpty(),
+        ], this.deleteAccount.bind(this));
+
+        this.router.post('/create-new-ad', [
+            check('title').not().isEmpty(),
+            check('description').not().isEmpty(),
+            check('meta'),
+            check('salary').not().isEmpty(),
+            check('location').not().isEmpty(),
+            check('expiresOn').isString().not().isEmpty(),
+            check('isPremium').isBoolean(),
+            check('images'),
+        ], this.createNewAd.bind(this));
+
+        this.router.put('/update-ad/:adId', [
+            check('title').not().isEmpty(),
+            check('description').not().isEmpty(),
+            check('meta'),
+            check('salary').not().isEmpty(),
+            check('location').not().isEmpty(),
+            check('expiresOn').isString().not().isEmpty(),
+            check('isPremium').isBoolean(),
+            check('images'),
+        ], this.updateAd.bind(this));
+
+        this.router.delete('/delete-ad/:adId', [], this.deleteAd.bind(this));
     }
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
@@ -149,5 +210,6 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
             return next(handleError(err));
         }
     }
-
 }
+
+export default new RecruiterController();

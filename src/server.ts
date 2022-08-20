@@ -7,7 +7,7 @@ import 'express-async-errors';
 import helmet from 'helmet';
 import logger from 'jet-logger';
 import morgan from 'morgan';
-import api from './routes/api';
+import api from '@routes/api.routes';
 
 // Constants
 const app = express();

@@ -3,6 +3,7 @@ import JobSeeker from '@models/job-seeker';
 import { BadRequest } from '@models/libs/error-models/errors';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
+import { body, check } from 'express-validator';
 import { ERROR_MESSAGES } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from "../libs/handle-validation";
@@ -12,6 +13,45 @@ export class JobSeekerController extends ExpressController {
     public injectServices() {
         super.injectServices();
         this.userServices = new UserService(JobSeeker);
+    }
+
+    public initializeRouters() {
+        this.router.post('/login', [
+            check('email').not().isEmpty().escape().trim(),
+            check('password').not().isEmpty()
+        ], this.login.bind(this));
+
+        this.router.post('/signup', [
+            body('*').trim(),
+            check('first_name'),
+            check('last_name'),
+            check('email').normalizeEmail().isEmail(),
+            check('password').isLength({ min: 6 }),
+            check('securityQuestion').not().isEmpty().escape(),
+            check('securityAnswer').isLength({ min: 4 }),
+        ], this.signup.bind(this));
+
+        // this.router.use(simpleUserAuth.bind(this));
+        this.router.put('/update', [
+            body('*').trim(),
+            check('first_name').escape(),
+            check('last_name').escape(),
+            check('description').escape(),
+            check('meta').escape(),
+            check('images'),
+            check('resume'),
+            check('other_uploads'),
+        ], this.updateUserData.bind(this));
+
+        this.router.get('/whoami', [], this.whoami.bind(this));
+
+        this.router.get('/get-security-question', [], this.getSecurityQuestion.bind(this));
+
+        this.router.delete('/delete-account', [
+            check('answer').not().isEmpty(),
+        ], this.deleteAccount.bind(this));
+        
+        this.router.post('/add-view', [], this.addJobView.bind(this));
     }
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
@@ -137,5 +177,6 @@ export class JobSeekerController extends ExpressController {
             next(handleError(err));
         }
     }
-
 }
+
+export default new JobSeekerController();
