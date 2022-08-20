@@ -1,12 +1,18 @@
+import express from 'express';
 import adController from '../controllers/ad-controller';
 import analyticsController from '../controllers/analytics.controller';
 import jobSeekerController from '../controllers/job-seeker.controller';
-import { ExpressController } from '../controllers/libs/express.controller';
 import recruiterController from '../controllers/recruiter.controller';
 
-// Setup routers
-class ExpressApiRouter extends ExpressController {
-    public initializeRouters() {
+class ExpressApiRouter {
+    public router: express.Router;
+
+    public constructor() {
+        this.router = express.Router();
+        this.initalizeRoutes();
+    }
+
+    public initalizeRoutes() {
         this.router.use('/users/recruiter', recruiterController.router);
         this.router.use('/users/job-seeker', jobSeekerController.router);
         this.router.use('/ads', adController.router);

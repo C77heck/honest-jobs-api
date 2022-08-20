@@ -204,7 +204,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
     public async whoami(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             const recruiter = await this.userServices.extractUser(req);
-
+            console.log({ recruiter });
             res.status(200).json({ userData: recruiter.getPublicData() });
         } catch (err) {
             return next(handleError(err));
