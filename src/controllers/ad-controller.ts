@@ -4,26 +4,10 @@ import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
-export class AdController {
-    public controller: ExpressController;
-
-    public constructor() {
-        this.controller = new ExpressController();
-        console.log({ WHATTHEFUCK: this.controller });
-    }
-
+export class AdController extends ExpressController {
     public async getAllAds(req: any, res: any, next: NextFunction) {
         try {
-            console.log({
-                controller: this.controller,
-                adQueryService: this.controller?.adQueryService,
-                filterService: this.controller?.filterService
-            });
-            const {
-                filters,
-                pagination,
-                sort
-            } = this.controller.adQueryService.getFormattedData(req);
+            const { filters, pagination, sort } = this.adQueryService.getFormattedData(req);
 
             const paginatedData = await Ad.getAllAds(pagination, filters, sort);
 
@@ -45,7 +29,7 @@ export class AdController {
 
     public async getFilters(req: any, res: any, next: NextFunction) {
         try {
-            const filter = await this.controller.filterService.getFilters();
+            const filter = await this.filterService.getFilters();
 
             res.status(200).json({ ...filter });
         } catch (err) {
@@ -56,7 +40,7 @@ export class AdController {
 // todo -> will need  to move this to a cluster module
     public async createFilters(req: any, res: any, next: NextFunction) {
         try {
-            const result = await this.controller.filterService.createFilters();
+            const result = await this.filterService.createFilters();
 
             res.status(200).json({ result });
         } catch (err) {

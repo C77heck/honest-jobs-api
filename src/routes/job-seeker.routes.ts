@@ -1,4 +1,5 @@
 import { ExpressRouter } from '@routes/libs/express.router';
+import { NextFunction, Request, Response } from 'express';
 
 const { check, body } = require('express-validator');
 
@@ -7,7 +8,7 @@ class JobSeekerRouter extends ExpressRouter {
         this.router.post('/login', [
             check('email').not().isEmpty().escape().trim(),
             check('password').not().isEmpty()
-        ], this.jobSeekerController.login);
+        ], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.login(req, res, next));
 
         this.router.post('/signup', [
             body('*').trim(),
@@ -17,9 +18,9 @@ class JobSeekerRouter extends ExpressRouter {
             check('password').isLength({ min: 6 }),
             check('securityQuestion').not().isEmpty().escape(),
             check('securityAnswer').isLength({ min: 4 }),
-        ], this.jobSeekerController.signup);
+        ], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.signup(req, res, next));
 
-// this.router.use(simpleUserAuth);
+// this.router.use(simpleUserAuth(req, res, next));
         this.router.put('/update', [
             body('*').trim(),
             check('first_name').escape(),
@@ -29,15 +30,15 @@ class JobSeekerRouter extends ExpressRouter {
             check('images'),
             check('resume'),
             check('other_uploads'),
-        ], this.jobSeekerController.updateUserData);
+        ], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.updateUserData(req, res, next));
 
-        this.router.get('/whoami', [], this.jobSeekerController.whoami);
+        this.router.get('/whoami', [], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.whoami(req, res, next));
 
-        this.router.get('/get-security-question', [], this.jobSeekerController.getSecurityQuestion);
+        this.router.get('/get-security-question', [], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.getSecurityQuestion(req, res, next));
 
         this.router.delete('/delete-account', [
             check('answer').not().isEmpty(),
-        ], this.jobSeekerController.deleteAccount);
+        ], (req: Request, res: Response, next: NextFunction) => this.jobSeekerController.deleteAccount(req, res, next));
     }
 }
 

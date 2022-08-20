@@ -1,4 +1,5 @@
 import { ExpressRouter } from '@routes/libs/express.router';
+import { NextFunction, Request, Response } from 'express';
 
 const express = require('express');
 const { check, body } = require('express-validator');
@@ -8,7 +9,7 @@ class RecruiterRouter extends ExpressRouter {
         this.router.post('/login', [
             check('email').not().isEmpty().trim(),
             check('password').not().isEmpty()
-        ], this.recruiterController.login);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.login(req, res, next));
 
         this.router.post('/signup', [
             body('*').trim(),
@@ -17,7 +18,7 @@ class RecruiterRouter extends ExpressRouter {
             check('password').isLength({ min: 6 }),
             check('securityQuestion').not().isEmpty(),
             check('securityAnswer').isLength({ min: 4 }),
-        ], this.recruiterController.signup);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.signup(req, res, next));
 
         this.router.put('/update', [
             body('*').trim(),
@@ -27,19 +28,19 @@ class RecruiterRouter extends ExpressRouter {
             check('meta'),
             check('images'),
             check('logo'),
-        ], this.recruiterController.updateUserData);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.updateUserData(req, res, next));
 
-        this.router.get('/whoami', [], this.recruiterController.whoami);
+        this.router.get('/whoami', [], (req: Request, res: Response, next: NextFunction) => this.recruiterController.whoami(req, res, next));
 
-        this.router.get('/get-ads', [], this.recruiterController.getAds);
+        this.router.get('/get-ads', [], (req: Request, res: Response, next: NextFunction) => this.recruiterController.getAds(req, res, next));
 
 // this.router.use(simpleUserAuth);
 
-        this.router.get('/get-security-question', [], this.recruiterController.getSecurityQuestion);
+        this.router.get('/get-security-question', [], (req: Request, res: Response, next: NextFunction) => this.recruiterController.getSecurityQuestion(req, res, next));
 
         this.router.delete('/delete-account', [
             check('answer').not().isEmpty(),
-        ], this.recruiterController.deleteAccount);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.deleteAccount(req, res, next));
 
         this.router.post('/create-new-ad', [
             check('title').not().isEmpty(),
@@ -50,7 +51,7 @@ class RecruiterRouter extends ExpressRouter {
             check('expiresOn').isString().not().isEmpty(),
             check('isPremium').isBoolean(),
             check('images'),
-        ], this.recruiterController.createNewAd);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.createNewAd(req, res, next));
 
         this.router.put('/update-ad/:adId', [
             check('title').not().isEmpty(),
@@ -61,9 +62,9 @@ class RecruiterRouter extends ExpressRouter {
             check('expiresOn').isString().not().isEmpty(),
             check('isPremium').isBoolean(),
             check('images'),
-        ], this.recruiterController.updateAd);
+        ], (req: Request, res: Response, next: NextFunction) => this.recruiterController.updateAd(req, res, next));
 
-        this.router.delete('/delete-ad/:adId', [], this.recruiterController.deleteAd);
+        this.router.delete('/delete-ad/:adId', [], (req: Request, res: Response, next: NextFunction) => this.recruiterController.deleteAd(req, res, next));
     }
 }
 
