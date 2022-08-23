@@ -14,7 +14,18 @@ export class AdController extends ExpressController {
 
         this.router.get('/ad-filters', [], this.getFilters.bind(this));
 
-        this.router.get('/test-filter-creation', [], this.createFilters.bind(this));
+        this.router.get('/test', [], this.createFilters.bind(this));
+    }
+
+    // todo -> will need  to move this to a cluster module
+    public async createFilters(req: any, res: any, next: NextFunction) {
+        try {
+            const result = await this.filterService.createFilters();
+
+            res.status(200).json({ result });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     public async getAllAds(req: any, res: any, next: NextFunction) {
@@ -44,17 +55,6 @@ export class AdController extends ExpressController {
             const filter = await this.filterService.getFilters();
 
             res.status(200).json({ ...filter });
-        } catch (err) {
-            return next(handleError(err));
-        }
-    }
-
-// todo -> will need  to move this to a cluster module
-    public async createFilters(req: any, res: any, next: NextFunction) {
-        try {
-            const result = await this.filterService.createFilters();
-
-            res.status(200).json({ result });
         } catch (err) {
             return next(handleError(err));
         }

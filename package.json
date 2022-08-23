@@ -65,7 +65,6 @@
     "@types/express-validator": "^3.0.0",
     "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^8.5.8",
-    "@types/mongoose": "^5.11.97",
     "@types/mongoose-unique-validator": "^1.0.5",
     "@types/uuid": "^8.3.4",
     "axios": "^0.26.1",

@@ -23,7 +23,7 @@ roleSchema.methods.updateRole = function (data: RoleDocument) {
     return this.save({ validateModifiedOnly: true });
 };
 
-export interface JobSeekerModel extends Mongoose.Model<any> {
+export interface RoleModel extends Mongoose.Model<any> {
     getRoles(this: Mongoose.Model<any>): Promise<RoleDocument[]>;
 
     getRole(this: Mongoose.Model<any>, userId: string): Promise<RoleDocument>;
@@ -37,4 +37,4 @@ roleSchema.static('getRole', async function (this: Mongoose.Model<any>, roleId: 
     return this.findOne({ _id: roleId });
 });
 
-export default Mongoose.model<RoleDocument, JobSeekerModel>('Role', roleSchema);
+export default Mongoose.model<RoleDocument, RoleModel>('Role', roleSchema);

@@ -3,10 +3,9 @@ import { PaginationInterface } from '@models/libs/pagination.interface';
 import { BaseUserDocument } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
 import Mongoose from 'mongoose';
-import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
-const Schema = mongoose.Schema;
+const Schema = Mongoose.Schema;
 
 export interface RecruiterDocument extends BaseUserDocument {
     company_name: string;
@@ -33,7 +32,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    postedJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
+    postedJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
     description: { type: String },
     address: { type: String },
     logo: { type: String },
@@ -134,4 +133,4 @@ recruiterSchema.static('getUser', async function (this: Mongoose.Model<any>, use
     return this.findOne({ _id: userId });
 });
 
-export default mongoose.model<RecruiterDocument, RecruiterModel>('Recruiter', recruiterSchema);
+export default Mongoose.model<RecruiterDocument, RecruiterModel>('Recruiter', recruiterSchema);
