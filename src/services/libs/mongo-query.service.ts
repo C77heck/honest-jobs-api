@@ -14,7 +14,7 @@ export interface SortResult {
 export class MongoQueryService {
     public getFormattedData(req: express.Request) {
         return {
-            filters: this.extractFilters(req),
+            filters: this.customQueryHandler(req),
             pagination: this.getPaginationFromRequest(req),
             sort: this.getMongoSortOptions(req)
         };
@@ -25,17 +25,12 @@ export class MongoQueryService {
             return {};
         }
 
-        const customFilters = this.customQueryHandler(req);
+        return { ...(req.query?.filters as any || {}) };
 
-        if (!customFilters) {
-            return { ...(req.query?.filters as any || {}) };
-        }
-
-        return customFilters;
     }
 
     public customQueryHandler(req: express.Request) {
-        return null;
+        return this.extractFilters(req);
     }
 
     private getMongoSortOptions(req: express.Request): SortResult {
@@ -81,5 +76,4 @@ export class MongoQueryService {
 
         return { page, limit };
     };
-
 }
