@@ -7,15 +7,19 @@ import { handleError } from '../libs/handle-error';
 export class FilterService extends DocumentService<FilterDocument> {
     public adService = new AdService(Ad);
 
-    public async getFilters(): Promise<FilterDocument> {
-        const filters = await this.collection.find();
+    public async getFilters(): Promise<FilterDocument | null> {
+        const filters = await this.collection.findOne({});
 
-        return filters?.[0] || {};
+        return filters;
     }
 
     public async remove() {
         try {
             const filter = await this.getFilters();
+
+            if (!filter) {
+                return null;
+            }
 
             return filter.remove();
         } catch (e) {
