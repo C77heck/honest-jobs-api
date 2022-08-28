@@ -54,7 +54,7 @@ export class AdController extends ExpressController {
         try {
             const filter = await this.filterService.getFilters();
 
-            res.status(200).json({ ...filter });
+            res.status(200).json({ filter });
         } catch (err) {
             return next(handleError(err));
         }

@@ -66,7 +66,7 @@ export class FilterService extends DocumentService<FilterDocument> {
             });
         }
 
-        return this.collection.create({
+        const instance = new this.collection({
             location: this.formatFilterData(filters.location),
             jobType: this.formatFilterData(filters.jobType),
             industryType: this.formatFilterData(filters.industryType),
@@ -74,6 +74,8 @@ export class FilterService extends DocumentService<FilterDocument> {
             postedAt: this.formatFilterData(filters.postedAt),
             relatedRoles: this.formatFilterData(filters.relatedRoles) // TODO -> FIGURE HOW TO connect names
         });
+
+        return instance.save();
     }
 
     public formatFilterData(rawFilters: any): FilterItem[] {
