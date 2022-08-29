@@ -11,28 +11,22 @@ export interface FilterItem {
 }
 
 export interface FilterDocument extends Document {
-    location: FilterItem[];
-    industryType: FilterItem[];
-    companyType: FilterItem[];
-    postedAt: FilterItem[];
-    relatedRoles: FilterItem[];
-    jobType: FilterItem[];
+    location: string[];
+    industryType: string[];
+    companyType: string[];
+    postedAt: string[];
+    relatedRoles: string[];
+    jobType: string[];
     updateFilter?: (data: FilterDocument) => Promise<FilterDocument>;
 }
 
-const filterDataSchema = new Schema({
-    value: String,
-    title: String,
-    items: Number
-});
-
 const filterSchema = new Schema<FilterDocument>({
-    location: { type: [filterDataSchema] },
-    industryType: { type: [filterDataSchema] },
-    companyType: { type: [filterDataSchema] },
-    postedAt: { type: [filterDataSchema] },
-    relatedRoles: { type: [filterDataSchema] },
-    jobType: { type: [filterDataSchema] }
+    location: { type: [String] },
+    industryType: { type: [String] },
+    companyType: { type: [String] },
+    postedAt: { type: [String] },
+    relatedRoles: { type: [String] },
+    jobType: { type: [String] }
 });
 
 filterSchema.set('timestamps', true);
