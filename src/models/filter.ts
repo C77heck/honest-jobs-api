@@ -7,26 +7,25 @@ const Schema = mongoose.Schema;
 export interface FilterItem {
     value: string;
     title: string;
-    items: number;
 }
 
 export interface FilterDocument extends Document {
-    location: string[];
-    industryType: string[];
-    companyType: string[];
-    postedAt: string[];
-    relatedRoles: string[];
-    jobType: string[];
+    location: FilterItem[];
+    industryType: FilterItem[];
+    companyType: FilterItem[];
+    postedAt: FilterItem[];
+    relatedRoles: FilterItem[];
+    jobType: FilterItem[];
     updateFilter?: (data: FilterDocument) => Promise<FilterDocument>;
 }
 
 const filterSchema = new Schema<FilterDocument>({
-    location: { type: [String] },
-    industryType: { type: [String] },
-    companyType: { type: [String] },
-    postedAt: { type: [String] },
-    relatedRoles: { type: [String] },
-    jobType: { type: [String] }
+    location: { type: [{ value: String, title: String }] },
+    industryType: { type: [{ value: String, title: String }] },
+    companyType: { type: [{ value: String, title: String }] },
+    postedAt: { type: [{ value: String, title: String }] },
+    relatedRoles: { type: [{ value: String, title: String }] },
+    jobType: { type: [{ value: String, title: String }] }
 });
 
 filterSchema.set('timestamps', true);
