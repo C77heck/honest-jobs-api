@@ -16,7 +16,9 @@ export class FilterService extends DocumentService<FilterDocument> {
             { title: 'Last 7 days', value: '168' },
             { title: 'Last 14 days', value: '336' },
         ];
-
+        // TODO -> FIGURE THE MOST EFFECIENT WAY OF COUNTING DOCUMENTS ON THE FLY
+        // const items = await this.adService.countAds();
+        // all of them to get the items value here
         filters.postedAt = postedAt.map(i => ({ ...i, items: 1 }));
         console.log(filters);
         return filters;

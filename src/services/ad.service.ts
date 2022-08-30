@@ -5,4 +5,8 @@ export class AdService extends DocumentService<AdDocument> {
     public getAllAds() {
         return this.collection.find();
     }
+
+    public countAds(filter: any) {
+        return this.collection.count(filter);
+    }
 }
