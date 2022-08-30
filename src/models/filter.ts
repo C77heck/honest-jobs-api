@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
 export interface FilterItem {
     value: string;
     title: string;
+    items: number;
 }
 
 export interface FilterDocument extends Document {

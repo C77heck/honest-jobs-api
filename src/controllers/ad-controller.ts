@@ -52,7 +52,9 @@ export class AdController extends ExpressController {
 
     public async getFilters(req: any, res: any, next: NextFunction) {
         try {
-            const filter = await this.filterService.getFilters();
+            const { filters } = this.adQueryService.getFormattedData(req);
+
+            const filter = await this.filterService.getFilters(filters);
 
             res.status(200).json({ filter });
         } catch (err) {
