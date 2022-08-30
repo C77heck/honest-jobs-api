@@ -9,8 +9,16 @@ export class FilterService extends DocumentService<FilterDocument> {
     public adService = new AdService(Ad);
 
     public async getFilters(): Promise<FilterDocument | null> {
-        const filters = await this.collection.findOne({});
+        const filters: any = await this.collection.findOne({});
+        const postedAt = [
+            { title: 'Last 24 hours', value: '24' },
+            { title: 'Last 3 days', value: '72' },
+            { title: 'Last 7 days', value: '168' },
+            { title: 'Last 14 days', value: '336' },
+        ];
 
+        filters.postedAt = postedAt.map(i => ({ ...i, items: 1 }));
+        console.log(filters);
         return filters;
     }
 
