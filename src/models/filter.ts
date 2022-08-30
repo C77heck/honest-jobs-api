@@ -20,13 +20,19 @@ export interface FilterDocument extends Document {
     updateFilter?: (data: FilterDocument) => Promise<FilterDocument>;
 }
 
+const filterItemSchema = new Schema<FilterItem>({
+    value: String,
+    title: String,
+    items: Number
+});
+
 const filterSchema = new Schema<FilterDocument>({
-    location: { type: [{ value: String, title: String }] },
-    industryType: { type: [{ value: String, title: String }] },
-    companyType: { type: [{ value: String, title: String }] },
-    postedAt: { type: [{ value: String, title: String }] },
-    relatedRoles: { type: [{ value: String, title: String }] },
-    jobType: { type: [{ value: String, title: String }] }
+    location: { type: [filterItemSchema] },
+    industryType: { type: [filterItemSchema] },
+    companyType: { type: [filterItemSchema] },
+    postedAt: { type: [filterItemSchema] },
+    relatedRoles: { type: [filterItemSchema] },
+    jobType: { type: [filterItemSchema] }
 });
 
 filterSchema.set('timestamps', true);

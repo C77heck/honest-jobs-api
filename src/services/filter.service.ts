@@ -121,6 +121,7 @@ export class FilterService extends DocumentService<FilterDocument> {
         const filter: FilterItem[] = [];
 
         for (const prop in rawFilters) {
+            console.log(rawFilters, rawFilters[prop]);
             switch (prop) {
                 case '24':
                     filter.push({ title: 'Last 24 hours', value: prop, items: rawFilters[prop] });
