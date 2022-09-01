@@ -13,6 +13,7 @@ export class AdQueryService extends MongoQueryService {
                     break;
                 case 'postedAt':
                     filters.createdAt = this.formatDateQuery(rawFilters[key]);
+                    console.log(this.formatDateQuery(rawFilters[key]));
                     break;
                 case 'salaries':
                     filters.salary = { $gte: rawFilters[key] };
@@ -30,28 +31,22 @@ export class AdQueryService extends MongoQueryService {
     }
 
     public formatDateQuery(dateFilter: '24' | '72' | '168' | '336') {
-        // '24': moment().add(1, 'day'),
-
         switch (dateFilter) {
             case '24':
                 return {
-                    $gte: moment().add(-30, 'hours').toDate(),
-                    $lte: moment().toDate(),
+                    $lte: moment().add(-30, 'hours').toDate(),
                 };
             case '72':
                 return {
-                    $gte: moment().add(-85, 'hours').toDate(),
-                    $lte: moment().toDate(),
+                    $lte: moment().add(-85, 'hours').toDate(),
                 };
             case '168':
                 return {
-                    $gte: moment().add(-190, 'hours').toDate(),
-                    $lte: moment().toDate(),
+                    $lte: moment().add(-190, 'hours').toDate(),
                 };
             case '336':
                 return {
-                    $gte: moment().add(-380, 'hours').toDate(),
-                    $lte: moment().toDate(),
+                    $lte: moment().add(-380, 'hours').toDate(),
                 };
             default:
                 return null;
