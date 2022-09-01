@@ -26,7 +26,6 @@ export class MongoQueryService {
         }
 
         return { ...(req.query?.filters as any || {}) };
-
     }
 
     public customQueryHandler(req: express.Request) {

@@ -89,7 +89,7 @@ interface AdModel extends Mongoose.Model<any> {
 adSchema.static('getAllAds', async function (this: Mongoose.Model<AdDocument>, pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {
     const limit = pagination?.limit || 5;
     const page = pagination?.page || 0;
-
+    console.log(filters);
     const items = await this.find({
         ...filters,
     })
