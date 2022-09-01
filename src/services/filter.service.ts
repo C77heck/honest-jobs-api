@@ -3,7 +3,7 @@ import { FilterDocument, FilterItem } from '@models/filter';
 import { AdService } from '@services/ad.service';
 import { DocumentService } from '@services/libs/document.service';
 import moment from 'moment';
-import { round } from '../libs/helpers';
+import { priceFormat, round } from '../libs/helpers';
 
 export class FilterService extends DocumentService<FilterDocument> {
     public adService = new AdService(Ad);
@@ -74,7 +74,7 @@ export class FilterService extends DocumentService<FilterDocument> {
             industryType: this.formatFilter(industryType),
             companyType: this.formatFilter(companyType),
             relatedRoles: this.formatFilter(relatedRoles),
-            salaries: this.formatFilter(salaries),
+            salaries: this.formatFilter(salaries, priceFormat),
             postedAt: this.formatDateFilter(rawPostedAt)
         });
 
@@ -104,10 +104,14 @@ export class FilterService extends DocumentService<FilterDocument> {
         };
     }
 
-    private formatFilter(rawFilters: { [key: string]: number }): FilterItem[] {
+    private formatFilter(rawFilters: { [key: string]: number }, formatter?: Function): FilterItem[] {
         const filter: FilterItem[] = [];
         for (const prop in rawFilters) {
-            filter.push({ title: prop, value: prop, items: rawFilters[prop] });
+            filter.push({
+                title: formatter ? formatter(prop) : prop,
+                value: prop,
+                items: rawFilters[prop]
+            });
         }
 
         return filter;
