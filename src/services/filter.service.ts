@@ -74,7 +74,7 @@ export class FilterService extends DocumentService<FilterDocument> {
             industryType: this.formatFilter(industryType),
             companyType: this.formatFilter(companyType),
             relatedRoles: this.formatFilter(relatedRoles),
-            salaries: this.formatFilter(rawPostedAt),
+            salaries: this.formatFilter(salaries),
             postedAt: this.formatDateFilter(rawPostedAt)
         });
 
