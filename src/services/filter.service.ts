@@ -3,7 +3,6 @@ import { FilterDocument, FilterItem } from '@models/filter';
 import { AdService } from '@services/ad.service';
 import { DocumentService } from '@services/libs/document.service';
 import moment from 'moment';
-import { handleError } from '../libs/handle-error';
 import { round } from '../libs/helpers';
 
 export class FilterService extends DocumentService<FilterDocument> {
@@ -11,7 +10,6 @@ export class FilterService extends DocumentService<FilterDocument> {
 
     public async getFilters(adFilters = null): Promise<FilterDocument | null> {
         const filters: any = await this.collection.findOne({});
-
         // TODO -> FIGURE THE MOST EFFECIENT WAY OF COUNTING DOCUMENTS ON THE FLY
         // const items = await this.adService.countAds();
         // all of them to get the items value here
@@ -24,22 +22,8 @@ export class FilterService extends DocumentService<FilterDocument> {
         return filters;
     }
 
-    public async remove() {
-        try {
-            const filter = await this.getFilters();
-
-            if (!filter) {
-                return null;
-            }
-
-            return filter.remove();
-        } catch (e) {
-            handleError(e);
-        }
-    }
-
     public async createFilters() {
-        await this.remove();
+        await this.collection.remove({});
         const ads = await this.adService.getAllAds();
 
         const location: { [key: string]: number } = {};
@@ -62,17 +46,21 @@ export class FilterService extends DocumentService<FilterDocument> {
             if (ad.location) {
                 location[ad.location] = ad.location in location ? location[ad.location] + 1 : 1;
             }
+
             if (ad?.companyType) {
                 companyType[ad.companyType] = ad.companyType in companyType ? companyType[ad.companyType] + 1 : 1;
             }
+
             if (ad.jobType) {
                 jobType[ad.jobType] = ad.jobType in jobType ? jobType[ad.jobType] + 1 : 1;
             }
+
             if (ad.relatedRoles) {
                 (ad?.relatedRoles || []).forEach(role => {
                     relatedRoles[role] = role in jobType ? jobType[role] + 1 : 1;
                 });
             }
+
             if (ad.industryType) {
                 (ad?.industryType || []).forEach(role => {
                     industryType[role] = role in jobType ? jobType[role] + 1 : 1;
@@ -129,7 +117,6 @@ export class FilterService extends DocumentService<FilterDocument> {
         const filter: FilterItem[] = [];
 
         for (const prop in rawFilters) {
-            console.log(rawFilters, rawFilters[prop]);
             switch (prop) {
                 case '24':
                     filter.push({ title: 'Last 24 hours', value: prop, items: rawFilters[prop] });
