@@ -15,7 +15,7 @@ const Schema = mongoose.Schema;
 export interface AdDocument extends Document {
     title: string;
     description: string;
-    salary: string;
+    salary: number;
     location: string;
     expiresOn: Date;
     isPremium: boolean;
@@ -41,10 +41,10 @@ export interface AdDocument extends Document {
 }
 
 const adSchema = new Schema({
-    title: { type: String, required: true },
+    title: { type: String, required: true, index: true },
     description: { type: String, required: true },
-    salary: { type: String, required: true },
-    location: { type: String, required: true },
+    salary: { type: Number, required: true, index: true },
+    location: { type: String, required: true, index: true },
     expiresOn: { type: String, required: true },
     isPremium: { type: Boolean, required: true },
     logo: String,

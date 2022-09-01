@@ -17,6 +17,7 @@ export interface FilterDocument extends Document {
     postedAt: FilterItem[];
     relatedRoles: FilterItem[];
     jobType: FilterItem[];
+    salaries: FilterItem[];
     updateFilter?: (data: FilterDocument) => Promise<FilterDocument>;
 }
 
@@ -32,7 +33,8 @@ const filterSchema = new Schema<FilterDocument>({
     companyType: { type: [filterItemSchema] },
     postedAt: { type: [filterItemSchema] },
     relatedRoles: { type: [filterItemSchema] },
-    jobType: { type: [filterItemSchema] }
+    jobType: { type: [filterItemSchema] },
+    salaries: { type: [filterItemSchema] }
 });
 
 filterSchema.set('timestamps', true);

@@ -40,3 +40,7 @@ export const numArray = (number: number, value = false): any[] => {
     }
     return Array.from({ length: number }, (i, index) => value || index);
 };
+
+export const round = (number: number, decimal = 100): number => {
+    return Math.round(number / decimal) * decimal;
+};

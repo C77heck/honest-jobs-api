@@ -4,6 +4,7 @@ import { AdService } from '@services/ad.service';
 import { DocumentService } from '@services/libs/document.service';
 import moment from 'moment';
 import { handleError } from '../libs/handle-error';
+import { round } from '../libs/helpers';
 
 export class FilterService extends DocumentService<FilterDocument> {
     public adService = new AdService(Ad);
@@ -47,10 +48,16 @@ export class FilterService extends DocumentService<FilterDocument> {
         const relatedRoles: { [key: string]: number } = {};
         const jobType: { [key: string]: number } = {};
         const rawPostedAt: { [key: string]: number } = {};
+        const salaries: { [key: string]: number } = {};
         const dateOptions = this.getDateOptions();
 
         for (const ad of ads) {
             this.groupByPostedAt(rawPostedAt, ad.createdAt, dateOptions);
+
+            if (ad.salary) {
+                const roundedSalary = round(ad.salary, 10000);
+                salaries[roundedSalary] = roundedSalary in salaries ? salaries[roundedSalary] + 1 : 1;
+            }
 
             if (ad.location) {
                 location[ad.location] = ad.location in location ? location[ad.location] + 1 : 1;
@@ -79,6 +86,7 @@ export class FilterService extends DocumentService<FilterDocument> {
             industryType: this.formatFilter(industryType),
             companyType: this.formatFilter(companyType),
             relatedRoles: this.formatFilter(relatedRoles),
+            salaries: this.formatFilter(rawPostedAt),
             postedAt: this.formatDateFilter(rawPostedAt)
         });
 
