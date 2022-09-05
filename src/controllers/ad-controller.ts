@@ -8,6 +8,8 @@ export class AdController extends ExpressController {
     public initializeRouters() {
         this.router.get('/', [], this.getAllAds.bind(this));
 
+        this.router.get('/similar-ads/:adId', [], this.getSimilarAds.bind(this));
+
         this.router.get('/get-ads-by-employer/:recruiterId', [], this.getAdsByEmployer.bind(this));
 
         this.router.get('/get-by-id/:adId', [], this.getById.bind(this));
@@ -23,6 +25,23 @@ export class AdController extends ExpressController {
             const result = await this.filterService.createFilters();
 
             res.status(200).json({ result });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    public async getSimilarAds(req: any, res: any, next: NextFunction) {
+        try {
+            const adId = req.params?.adId;
+
+            if (!adId) {
+                // todo -> how to associate them...
+                console.log('no ad id...');
+            }
+
+            const response = await Ad.find().limit(9);
+
+            res.status(200).json({ items: response });
         } catch (err) {
             return next(handleError(err));
         }
