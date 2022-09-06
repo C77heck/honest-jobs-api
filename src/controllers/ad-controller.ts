@@ -8,6 +8,8 @@ export class AdController extends ExpressController {
     public initializeRouters() {
         this.router.get('/', [], this.getAllAds.bind(this));
 
+        this.router.put('/create-alert/:adId', [], this.getAllAds.bind(this));
+
         this.router.get('/similar-ads/:adId', [], this.getSimilarAds.bind(this));
 
         this.router.get('/get-ads-by-employer/:recruiterId', [], this.getAdsByEmployer.bind(this));

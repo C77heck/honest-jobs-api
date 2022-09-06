@@ -50,8 +50,52 @@ export class JobSeekerController extends ExpressController {
         this.router.delete('/delete-account', [
             check('answer').not().isEmpty(),
         ], this.deleteAccount.bind(this));
-        
+
         this.router.post('/add-view', [], this.addJobView.bind(this));
+
+        this.router.put('/add-to-favourites/:adId', [], this.addToFavourites.bind(this));
+
+        this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
+    }
+
+    public async addToFavourites(req: express.Request, res: express.Response, next: NextFunction) {
+        try {
+            handleValidation(req as any as any);
+
+            const adId = req.params?.adId;
+
+            if (!adId) {
+                throw new BadRequest('Missing ad id');
+            }
+
+            const user = await this.userServices.extractUser(req);
+
+            await user.addToFavourites(adId);
+
+            res.json({ message: 'Successfully added to favourites' });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    public async removeFromFavourites(req: express.Request, res: express.Response, next: NextFunction) {
+        try {
+            handleValidation(req as any as any);
+
+            const adId = req.params?.adId;
+
+            if (!adId) {
+                throw new BadRequest('Missing ad id');
+            }
+
+            const user = await this.userServices.extractUser(req);
+
+            await user.removeFromFavourites(adId);
+
+            res.json({ message: 'Successfully removed from favourites' });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {

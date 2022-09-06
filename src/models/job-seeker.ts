@@ -14,10 +14,13 @@ export interface JobSeekerDocument extends BaseUserDocument {
     appliedForJobs?: { id: string, appliedAt: Date }[];
     viewedAd?: { id: string, viewedAt: Date }[];
     desiredRoles: string[];
+    favourites: { id: string, addedAt: Date }[];
     addAppliedJobs: (job: string) => Promise<JobSeekerDocument>;
     removeAppliedJob: (job: string) => Promise<JobSeekerDocument>;
     getAppliedJobs: () => Promise<AdDocument[]>;
     addView: (adId: string) => Promise<JobSeekerDocument>;
+    addToFavourites: (adId: string) => Promise<JobSeekerDocument>;
+    removeFromFavourites: (adId: string) => Promise<JobSeekerDocument>;
 }
 
 const userSchema = new Schema<JobSeekerDocument>({
@@ -32,6 +35,7 @@ const userSchema = new Schema<JobSeekerDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
+    favourites: { type: [{ id: Mongoose.Types.ObjectId, addedAt: Date }], ref: 'Ad' },
     appliedForJobs: { type: [{ id: Mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
     viewedAd: { type: [{ id: Mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
     desiredRoles: { type: [Mongoose.Types.ObjectId], ref: 'Roles' },
@@ -49,6 +53,18 @@ userSchema.plugin(uniqueValidator);
 
 userSchema.methods.addAppliedJobs = function (job: string) {
     this.appliedForJobs = [...(this.appliedForJobs || []), { id: job, appliedAt: new Date() }];
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.addToFavourites = function (adId: string) {
+    this.favourites = this.favourites.filter(favourite => favourite.id !== adId);
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+userSchema.methods.removeFromFavourites = function (adId: string) {
+    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
 
     return this.save({ validateModifiedOnly: true });
 };
