@@ -73,6 +73,14 @@ adSchema.set('timestamps', true);
 
 adSchema.plugin(uniqueValidator);
 
+adSchema.methods.addUserToAlerts = function (user: BaseUserDocument) {
+
+};
+
+adSchema.methods.removeUserFromAlerts = function (user: BaseUserDocument) {
+
+};
+
 interface AdModel extends Mongoose.Model<any> {
     getAllAds(pagination: any, filters?: {}, sort?: {}): Promise<PaginationInterface<AdDocument>>;
 
