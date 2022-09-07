@@ -71,7 +71,7 @@ userSchema.methods.removeFromFavourites = function (adId: string) {
 
 userSchema.methods.getPublicData = function () {
     return {
-        type: 'job-seeker',
+        role: 'job-seeker',
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
@@ -80,6 +80,7 @@ userSchema.methods.getPublicData = function () {
         images: this?.images || [''],
         resume: this?.resume || '',
         other_uploads: this?.other_uploads || [''],
+        favourites: this?.favourites || [''],
     };
 };
 

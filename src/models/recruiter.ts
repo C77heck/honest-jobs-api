@@ -13,10 +13,13 @@ export interface RecruiterDocument extends BaseUserDocument {
     postedJobs?: string[];
     relatedIndustry?: string[];
     companyType: 'Agency' | 'Direct Employer';
-    logo?: string,
+    logo?: string;
+    favourites?: { id: string, addedAt: Date }[];
     addPostedJobs: (job: string) => Promise<RecruiterDocument>;
     removePostedJob: (job: string) => Promise<RecruiterDocument>;
     getPostedJobs: (pagination: PaginationOptions, filters?: {}, sort?: {}) => Promise<PaginationInterface<AdDocument>>;
+    addToFavourites: (adId: string) => Promise<RecruiterDocument>;
+    removeFromFavourites: (adId: string) => Promise<RecruiterDocument>;
 }
 
 const recruiterSchema = new Schema<RecruiterDocument>({
@@ -33,6 +36,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     },
     isRecruiter: { type: Boolean, required: true, default: false },
     postedJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
+    favourites: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
     description: { type: String },
     address: { type: String },
     logo: { type: String },
@@ -42,7 +46,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
 
 recruiterSchema.methods.getPublicData = function () {
     return {
-        type: 'recruiter',
+        role: 'recruiter',
         email: this.email,
         description: this?.description || '',
         address: this?.address || '',
@@ -57,6 +61,17 @@ recruiterSchema.set('timestamps', true);
 
 recruiterSchema.plugin(uniqueValidator);
 
+recruiterSchema.methods.addToFavourites = function (adId: string) {
+    this.favourites = (this.favourites || []).filter(favourite => favourite.id !== adId);
+
+    return this.save({ validateModifiedOnly: true });
+};
+
+recruiterSchema.methods.removeFromFavourites = function (adId: string) {
+    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
+
+    return this.save({ validateModifiedOnly: true });
+};
 recruiterSchema.methods.addPostedJobs = function (job: string): Promise<RecruiterDocument> {
     this.postedJobs = [...(this.postedJobs || []), job];
 
