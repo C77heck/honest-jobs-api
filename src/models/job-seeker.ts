@@ -35,7 +35,7 @@ const userSchema = new Schema<JobSeekerDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    favourites: { type: [{ id: Mongoose.Types.ObjectId, addedAt: Date }], ref: 'Ad' },
+    favourites: [{ id: { type: [Mongoose.Types.ObjectId], ref: 'Ad' }, addedAt: Date }],
     appliedForJobs: { type: [{ id: Mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
     viewedAd: { type: [{ id: Mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
     desiredRoles: { type: [Mongoose.Types.ObjectId], ref: 'Roles' },
@@ -58,13 +58,13 @@ userSchema.methods.addAppliedJobs = function (job: string) {
 };
 
 userSchema.methods.addToFavourites = function (adId: string) {
-    this.favourites = this.favourites.filter(favourite => favourite.id !== adId);
+    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
 
     return this.save({ validateModifiedOnly: true });
 };
 
 userSchema.methods.removeFromFavourites = function (adId: string) {
-    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
+    this.favourites = this.favourites.filter(favourite => favourite.id !== adId);
 
     return this.save({ validateModifiedOnly: true });
 };

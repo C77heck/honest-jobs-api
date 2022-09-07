@@ -36,7 +36,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     },
     isRecruiter: { type: Boolean, required: true, default: false },
     postedJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
-    favourites: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
+    favourites: [{ id: { type: [Mongoose.Types.ObjectId], ref: 'Ad' }, addedAt: Date }],
     description: { type: String },
     address: { type: String },
     logo: { type: String },
@@ -54,6 +54,7 @@ recruiterSchema.methods.getPublicData = function () {
         images: this?.images || [''],
         company_name: this?.company_name || '',
         logo: this?.logo || '',
+        favourites: this?.favourites || [],
     };
 };
 
@@ -62,16 +63,23 @@ recruiterSchema.set('timestamps', true);
 recruiterSchema.plugin(uniqueValidator);
 
 recruiterSchema.methods.addToFavourites = function (adId: string) {
-    this.favourites = (this.favourites || []).filter(favourite => favourite.id !== adId);
+    console.log(this.favourites, {
+        adId,
+        result: [...(this.favourites || []), { id: adId, addedAt: new Date() }]
+    });
+
+    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
+    console.log(this.favourites);
 
     return this.save({ validateModifiedOnly: true });
 };
 
 recruiterSchema.methods.removeFromFavourites = function (adId: string) {
-    this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
+    this.favourites = (this.favourites || []).filter(favourite => favourite.id !== adId);
 
     return this.save({ validateModifiedOnly: true });
 };
+
 recruiterSchema.methods.addPostedJobs = function (job: string): Promise<RecruiterDocument> {
     this.postedJobs = [...(this.postedJobs || []), job];
 
