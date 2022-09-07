@@ -1,4 +1,5 @@
 import { PaginationInterface } from '@models/libs/pagination.interface';
+import { BaseUserDocument } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
@@ -38,6 +39,8 @@ export interface AdDocument extends Document {
         featured: boolean;
         premium: boolean;
     }
+    addUserToAlerts: (user: BaseUserDocument) => Promise<AdDocument>
+    removeUserFromAlerts: (user: BaseUserDocument) => Promise<AdDocument>
 }
 
 const adSchema = new Schema({
@@ -75,15 +78,15 @@ interface AdModel extends Mongoose.Model<any> {
 
     updateAd(this: Mongoose.Model<any>, adId: string | number, adData: AdDocument): Promise<AdDocument>;
 
-    getById(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+    getById(this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument>;
 
-    addGuestView(this: Mongoose.Model<any>, sessionId: string, adId: string | number): Promise<any>;
+    addGuestView(this: Mongoose.Model<any>, sessionId: string, adId: string | number): Promise<AdDocument>;
 
-    addRegisteredUserView(this: Mongoose.Model<any>, userId: string, adId: string | number): Promise<any>;
+    addRegisteredUserView(this: Mongoose.Model<any>, userId: string, adId: string | number): Promise<AdDocument>;
 
-    addAppliedFor(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+    addAppliedFor(this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument>;
 
-    switchAdCategory(this: Mongoose.Model<any>, adId: string | number): Promise<any>;
+    switchAdCategory(this: Mongoose.Model<any>, adId: string | number): Promise<AdDocument>;
 }
 
 adSchema.static('getAllAds', async function (this: Mongoose.Model<AdDocument>, pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {

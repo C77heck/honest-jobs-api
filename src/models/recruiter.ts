@@ -36,7 +36,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
     },
     isRecruiter: { type: Boolean, required: true, default: false },
     postedJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
-    favourites: [{ id: { type: [Mongoose.Types.ObjectId], ref: 'Ad' }, addedAt: Date }],
+    favourites: [{ id: { type: Mongoose.Types.ObjectId, ref: 'Ad' }, addedAt: Date }],
     description: { type: String },
     address: { type: String },
     logo: { type: String },
@@ -63,13 +63,11 @@ recruiterSchema.set('timestamps', true);
 recruiterSchema.plugin(uniqueValidator);
 
 recruiterSchema.methods.addToFavourites = function (adId: string) {
-    console.log(this.favourites, {
-        adId,
-        result: [...(this.favourites || []), { id: adId, addedAt: new Date() }]
-    });
+    if ((this.favourites || []).find(doc => doc.id.toString() === adId)) {
+        return this.save({ validateModifiedOnly: true });
+    }
 
     this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
-    console.log(this.favourites);
 
     return this.save({ validateModifiedOnly: true });
 };
