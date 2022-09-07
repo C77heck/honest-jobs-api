@@ -1,11 +1,19 @@
 import Ad from '@models/ad';
-import { NotFound, Unauthorized } from '@models/libs/error-models/errors';
-import Recruiter from '@models/recruiter';
+import JobSeeker from '@models/job-seeker';
+import { BadRequest, NotFound, Unauthorized } from '@models/libs/error-models/errors';
+import Recruiter, { RecruiterDocument } from '@models/recruiter';
+import { RoleType } from '@models/user';
+import { UserService } from '@services/user.service';
 import { NextFunction } from 'express';
 import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
-export class AdController extends ExpressController {
+export class AdController extends ExpressController<RecruiterDocument> {
+    public injectServices() {
+        super.injectServices();
+        this.userServices = new UserService<RecruiterDocument>(Recruiter);
+    }
+
     public initializeRouters() {
         this.router.get('/', [], this.getAllAds.bind(this));
 
@@ -33,15 +41,29 @@ export class AdController extends ExpressController {
         }
     }
 
+    private getUserServiceByRole(role: RoleType) {
+        switch (role) {
+            case 'recruiter':
+                return new UserService(Recruiter);
+            case 'job-seeker':
+                return new UserService(JobSeeker);
+            default:
+                throw new BadRequest('Role is missing');
+        }
+    }
+
     public async addUserToAlerts(req: any, res: any, next: NextFunction) {
         try {
             const adId = req.params?.adId;
+            const role = req.headers?.role || '';
 
             if (!adId) {
                 throw new NotFound('Ad id is missing!');
             }
 
-            const user = this.userServices.extractUser(req);
+            const userService = this.getUserServiceByRole(role);
+
+            const user = await userService.extractUser(req);
 
             if (!user) {
                 throw new Unauthorized('Unauthorized');
@@ -53,7 +75,7 @@ export class AdController extends ExpressController {
                 throw new NotFound('This document does not exist!');
             }
 
-            await adDocument.addUserToAlerts(user);
+            await adDocument.addUserToAlerts(user, role);
 
             res.status(200).json({ message: 'Successfully added user to alerts' });
         } catch (err) {
@@ -69,7 +91,8 @@ export class AdController extends ExpressController {
                 throw new NotFound('Ad id is missing!');
             }
 
-            const user = this.userServices.extractUser(req);
+            const user = await this.userServices.extractUser(req);
+            const role = user.getPublicData()?.role;
 
             if (!user) {
                 throw new Unauthorized('Unauthorized');
@@ -81,7 +104,7 @@ export class AdController extends ExpressController {
                 throw new NotFound('This document does not exist!');
             }
 
-            await adDocument.removeUserFromAlerts(user);
+            await adDocument.removeUserFromAlerts(user, role);
 
             res.status(200).json({ message: 'Successfully added user to alerts' });
         } catch (err) {

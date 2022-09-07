@@ -2,6 +2,8 @@ import { JobSeekerDocument } from '@models/job-seeker';
 import { RecruiterDocument } from '@models/recruiter';
 import { Document } from 'mongoose';
 
+export type RoleType = 'recruiter' | 'job-seeker';
+
 export interface BaseUserDocument extends Document {
     email: string;
     password: string;

@@ -1,5 +1,6 @@
 import { PaginationInterface } from '@models/libs/pagination.interface';
-import { BaseUserDocument } from '@models/user';
+import { RoleDocument } from '@models/role';
+import { BaseUserDocument, RoleType } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
@@ -39,8 +40,10 @@ export interface AdDocument extends Document {
         featured: boolean;
         premium: boolean;
     }
-    addUserToAlerts: (user: BaseUserDocument) => Promise<AdDocument>
-    removeUserFromAlerts: (user: BaseUserDocument) => Promise<AdDocument>
+    jobSeekerAlerts: { id: string, addedAt: Date }[];
+    recruiterAlerts: { id: string, addedAt: Date }[];
+    addUserToAlerts: (user: BaseUserDocument, role: RoleDocument) => Promise<AdDocument>
+    removeUserFromAlerts: (user: BaseUserDocument, role: RoleDocument) => Promise<AdDocument>
 }
 
 const adSchema = new Schema({
@@ -67,18 +70,33 @@ const adSchema = new Schema({
         featured: { type: Boolean, default: false },
         premium: { type: Boolean, default: false }
     },
+    jobSeekerAlerts: [{ id: { type: mongoose.Types.ObjectId, ref: 'JobSeeker' }, addedAt: Date }],
+    recruiterAlerts: [{ id: { type: mongoose.Types.ObjectId, ref: 'Recruiter' }, addedAt: Date }],
 });
 
 adSchema.set('timestamps', true);
 
 adSchema.plugin(uniqueValidator);
 
-adSchema.methods.addUserToAlerts = function (user: BaseUserDocument) {
+adSchema.methods.getIsUserInAlertList = function (user: BaseUserDocument, role: RoleType) {
+    const alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
 
+    return !!alerts.find((alert: any) => alert.id.toString() === user?._id.toString());
+};
+adSchema.methods.addUserToAlerts = function (user: BaseUserDocument, role: RoleType) {
+    let alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
+
+    alerts = [...alerts, { id: user._id, addedAt: new Date() }];
+
+    return this.save({ validateModifiedOnly: true });
 };
 
-adSchema.methods.removeUserFromAlerts = function (user: BaseUserDocument) {
+adSchema.methods.removeUserFromAlerts = function (user: BaseUserDocument, role: RoleType) {
+    let alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
 
+    alerts = alerts.filter((alert: any) => alert.id.toString() !== user._id.toString());
+
+    return this.save({ validateModifiedOnly: true });
 };
 
 interface AdModel extends Mongoose.Model<any> {
