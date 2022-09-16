@@ -73,7 +73,7 @@ recruiterSchema.methods.addToFavourites = function (adId: string) {
 };
 
 recruiterSchema.methods.removeFromFavourites = function (adId: string) {
-    this.favourites = (this.favourites || []).filter(favourite => favourite.id !== adId);
+    this.favourites = (this.favourites || []).filter(favourite => favourite.id.toString() !== adId);
 
     return this.save({ validateModifiedOnly: true });
 };
