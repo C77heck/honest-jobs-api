@@ -30,6 +30,8 @@ export class AdController extends ExpressController<RecruiterDocument> {
         this.router.put('/remove-alert/:adId', [], this.removeUserFromAlerts.bind(this));
 
         this.router.get('/test', [], this.createFilters.bind(this));
+
+        this.router.get('/apply/:adId', [], this.createFilters.bind(this));
     }
 
     // todo -> will need  to move this to a cluster module
@@ -38,6 +40,15 @@ export class AdController extends ExpressController<RecruiterDocument> {
             const result = await this.filterService.createFilters();
 
             res.status(200).json({ result });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    public async apply(req: any, res: any, next: NextFunction) {
+        try {
+            // todo -> create the application process and save it as a seperate document.
+            res.status(200).json({ message: 'Succesfully applied' });
         } catch (err) {
             return next(handleError(err));
         }
