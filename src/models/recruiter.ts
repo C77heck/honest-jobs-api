@@ -46,6 +46,7 @@ const recruiterSchema = new Schema<RecruiterDocument>({
 
 recruiterSchema.methods.getPublicData = function () {
     return {
+        id: this._id,
         role: 'recruiter',
         email: this.email,
         description: this?.description || '',

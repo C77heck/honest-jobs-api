@@ -75,6 +75,7 @@ userSchema.methods.removeFromFavourites = function (adId: string) {
 
 userSchema.methods.getPublicData = function () {
     return {
+        id: this._id,
         role: 'job-seeker',
         first_name: this.first_name,
         last_name: this.last_name,

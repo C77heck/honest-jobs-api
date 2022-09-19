@@ -79,22 +79,52 @@ adSchema.set('timestamps', true);
 adSchema.plugin(uniqueValidator);
 
 adSchema.methods.getIsUserInAlertList = function (user: BaseUserDocument, role: RoleType) {
-    const alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
-
-    return !!alerts.find((alert: any) => alert.id.toString() === user?._id.toString());
+    switch (role) {
+        case 'job-seeker':
+            return !!this.jobSeekerAlerts.find((alert: any) => alert.id.toString() === user?._id.toString());
+        case 'recruiter':
+            return !!this.recruiterAlerts.find((alert: any) => alert.id.toString() === user?._id.toString());
+        default:
+            return false;
+    }
 };
 adSchema.methods.addUserToAlerts = function (user: BaseUserDocument, role: RoleType) {
-    let alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
+    try {
+        switch (role) {
+            case 'job-seeker':
+                this.jobSeekerAlerts = [...this.jobSeekerAlerts, {
+                    id: user._id,
+                    addedAt: new Date()
+                }];
+                break;
+            case 'recruiter':
+                this.recruiterAlerts = [...this.recruiterAlerts, {
+                    id: user._id,
+                    addedAt: new Date()
+                }];
+                break;
+            default:
+                return null;
+        }
 
-    alerts = [...alerts, { id: user._id, addedAt: new Date() }];
+        return this.save({ validateModifiedOnly: true });
+    } catch (e) {
+        console.log(e);
+    }
 
-    return this.save({ validateModifiedOnly: true });
 };
 
 adSchema.methods.removeUserFromAlerts = function (user: BaseUserDocument, role: RoleType) {
-    let alerts = role === 'recruiter' ? this.recruiterAlerts : this.jobSeekerAlerts;
-
-    alerts = alerts.filter((alert: any) => alert.id.toString() !== user._id.toString());
+    switch (role) {
+        case 'job-seeker':
+            this.jobSeekerAlerts = this.jobSeekerAlerts.filter((alert: any) => alert.id.toString() !== user._id.toString());
+            break;
+        case 'recruiter':
+            this.recruiterAlerts = this.recruiterAlerts.filter((alert: any) => alert.id.toString() !== user._id.toString());
+            break;
+        default:
+            return null;
+    }
 
     return this.save({ validateModifiedOnly: true });
 };
@@ -118,7 +148,7 @@ interface AdModel extends Mongoose.Model<any> {
 adSchema.static('getAllAds', async function (this: Mongoose.Model<AdDocument>, pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {
     const limit = pagination?.limit || 5;
     const page = pagination?.page || 0;
-    console.log(filters);
+
     const items = await this.find({
         ...filters,
     })

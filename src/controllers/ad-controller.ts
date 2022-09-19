@@ -27,6 +27,8 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
         this.router.put('/create-alert/:adId', [], this.addUserToAlerts.bind(this));
 
+        this.router.put('/remove-alert/:adId', [], this.removeUserFromAlerts.bind(this));
+
         this.router.get('/test', [], this.createFilters.bind(this));
     }
 
@@ -77,7 +79,7 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
             await adDocument.addUserToAlerts(user, role);
 
-            res.status(200).json({ message: 'Successfully added user to alerts' });
+            res.status(200).json({ message: 'Successfully added to alerts' });
         } catch (err) {
             return next(handleError(err));
         }
@@ -106,7 +108,7 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
             await adDocument.removeUserFromAlerts(user, role);
 
-            res.status(200).json({ message: 'Successfully added user to alerts' });
+            res.status(200).json({ message: 'Successfully removed from alerts' });
         } catch (err) {
             return next(handleError(err));
         }
