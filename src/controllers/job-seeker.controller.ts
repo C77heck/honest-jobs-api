@@ -75,7 +75,7 @@ export class JobSeekerController extends ExpressController {
 
             const createdApplicants = await this.applyService.getByApplicant(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.APPLIED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -89,7 +89,7 @@ export class JobSeekerController extends ExpressController {
 
             const createdApplicants = await this.applyService.create(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.APPLIED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -109,7 +109,7 @@ export class JobSeekerController extends ExpressController {
 
             await user.addToFavourites(adId);
 
-            res.json({ message: 'Successfully added to favourites' });
+            res.json({ message: MESSAGE.SUCCESS.ADDED_TO_FAVOURITES });
         } catch (err) {
             return next(handleError(err));
         }
@@ -129,7 +129,7 @@ export class JobSeekerController extends ExpressController {
 
             await user.removeFromFavourites(adId);
 
-            res.json({ message: 'Successfully removed from favourites' });
+            res.json({ message: MESSAGE.SUCCESS.REMOVED_FROM_FAVOURITES });
         } catch (err) {
             return next(handleError(err));
         }
@@ -173,7 +173,7 @@ export class JobSeekerController extends ExpressController {
 
             await this.userServices.updateUser(req, req.body);
 
-            res.status(201).json({ message: 'User data has been successfully updated.' });
+            res.status(201).json({ message: MESSAGE.SUCCESS.USER_DATA_UPDATED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -199,7 +199,7 @@ export class JobSeekerController extends ExpressController {
 
             await jobSeeker.remove();
 
-            res.status(200).json({ message: 'Account has been successfully deleted.' });
+            res.status(200).json({ message: MESSAGE.SUCCESS.ACCOUNT_DELETED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -241,7 +241,7 @@ export class JobSeekerController extends ExpressController {
                 await jobSeeker.addView(req.body.adId);
             }
 
-            res.json({ message: 'Success' });
+            res.json({ message: MESSAGE.SUCCESS.GENERIC });
         } catch (err) {
             next(handleError(err));
         }

@@ -5,6 +5,7 @@ import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import { RoleType } from '@models/user';
 import { UserService } from '@services/user.service';
 import { NextFunction } from 'express';
+import { MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
@@ -79,7 +80,7 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
             await adDocument.addUserToAlerts(user, role);
 
-            res.status(200).json({ message: 'Successfully added to alerts' });
+            res.status(200).json({ message:MESSAGE.SUCCESS.ALERT_ADDED  });
         } catch (err) {
             return next(handleError(err));
         }
@@ -108,7 +109,7 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
             await adDocument.removeUserFromAlerts(user, role);
 
-            res.status(200).json({ message: 'Successfully removed from alerts' });
+            res.status(200).json({ message: MESSAGE.SUCCESS.ALERT_REMOVED });
         } catch (err) {
             return next(handleError(err));
         }

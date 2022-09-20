@@ -4,6 +4,7 @@ import Review, { ReviewDocument } from '@models/review';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { body, check } from 'express-validator';
+import { MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
@@ -87,14 +88,14 @@ export class ReviewController extends ExpressController<RecruiterDocument> {
             ));
         }
 
-        res.status(201).json({ message: 'New review has been successfully added' });
+        res.status(201).json({ message: MESSAGE.SUCCESS.REVIEW_ADDED });
     }
 
     public async updateReview(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             const updatedReview = await Review.updateReview(req.params.reviewId, req.body as ReviewDocument);
 
-            res.status(200).json({ updatedReview, message: 'Successfully updated.' });
+            res.status(200).json({ updatedReview, message: MESSAGE.SUCCESS.GENERIC });
         } catch (err) {
             return next(handleError(err));
         }
@@ -107,7 +108,7 @@ export class ReviewController extends ExpressController<RecruiterDocument> {
             return next(handleError(err));
         }
 
-        res.status(201).json({ message: 'New review has been successfully added' });
+        res.status(201).json({ message: MESSAGE.SUCCESS.REVIEW_DELETED });
     }
 }
 

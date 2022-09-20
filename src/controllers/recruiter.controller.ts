@@ -99,7 +99,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             const createdApplicants = await this.applyService.addOffer(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.OFFER_MADE });
         } catch (err) {
             return next(handleError(err));
         }
@@ -113,7 +113,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             const createdApplicants = await this.applyService.reject(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.REJECTED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -127,7 +127,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             const createdApplicants = await this.applyService.getByRecruiter(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+            res.status(200).json({ createdApplicants });
         } catch (err) {
             return next(handleError(err));
         }
@@ -147,7 +147,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             await user.addToFavourites(adId);
 
-            res.json({ message: 'Successfully added to favourites' });
+            res.json({ message: MESSAGE.SUCCESS.ADDED_TO_FAVOURITES });
         } catch (err) {
             return next(handleError(err));
         }
@@ -167,7 +167,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             await user.removeFromFavourites(adId);
 
-            res.json({ message: 'Successfully removed from favourites' });
+            res.json({ message: MESSAGE.SUCCESS.REMOVED_FROM_FAVOURITES });
         } catch (err) {
             return next(handleError(err));
         }
@@ -209,7 +209,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
             handleValidation(req as any);
             await this.userServices.updateUser(req, req.body);
 
-            res.status(201).json({ message: 'User data has been successfully updated.' });
+            res.status(201).json({ message: MESSAGE.SUCCESS.USER_DATA_UPDATED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -239,7 +239,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             await recruiter.addPostedJobs(createdAd?._id);
 
-            res.status(201).json({ message: 'New ad has been successfully added' });
+            res.status(201).json({ message: MESSAGE.SUCCESS.AD_CREATED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -249,7 +249,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         try {
             const updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
 
-            res.status(200).json({ updatedAd, message: 'Successfully updated.' });
+            res.status(200).json({ updatedAd, message: MESSAGE.SUCCESS.GENERIC });
         } catch (err) {
             return next(handleError(err));
         }
@@ -265,7 +265,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             await ad.remove();
 
-            res.status(201).json({ message: 'Ad has been successfully deleted' });
+            res.status(201).json({ message: MESSAGE.SUCCESS.AD_DELETED });
         } catch (err) {
             return next(new HttpError(
                 'Could not delete Ad, please try again.',
@@ -293,7 +293,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             await recruiter.remove();
 
-            res.status(200).json({ message: 'Account has been successfully deleted.' });
+            res.status(200).json({ message: MESSAGE.SUCCESS.ACCOUNT_DELETED });
         } catch (err) {
             return next(handleError(err));
         }
