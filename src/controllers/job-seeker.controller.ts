@@ -62,24 +62,30 @@ export class JobSeekerController extends ExpressController {
 
         this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
 
-        this.router.get('/apply/:adId', [], this.apply.bind(this));
+        this.router.get('/apply/:adId', [], this.hasApplied.bind(this));
+
+        this.router.post('/apply', [], this.apply.bind(this));
+    }
+
+    public async hasApplied(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userServices.extractUser(req);
+
+            const ad = await this.adService.getAd(req.params?.adId);
+
+            const createdApplicants = await this.applyService.getByApplicant(ad, user);
+
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     public async apply(req: any, res: any, next: NextFunction) {
         try {
             const user = await this.userServices.extractUser(req);
 
-            const adId = req.params?.adId;
-
-            if (!adId) {
-                throw new BadRequest(ERROR_MESSAGES.AD_ID);
-            }
-
-            const ad = await Ad.findById(adId);
-
-            if (!ad) {
-                throw new BadRequest(ERROR_MESSAGES.AD_NOT_FOUND);
-            }
+            const ad = await this.adService.getAd(req.body?.adId);
 
             const createdApplicants = await this.applyService.create(ad, user);
 
@@ -176,7 +182,7 @@ export class JobSeekerController extends ExpressController {
     public async getSecurityQuestion(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             if (!req.body.email) {
-                throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
+                throw new BadRequest(ERROR_MESSAGES.MISSING.EMAIL);
             }
 
             const securityQuestion = await this.userServices.getSecurityQuestion(req);
@@ -222,12 +228,12 @@ export class JobSeekerController extends ExpressController {
             const { sessionId, adId } = req.body;
 
             if (!adId) {
-                throw new BadRequest(ERROR_MESSAGES.AD_ID);
+                throw new BadRequest(ERROR_MESSAGES.MISSING.AD);
             }
 
             if (!jobSeeker) {
                 if (!sessionId) {
-                    throw new BadRequest(ERROR_MESSAGES.MISSING_SESSION_ID);
+                    throw new BadRequest(ERROR_MESSAGES.MISSING.SESSION_ID);
                 }
                 await Ad.addGuestView(sessionId, adId);
             } else {

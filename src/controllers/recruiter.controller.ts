@@ -1,18 +1,23 @@
 import Ad, { AdDocument } from '@models/ad';
+import Application from '@models/application';
 import { BadRequest, HttpError } from '@models/libs/error-models/errors';
 import Recruiter, { RecruiterDocument } from '@models/recruiter';
+import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { body, check } from 'express-validator';
-import { ERROR_MESSAGES } from '../libs/constants';
+import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
 import { ExpressController } from './libs/express.controller';
 
 export class RecruiterController extends ExpressController<RecruiterDocument> {
+    public applyService: ApplyService;
+
     public injectServices() {
         super.injectServices();
         this.userServices = new UserService(Recruiter);
+        this.applyService = new ApplyService(Application);
     }
 
     public initializeRouters() {
@@ -78,6 +83,54 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
 
         this.router.delete('/delete-ad/:adId', [], this.deleteAd.bind(this));
+
+        this.router.get('/apply/:adId', [], this.getApplicants.bind(this));
+
+        this.router.put('/apply/approve', [], this.addOfferMade.bind(this));
+
+        this.router.put('/apply/reject', [], this.rejectApplication.bind(this));
+    }
+
+    public async addOfferMade(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userServices.extractUser(req);
+
+            const ad = await this.adService.getAd(req.body?.adId);
+
+            const createdApplicants = await this.applyService.addOffer(ad, user);
+
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    public async rejectApplication(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userServices.extractUser(req);
+
+            const ad = await this.adService.getAd(req.body?.adId);
+
+            const createdApplicants = await this.applyService.reject(ad, user);
+
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    public async getApplicants(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userServices.extractUser(req);
+
+            const ad = await this.adService.getAd(req.params?.adId);
+
+            const createdApplicants = await this.applyService.getByRecruiter(ad, user);
+
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     public async addToFavourites(req: express.Request, res: express.Response, next: NextFunction) {
@@ -204,7 +257,8 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async deleteAd(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const ad = await Ad.findById(req.params.adId);
+            const ad = await this.adService.getAd(req.params?.adId);
+
             const recruiter = await this.userServices.extractUser(req);
 
             await recruiter.removePostedJob(ad?._id);
@@ -223,7 +277,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
     public async getSecurityQuestion(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             if (!req.body.email) {
-                throw new BadRequest(ERROR_MESSAGES.MISSING_EMAIL);
+                throw new BadRequest(ERROR_MESSAGES.MISSING.EMAIL);
             }
             const securityQuestion = await this.userServices.getSecurityQuestion(req);
 

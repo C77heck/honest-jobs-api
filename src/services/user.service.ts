@@ -126,7 +126,7 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
         const user = await this.collection.findById(userId);
 
         if (!user) {
-            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
+            throw new BadRequest(ERROR_MESSAGES.NOT_FOUND.USER);
         }
 
         return user;
@@ -142,7 +142,7 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
         const user = await this.collection.findOne({ email: req.body.email });
 
         if (!user) {
-            throw new BadRequest(ERROR_MESSAGES.USER_NOT_FOUND);
+            throw new BadRequest(ERROR_MESSAGES.NOT_FOUND.USER);
         }
 
         const securityQuestion = await user.getUserSecurityQuestion();

@@ -1,13 +1,18 @@
 export const CONSTANTS = { REDIS: ['honest-jobs'] };
 
 export const ERROR_MESSAGES = {
+    MISSING: {
+        EMAIL: 'Email is missing!',
+        SESSION_ID: 'Missing session id',
+        AD: 'Missing ad id',
+    },
+    NOT_FOUND: {
+        USER: 'User not found!',
+        APPLICANT: 'User not found!',
+        AD: 'Ad not found',
+    },
     GENERIC: 'Something went wrong. Please try again later.',
-    MISSING_EMAIL: 'Email is missing!',
-    USER_NOT_FOUND: 'User not found!',
     INVALID_TOKEN: 'Invalid token!',
-    MISSING_SESSION_ID: 'Missing session id',
-    AD_ID: 'Missing ad id',
-    AD_NOT_FOUND: 'Ad not found',
     AD_EXPIRED: 'Ad expired',
 };
 

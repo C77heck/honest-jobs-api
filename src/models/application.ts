@@ -5,12 +5,24 @@ const Schema = mongoose.Schema;
 
 export interface ApplicationDocument extends Document {
     ad: { type: Mongoose.Types.ObjectId, ref: 'Ad' };
-    applicant: { type: Mongoose.Types.ObjectId, ref: 'job-seeker' };
+    applicant: { type: Mongoose.Types.ObjectId, ref: 'Job-seeker' };
+    recruiter: { type: Mongoose.Types.ObjectId, ref: 'Recruiter' };
+    status: {
+        isRejected: boolean;
+        isOfferMade: boolean;
+        message: string;
+    };
 }
 
 const applicationSchema = new Schema<ApplicationDocument>({
     ad: { type: Mongoose.Types.ObjectId, ref: 'Ad' },
-    applicant: { type: Mongoose.Types.ObjectId, ref: 'job-seeker' },
+    applicant: { type: Mongoose.Types.ObjectId, ref: 'Job-seeker' },
+    recruiter: { type: Mongoose.Types.ObjectId, ref: 'Recruiter' },
+    status: {
+        isRejected: Boolean,
+        isOfferMade: Boolean,
+        message: String,
+    },
 });
 
 applicationSchema.set('timestamps', true);
