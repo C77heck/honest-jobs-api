@@ -21,7 +21,6 @@ export interface AdDocument extends Document {
     location: string;
     expiresOn: Date;
     isPremium: boolean;
-
     jobType: 'Permanent' | 'Remote' | 'Contract' | 'Part Time' | 'Temporary';
     companyType: 'Agency' | 'Direct Employer';
     industryType?: string[];

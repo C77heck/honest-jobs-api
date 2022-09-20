@@ -1,18 +1,23 @@
 import Ad from '@models/ad';
+import Application from '@models/application';
 import JobSeeker from '@models/job-seeker';
 import { BadRequest } from '@models/libs/error-models/errors';
+import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
 import { body, check } from 'express-validator';
-import { ERROR_MESSAGES } from '../libs/constants';
+import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from "../libs/handle-validation";
 import { ExpressController } from './libs/express.controller';
 
 export class JobSeekerController extends ExpressController {
+    public applyService: ApplyService;
+
     public injectServices() {
         super.injectServices();
         this.userServices = new UserService(JobSeeker);
+        this.applyService = new ApplyService(Application);
     }
 
     public initializeRouters() {
@@ -56,6 +61,32 @@ export class JobSeekerController extends ExpressController {
         this.router.put('/add-to-favourites/:adId', [], this.addToFavourites.bind(this));
 
         this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
+
+        this.router.get('/apply/:adId', [], this.apply.bind(this));
+    }
+
+    public async apply(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userServices.extractUser(req);
+
+            const adId = req.params?.adId;
+
+            if (!adId) {
+                throw new BadRequest(ERROR_MESSAGES.AD_ID);
+            }
+
+            const ad = await Ad.findById(adId);
+
+            if (!ad) {
+                throw new BadRequest(ERROR_MESSAGES.AD_NOT_FOUND);
+            }
+
+            const createdApplicants = await this.applyService.create(ad, user);
+
+            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESSFULLY_APPLIED });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     public async addToFavourites(req: express.Request, res: express.Response, next: NextFunction) {

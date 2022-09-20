@@ -7,4 +7,10 @@ export const ERROR_MESSAGES = {
     INVALID_TOKEN: 'Invalid token!',
     MISSING_SESSION_ID: 'Missing session id',
     AD_ID: 'Missing ad id',
+    AD_NOT_FOUND: 'Ad not found',
+    AD_EXPIRED: 'Ad expired',
+};
+
+export const MESSAGE = {
+    SUCCESSFULLY_APPLIED: 'Succesfully applied'
 };
