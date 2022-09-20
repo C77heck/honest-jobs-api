@@ -97,7 +97,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             const ad = await this.adService.getAd(req.body?.adId);
 
-            const createdApplicants = await this.applyService.addOffer(ad, user);
+            const createdApplicants = await this.applyService.addOffer(ad, user, req.body?.message);
 
             res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.OFFER_MADE });
         } catch (err) {
@@ -111,7 +111,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
             const ad = await this.adService.getAd(req.body?.adId);
 
-            const createdApplicants = await this.applyService.reject(ad, user);
+            const createdApplicants = await this.applyService.reject(ad, user, req.body?.message);
 
             res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.REJECTED });
         } catch (err) {
