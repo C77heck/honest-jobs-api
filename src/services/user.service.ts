@@ -1,4 +1,3 @@
-import JobSeeker from '@models/job-seeker';
 import {
     BadRequest,
     Forbidden,
@@ -39,13 +38,14 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
 
             let createdUser: any;
             try {
-                createdUser = new JobSeeker({
+                createdUser = new this.collection({
                     ...req.body,
                     password: hashedPassword
                 });
 
-                return createdUser.save();
+                await createdUser.save();
             } catch (err) {
+                console.log({ err });
                 throw new InternalServerError('Could not create user, please try again.', { session });
             }
 
@@ -54,8 +54,8 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
 
             return this.login(req);
         } catch (err) {
-            await err.payload.session.abortTransaction();
-            await err.payload.session.endSession();
+            await err.payload?.session?.abortTransaction();
+            await err.payload?.session?.endSession();
 
             throw err;
         }

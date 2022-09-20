@@ -137,8 +137,8 @@ export class JobSeekerController extends ExpressController {
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any as any);
-
+            handleValidation(req as any);
+            
             const result = await this.userServices.signup(req);
 
             res.json({ result });

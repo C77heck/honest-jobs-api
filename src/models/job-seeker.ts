@@ -1,9 +1,9 @@
 import Ad, { AdDocument } from '@models/ad';
 import { BaseUserDocument } from '@models/user';
-import Mongoose from 'Mongoose';
-import uniqueValidator from 'Mongoose-unique-validator';
+import mongoose from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator';
 
-const Schema = Mongoose.Schema;
+const Schema = mongoose.Schema;
 
 export interface JobSeekerDocument extends BaseUserDocument {
     first_name: string;
@@ -23,7 +23,7 @@ export interface JobSeekerDocument extends BaseUserDocument {
     removeFromFavourites: (adId: string) => Promise<JobSeekerDocument>;
 }
 
-const userSchema = new Schema<JobSeekerDocument>({
+const jobSeekerSchema = new Schema<JobSeekerDocument>({
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     email: { type: String, required: true },
@@ -35,10 +35,10 @@ const userSchema = new Schema<JobSeekerDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    favourites: [{ id: { type: Mongoose.Types.ObjectId, ref: 'Ad' }, addedAt: Date }],
-    appliedForJobs: { type: [{ id: Mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
-    viewedAd: { type: [{ id: Mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
-    desiredRoles: { type: [Mongoose.Types.ObjectId], ref: 'Roles' },
+    favourites: [{ id: { type: mongoose.Types.ObjectId, ref: 'Ad' }, addedAt: Date }],
+    appliedForJobs: { type: [{ id: mongoose.Types.ObjectId, appliedAt: Date }], ref: 'Ad' },
+    viewedAd: { type: [{ id: mongoose.Types.ObjectId, viewedAt: Date }], ref: 'Ad' },
+    desiredRoles: { type: [mongoose.Types.ObjectId], ref: 'Roles' },
     description: { type: String },
     logo: { type: String },
     meta: { type: String },
@@ -47,17 +47,17 @@ const userSchema = new Schema<JobSeekerDocument>({
     other_uploads: { type: [String] },
 });
 
-userSchema.set('timestamps', true);
+jobSeekerSchema.set('timestamps', true);
 
-userSchema.plugin(uniqueValidator);
+jobSeekerSchema.plugin(uniqueValidator);
 
-userSchema.methods.addAppliedJobs = function (job: string) {
+jobSeekerSchema.methods.addAppliedJobs = function (job: string) {
     this.appliedForJobs = [...(this.appliedForJobs || []), { id: job, appliedAt: new Date() }];
 
     return this.save({ validateModifiedOnly: true });
 };
 
-userSchema.methods.addToFavourites = function (adId: string) {
+jobSeekerSchema.methods.addToFavourites = function (adId: string) {
     if ((this.favourites || []).find(doc => doc.id.toString() === adId)) {
         return this.save({ validateModifiedOnly: true });
     }
@@ -67,13 +67,13 @@ userSchema.methods.addToFavourites = function (adId: string) {
     return this.save({ validateModifiedOnly: true });
 };
 
-userSchema.methods.removeFromFavourites = function (adId: string) {
+jobSeekerSchema.methods.removeFromFavourites = function (adId: string) {
     this.favourites = this.favourites.filter(favourite => favourite.id !== adId);
 
     return this.save({ validateModifiedOnly: true });
 };
 
-userSchema.methods.getPublicData = function () {
+jobSeekerSchema.methods.getPublicData = function () {
     return {
         id: this._id,
         role: 'job-seeker',
@@ -89,27 +89,27 @@ userSchema.methods.getPublicData = function () {
     };
 };
 
-userSchema.methods.removeAppliedJob = function (job: string) {
+jobSeekerSchema.methods.removeAppliedJob = function (job: string) {
     this.appliedForJobs = (this.appliedForJobs || []).filter((appliedJob: any) => appliedJob.id.toString() !== job);
 
     return this.save({ validateModifiedOnly: true });
 };
 
-userSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]> {
+jobSeekerSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]> {
     return Ad.find({ $in: this.appliedForJobs });
 };
 
-userSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<JobSeekerDocument> {
+jobSeekerSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<JobSeekerDocument> {
     this.status.loginAttempts = loginAttempts;
 
     return this.save({ validateModifiedOnly: true });
 };
 
-userSchema.methods.getUserSecurityQuestion = async function (): Promise<string> {
+jobSeekerSchema.methods.getUserSecurityQuestion = async function (): Promise<string> {
     return this.securityQuestion;
 };
 
-userSchema.methods.addView = async function (adId: string): Promise<JobSeekerDocument> {
+jobSeekerSchema.methods.addView = async function (adId: string): Promise<JobSeekerDocument> {
     if (!this.viewedAd) {
         this.viewedAd = [{ id: adId, viewedAt: new Date() }];
     }
@@ -119,33 +119,32 @@ userSchema.methods.addView = async function (adId: string): Promise<JobSeekerDoc
     return this.save();
 };
 
-export interface JobSeekerModel extends Mongoose.Model<any> {
-    getUsers(this: Mongoose.Model<any>): Promise<JobSeekerDocument[]>;
+export interface JobSeekerModel extends mongoose.Model<any> {
+    getUsers(this: mongoose.Model<any>): Promise<JobSeekerDocument[]>;
 
-    deleteUser(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
+    deleteUser(this: mongoose.Model<any>, userId: string): Promise<boolean>;
 
-    updateUser(this: Mongoose.Model<any>, userData: JobSeekerDocument, userId: string): Promise<any>;
+    updateUser(this: mongoose.Model<any>, userData: JobSeekerDocument, userId: string): Promise<any>;
 
-    getUser(this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
-
+    getUser(this: mongoose.Model<any>, userId: string): Promise<JobSeekerDocument>;
 }
 
-userSchema.static('getUsers', async function (this: Mongoose.Model<any>): Promise<JobSeekerDocument[]> {
+jobSeekerSchema.static('getUsers', async function (this: mongoose.Model<any>): Promise<JobSeekerDocument[]> {
     return this.find({ isRecruiter: false });
 });
 
-userSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
+jobSeekerSchema.static('deleteUser', async function (this: mongoose.Model<any>, userId: string): Promise<boolean> {
     const response = await this.deleteOne({ _id: userId });
 
     return !!response?.acknowledged;
 });
 
-userSchema.static('updateUser', async function (this: Mongoose.Model<any>, userData: JobSeekerDocument, userId: string): Promise<any> {
+jobSeekerSchema.static('updateUser', async function (this: mongoose.Model<any>, userData: JobSeekerDocument, userId: string): Promise<any> {
     return this.updateOne({ _id: userId }, { ...userData });
 });
 
-userSchema.static('getUser', async function (this: Mongoose.Model<any>, userId: string): Promise<JobSeekerDocument> {
+jobSeekerSchema.static('getUser', async function (this: mongoose.Model<any>, userId: string): Promise<JobSeekerDocument> {
     return this.findOne({ _id: userId });
 });
 
-export default Mongoose.model<JobSeekerDocument, JobSeekerModel>('JobSeeker', userSchema);
+export default mongoose.model<JobSeekerDocument, JobSeekerModel>('JobSeeker', jobSeekerSchema);

@@ -2,10 +2,10 @@ import Ad, { AdDocument } from '@models/ad';
 import { PaginationInterface } from '@models/libs/pagination.interface';
 import { BaseUserDocument } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
-import Mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
-const Schema = Mongoose.Schema;
+const Schema = mongoose.Schema;
 
 export interface RecruiterDocument extends BaseUserDocument {
     company_name: string;
@@ -35,8 +35,8 @@ const recruiterSchema = new Schema<RecruiterDocument>({
         isBlocked: { type: Boolean, required: false, default: false }
     },
     isRecruiter: { type: Boolean, required: true, default: false },
-    postedJobs: { type: [Mongoose.Types.ObjectId], ref: 'Ad' },
-    favourites: [{ id: { type: Mongoose.Types.ObjectId, ref: 'Ad' }, addedAt: Date }],
+    postedJobs: { type: [mongoose.Types.ObjectId], ref: 'Ad' },
+    favourites: [{ id: { type: mongoose.Types.ObjectId, ref: 'Ad' }, addedAt: Date }],
     description: { type: String },
     address: { type: String },
     logo: { type: String },
@@ -127,32 +127,32 @@ recruiterSchema.methods.getUserSecurityQuestion = async function (): Promise<str
     return this.securityQuestion;
 };
 
-export interface RecruiterModel extends Mongoose.Model<any> {
-    getUsers(this: Mongoose.Model<any>): Promise<RecruiterDocument[]>;
+export interface RecruiterModel extends mongoose.Model<any> {
+    getUsers(this: mongoose.Model<any>): Promise<RecruiterDocument[]>;
 
-    deleteUser(this: Mongoose.Model<any>, userId: string): Promise<boolean>;
+    deleteUser(this: mongoose.Model<any>, userId: string): Promise<boolean>;
 
-    updateUser(this: Mongoose.Model<any>, userData: RecruiterDocument, userId: string): Promise<any>;
+    updateUser(this: mongoose.Model<any>, userData: RecruiterDocument, userId: string): Promise<any>;
 
-    getUser(this: Mongoose.Model<any>, userId: string): Promise<RecruiterDocument>;
+    getUser(this: mongoose.Model<any>, userId: string): Promise<RecruiterDocument>;
 }
 
-recruiterSchema.static('getUsers', async function (this: Mongoose.Model<any>): Promise<RecruiterDocument[]> {
+recruiterSchema.static('getUsers', async function (this: mongoose.Model<any>): Promise<RecruiterDocument[]> {
     return this.find({ isRecruiter: true });
 });
 
-recruiterSchema.static('deleteUser', async function (this: Mongoose.Model<any>, userId: string): Promise<boolean> {
+recruiterSchema.static('deleteUser', async function (this: mongoose.Model<any>, userId: string): Promise<boolean> {
     const response = await this.deleteOne({ _id: userId });
 
     return !!response?.acknowledged;
 });
 
-recruiterSchema.static('updateUser', async function (this: Mongoose.Model<any>, userData: RecruiterDocument, userId: string): Promise<any> {
+recruiterSchema.static('updateUser', async function (this: mongoose.Model<any>, userData: RecruiterDocument, userId: string): Promise<any> {
     return this.updateOne({ _id: userId }, { ...userData });
 });
 
-recruiterSchema.static('getUser', async function (this: Mongoose.Model<any>, userId: string): Promise<RecruiterDocument> {
+recruiterSchema.static('getUser', async function (this: mongoose.Model<any>, userId: string): Promise<RecruiterDocument> {
     return this.findOne({ _id: userId });
 });
 
-export default Mongoose.model<RecruiterDocument, RecruiterModel>('Recruiter', recruiterSchema);
+export default mongoose.model<RecruiterDocument, RecruiterModel>('Recruiter', recruiterSchema);
