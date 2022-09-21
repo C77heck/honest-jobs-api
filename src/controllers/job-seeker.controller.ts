@@ -62,7 +62,7 @@ export class JobSeekerController extends ExpressController {
 
         this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
 
-        this.router.get('/apply/:adId', [], this.hasApplied.bind(this));
+        this.router.get('/has-applied/:adId', [], this.hasApplied.bind(this));
 
         this.router.post('/apply', [], this.apply.bind(this));
     }
@@ -75,7 +75,7 @@ export class JobSeekerController extends ExpressController {
 
             const createdApplicants = await this.applyService.getByApplicant(ad, user);
 
-            res.status(200).json({ createdApplicants, message: MESSAGE.SUCCESS.APPLIED });
+            res.status(200).json({ hasApplied: !!createdApplicants });
         } catch (err) {
             return next(handleError(err));
         }
@@ -138,7 +138,7 @@ export class JobSeekerController extends ExpressController {
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             handleValidation(req as any);
-            
+
             const result = await this.userServices.signup(req);
 
             res.json({ result });
