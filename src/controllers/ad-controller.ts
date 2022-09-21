@@ -10,11 +10,6 @@ import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 
 export class AdController extends ExpressController<RecruiterDocument> {
-    public injectServices() {
-        super.injectServices();
-        this.userServices = new UserService<RecruiterDocument>(Recruiter);
-    }
-
     public initializeRouters() {
         this.router.get('/', [], this.getAllAds.bind(this));
 
@@ -80,7 +75,7 @@ export class AdController extends ExpressController<RecruiterDocument> {
 
             await adDocument.addUserToAlerts(user, role);
 
-            res.status(200).json({ message:MESSAGE.SUCCESS.ALERT_ADDED  });
+            res.status(200).json({ message: MESSAGE.SUCCESS.ALERT_ADDED });
         } catch (err) {
             return next(handleError(err));
         }
@@ -94,7 +89,12 @@ export class AdController extends ExpressController<RecruiterDocument> {
                 throw new NotFound('Ad id is missing!');
             }
 
-            const user = await this.userServices.extractUser(req);
+            const headerRole = req.headers?.role || '';
+
+            const userService = this.getUserServiceByRole(headerRole);
+
+            const user = await userService.extractUser(req);
+
             const role = user.getPublicData()?.role;
 
             if (!user) {
