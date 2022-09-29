@@ -10,6 +10,7 @@ import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
 import { ExpressController } from './libs/express.controller';
+import { Validator } from './libs/helpers/validators';
 
 export class RecruiterController extends ExpressController<RecruiterDocument> {
     public applyService: ApplyService;
@@ -22,8 +23,12 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public initializeRouters() {
         this.router.post('/login', [
-            check('email').not().isEmpty().trim(),
-            check('password').not().isEmpty()
+            Validator.email.bind(this, 'email'),
+            Validator.password.bind(this, 'email'),
+            // field.bind(this, 'email'),
+            // field.bind(this, 'password'),
+            // check('email').not().isEmpty().trim(),
+            // check('password').not().isEmpty()
         ], this.login.bind(this));
 
         this.router.post('/signup', [
