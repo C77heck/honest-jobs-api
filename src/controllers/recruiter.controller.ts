@@ -1,6 +1,6 @@
 import Ad, { AdDocument } from '@models/ad';
 import Application from '@models/application';
-import { BadRequest, HttpError } from '@models/libs/error-models/errors';
+import { BadRequest, HttpError, UnprocessableEntity } from '@models/libs/error-models/errors';
 import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
@@ -10,7 +10,10 @@ import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
 import { ExpressController } from './libs/express.controller';
-import { Validator } from './libs/helpers/validators';
+import { field } from './libs/helpers/validator/field';
+import { trim } from './libs/helpers/validator/formatters';
+import { validate } from './libs/helpers/validator/validate';
+import { email, required } from './libs/helpers/validator/validators';
 
 export class RecruiterController extends ExpressController<RecruiterDocument> {
     public applyService: ApplyService;
@@ -23,12 +26,8 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public initializeRouters() {
         this.router.post('/login', [
-            Validator.email.bind(this, 'email'),
-            Validator.password.bind(this, 'email'),
-            // field.bind(this, 'email'),
-            // field.bind(this, 'password'),
-            // check('email').not().isEmpty().trim(),
-            // check('password').not().isEmpty()
+            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'password', [required])
         ], this.login.bind(this));
 
         this.router.post('/signup', [
@@ -190,9 +189,18 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         }
     }
 
+    public handleValidation(req: express.Request) {
+        const errors = validate(req);
+        if (!errors.isValid) {
+            console.log({ errors });
+            throw new UnprocessableEntity(`Invalid inputs passed, please check your data`);
+        }
+    }
+
     public async login(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
+
             const { user, token } = await this.userServices.login(req);
 
             const userData = user.getPublicData();

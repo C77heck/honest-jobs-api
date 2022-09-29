@@ -1,6 +1,7 @@
 import { UnprocessableEntity } from '@models/libs/error-models/errors';
 import { validationResult } from "express-validator";
 
+// todo -> rework the validation.
 export const handleValidation = (req: Request): void => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
