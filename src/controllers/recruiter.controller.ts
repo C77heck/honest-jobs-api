@@ -5,7 +5,7 @@ import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
-import { body, check } from 'express-validator';
+import { check } from 'express-validator';
 import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { handleValidation } from '../libs/handle-validation';
@@ -13,7 +13,7 @@ import { ExpressController } from './libs/express.controller';
 import { field } from './libs/helpers/validator/field';
 import { trim } from './libs/helpers/validator/formatters';
 import { validate } from './libs/helpers/validator/validate';
-import { email, required } from './libs/helpers/validator/validators';
+import { email, isBoolean, isString, required } from './libs/helpers/validator/validators';
 
 export class RecruiterController extends ExpressController<RecruiterDocument> {
     public applyService: ApplyService;
@@ -31,22 +31,21 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         ], this.login.bind(this));
 
         this.router.post('/signup', [
-            body('*').trim(),
-            check('company_name'),
-            check('email').normalizeEmail().isEmail(),
-            check('password').isLength({ min: 6 }),
-            check('securityQuestion').not().isEmpty(),
-            check('securityAnswer').isLength({ min: 4 }),
+            field.bind(this, 'company_name', [required]),
+            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'password', [required]),
+            field.bind(this, 'securityQuestion', [required]),
+            field.bind(this, 'securityAnswer', [required]),
         ], this.signup.bind(this));
 
         this.router.put('/update', [
-            body('*').trim(),
-            check('company_name'),
-            check('description'),
-            check('address'),
-            check('meta'),
-            check('images'),
-            check('logo'),
+            field.bind(this, 'company_name', [required]),
+            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'description', []),
+            field.bind(this, 'address', []),
+            field.bind(this, 'meta', []),
+            field.bind(this, 'images', []),
+            field.bind(this, 'logo', []),
         ], this.updateUserData.bind(this));
 
         this.router.get('/whoami', [], this.whoami.bind(this));
@@ -61,25 +60,25 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         ], this.deleteAccount.bind(this));
 
         this.router.post('/create-new-ad', [
-            check('title').not().isEmpty(),
-            check('description').not().isEmpty(),
-            check('meta'),
-            check('salary').not().isEmpty(),
-            check('location').not().isEmpty(),
-            check('expiresOn').isString().not().isEmpty(),
-            check('isPremium').isBoolean(),
-            check('images'),
+            field.bind(this, 'title', [required]),
+            field.bind(this, 'description', [required]),
+            field.bind(this, 'meta', []),
+            field.bind(this, 'salary', [required], [trim, email]),
+            field.bind(this, 'location', [required], [trim, email]),
+            field.bind(this, 'expiresOn', [required, isString], [trim, email]),
+            field.bind(this, 'isPremium', [isBoolean]),
+            field.bind(this, 'images', []),
         ], this.createNewAd.bind(this));
 
         this.router.put('/update-ad/:adId', [
-            check('title').not().isEmpty(),
-            check('description').not().isEmpty(),
-            check('meta'),
-            check('salary').not().isEmpty(),
-            check('location').not().isEmpty(),
-            check('expiresOn').isString().not().isEmpty(),
-            check('isPremium').isBoolean(),
-            check('images'),
+            field.bind(this, 'title', [required]),
+            field.bind(this, 'description', [required]),
+            field.bind(this, 'meta', []),
+            field.bind(this, 'salary', [required], [trim, email]),
+            field.bind(this, 'location', [required], [trim, email]),
+            field.bind(this, 'expiresOn', [required, isString], [trim, email]),
+            field.bind(this, 'isPremium', [isBoolean]),
+            field.bind(this, 'images', []),
         ], this.updateAd.bind(this));
 
         this.router.put('/add-to-favourites/:adId', [], this.addToFavourites.bind(this));
@@ -139,7 +138,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async addToFavourites(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any as any);
+            this.handleValidation(req);
 
             const adId = req.params?.adId;
 
@@ -159,7 +158,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async removeFromFavourites(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any as any);
+            this.handleValidation(req);
 
             const adId = req.params?.adId;
 
@@ -244,6 +243,8 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async createNewAd(req: express.Request, res: express.Response, next: NextFunction) {
         try {
+            this.handleValidation(req);
+
             const recruiter = await this.userServices.extractUser(req);
 
             const createdAd: any = new Ad({ ...req.body, logo: recruiter.logo } as AdDocument);
@@ -260,6 +261,8 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async updateAd(req: express.Request, res: express.Response, next: NextFunction) {
         try {
+            this.handleValidation(req);
+
             const updatedAd = await Ad.updateAd(req.params.adId, req.body as AdDocument);
 
             res.status(200).json({ updatedAd, message: MESSAGE.SUCCESS.GENERIC });

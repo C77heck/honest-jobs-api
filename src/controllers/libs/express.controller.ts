@@ -1,12 +1,14 @@
 import Ad from '@models/ad';
 import Filter from '@models/filter';
 import { JobSeekerDocument } from '@models/job-seeker';
+import { UnprocessableEntity } from '@models/libs/error-models/errors';
 import { BaseUserDocument } from '@models/user';
 import { AdQueryService } from '@services/ad-query.service';
 import { AdService } from '@services/ad.service';
 import { FilterService } from '@services/filter.service';
 import { UserService } from '@services/user.service';
 import express from 'express';
+import { validate } from './helpers/validator/validate';
 
 export class ExpressController<TUserType extends BaseUserDocument = JobSeekerDocument> {
     public router: express.Router;
@@ -29,5 +31,13 @@ export class ExpressController<TUserType extends BaseUserDocument = JobSeekerDoc
 
     public initializeRouters() {
 
+    }
+
+    public handleError(req: express.Request) {
+        const errors = validate(req);
+        if (!errors.isValid) {
+            console.log(errors);
+            throw new UnprocessableEntity(`Invalid inputs passed, please check your data`);
+        }
     }
 }
