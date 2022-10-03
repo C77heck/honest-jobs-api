@@ -1,12 +1,16 @@
 import express from 'express';
 import { FormatterFunction } from './formatters';
-import { ValidatorFunction } from './validators';
+import { LengthValidatorFunction, ValidatorFunction } from './validators';
 
-export type ValidatorArgumentOptions = ValidatorFunction[] | FormatterFunction<any>[];
+export type ValidatorArgumentOptions =
+    ValidatorFunction[]
+    | FormatterFunction<any>[]
+    | LengthValidatorFunction[];
 
-export const field = (field: string, validators: ValidatorArgumentOptions, formatters: FormatterFunction<any>[], req: express.Request, res: express.Response, next: express.NextFunction) => {
+export const field = (field: string, validators: ValidatorArgumentOptions, req: express.Request, res: express.Response, next: express.NextFunction) => {
     const fieldValue = req.body?.[field];
     const errors = [];
+
     for (const validator of validators) {
         const result = validator(fieldValue);
 

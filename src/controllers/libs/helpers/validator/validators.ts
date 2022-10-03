@@ -5,6 +5,8 @@ export interface ValidationResponse {
 
 export type ValidatorFunction = (value: any) => ValidationResponse;
 
+export type LengthValidatorFunction = (length: number) => ValidatorFunction;
+
 export const required: ValidatorFunction = (value: any): ValidationResponse => {
     if (!value) {
         return {
@@ -91,7 +93,7 @@ export const email: ValidatorFunction = (value: any): ValidationResponse => {
     };
 };
 
-export const minLength: ValidatorFunction = (length: number): any => {
+export const minLength: LengthValidatorFunction = (length: number): ValidatorFunction => {
     return (value: string): ValidationResponse => {
         if (value.length < length) {
             return {
@@ -106,8 +108,9 @@ export const minLength: ValidatorFunction = (length: number): any => {
         };
     };
 };
-export const maxLength: ValidatorFunction = (length: number): any => {
+export const maxLength: LengthValidatorFunction = (length: number): ValidatorFunction => {
     return (value: string): ValidationResponse => {
+        console.log(value, length, value.length);
         if (value.length > length) {
             return {
                 isValid: false,

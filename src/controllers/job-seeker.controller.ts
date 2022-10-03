@@ -11,7 +11,7 @@ import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
 import { field } from './libs/helpers/validator/field';
 import { trim } from './libs/helpers/validator/formatters';
-import { email, required } from './libs/helpers/validator/validators';
+import { email, maxLength, required } from './libs/helpers/validator/validators';
 
 export class JobSeekerController extends ExpressController {
     public applyService: ApplyService;
@@ -24,7 +24,7 @@ export class JobSeekerController extends ExpressController {
 
     public initializeRouters() {
         this.router.post('/login', [
-            field.bind(this, 'email', [required, email, trim]),
+            field.bind(this, 'email', [required, email, trim, maxLength(3)]),
             field.bind(this, 'password', [required])
         ], this.login.bind(this));
 

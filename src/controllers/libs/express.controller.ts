@@ -35,8 +35,8 @@ export class ExpressController<TUserType extends BaseUserDocument = JobSeekerDoc
 
     public handleValidation(req: express.Request) {
         const errors = validate(req);
+
         if (!errors.isValid) {
-            console.log(errors);
             throw new UnprocessableEntity(`Invalid inputs passed, please check your data`, errors);
         }
     }
