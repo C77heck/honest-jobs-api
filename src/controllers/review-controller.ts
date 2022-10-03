@@ -3,10 +3,11 @@ import Recruiter, { RecruiterDocument } from '@models/recruiter';
 import Review, { ReviewDocument } from '@models/review';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
-import { body, check } from 'express-validator';
 import { MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
 import { ExpressController } from './libs/express.controller';
+import { field } from './libs/helpers/validator/field';
+import { isDate, required } from './libs/helpers/validator/validators';
 
 export class ReviewController extends ExpressController<RecruiterDocument> {
     public injectServices() {
@@ -20,35 +21,27 @@ export class ReviewController extends ExpressController<RecruiterDocument> {
         this.router.get('/get-by-employer', [], this.getByEmployer.bind(this));
         // TODO -> auth for the employer
         this.router.post('/create-new-review/:employerId', [
-            body('*').trim().escape(),
-            check('title').not().isEmpty().escape(),
-            check('description').not().isEmpty().escape(),
-            check('salary').not().isEmpty().escape(),
-            check('location').not().isEmpty().escape(),
-            check('roleHeld').not().isEmpty().escape(),
-            check('suggestions').escape(),
-            check('rating').not().isEmpty().escape(),
-            check('pros').not().isEmpty().escape(),
-            check('cons').not().isEmpty().escape(),
-            check('startDate').isString().not().isEmpty().escape(),
-            check('finishDate').escape(),
-            check('isCurrentEmployer').isBoolean(),
+            field.bind(this, 'title', [required]),
+            field.bind(this, 'description', [required]),
+            field.bind(this, 'salary', [required]),
+            field.bind(this, 'location', [required]),
+            field.bind(this, 'roleHeld', [required]),
+            field.bind(this, 'rating', [required]),
+            field.bind(this, 'pros', [required]),
+            field.bind(this, 'cons', [required]),
+            field.bind(this, 'startDate', [required, isDate])
         ], this.createNewReview.bind(this));
 
         this.router.put('/update-review/:reviewId', [
-            body('*').trim().escape(),
-            check('title').not().isEmpty().escape(),
-            check('description').not().isEmpty().escape(),
-            check('salary').not().isEmpty().escape(),
-            check('location').not().isEmpty().escape(),
-            check('roleHeld').not().isEmpty().escape(),
-            check('suggestions').escape(),
-            check('rating').not().isEmpty().escape(),
-            check('pros').not().isEmpty().escape(),
-            check('cons').not().isEmpty().escape(),
-            check('startDate').isString().not().isEmpty().escape(),
-            check('finishDate').escape(),
-            check('isCurrentEmployer').isBoolean(),
+            field.bind(this, 'title', [required]),
+            field.bind(this, 'description', [required]),
+            field.bind(this, 'salary', [required]),
+            field.bind(this, 'location', [required]),
+            field.bind(this, 'roleHeld', [required]),
+            field.bind(this, 'rating', [required]),
+            field.bind(this, 'pros', [required]),
+            field.bind(this, 'cons', [required]),
+            field.bind(this, 'startDate', [required, isDate])
         ], this.updateReview.bind(this));
 
         this.router.delete('/delete-review/:reviewId', [], this.deleteReview.bind(this));

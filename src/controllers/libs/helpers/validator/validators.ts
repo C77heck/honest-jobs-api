@@ -46,6 +46,20 @@ export const isBoolean: ValidatorFunction = (value: any): ValidationResponse => 
         error: ''
     };
 };
+export const isDate: ValidatorFunction = (value: any): ValidationResponse => {
+    const date = new Date(value);
+    if (date.toDateString() === 'Invalid Date') {
+        return {
+            isValid: false,
+            error: 'Must be valid date'
+        };
+    }
+
+    return {
+        isValid: true,
+        error: ''
+    };
+};
 
 export const isString: ValidatorFunction = (value: any): ValidationResponse => {
     if (typeof value !== 'boolean') {
@@ -75,4 +89,22 @@ export const email: ValidatorFunction = (value: any): ValidationResponse => {
         isValid: true,
         error: ''
     };
+};
+
+export const minLength: ValidatorFunction = (length: number): any => {
+
+    return (value: string): ValidationResponse => {
+        if (value.length < length) {
+            return {
+                isValid: false,
+                error: `Input must be at least ${length} character long`
+            };
+        }
+
+        return {
+            isValid: true,
+            error: ''
+        };
+    };
+
 };

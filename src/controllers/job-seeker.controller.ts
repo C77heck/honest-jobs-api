@@ -5,11 +5,19 @@ import { BadRequest } from '@models/libs/error-models/errors';
 import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
-import { body, check } from 'express-validator';
+import { check } from 'express-validator';
 import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
-import { handleValidation } from "../libs/handle-validation";
 import { ExpressController } from './libs/express.controller';
+import { field } from './libs/helpers/validator/field';
+import { trim } from './libs/helpers/validator/formatters';
+import { email, minLength, required } from './libs/helpers/validator/validators';
+import {
+
+this.handleValidation;
+}
+fromlibs / handle - validation;
+";
 
 export class JobSeekerController extends ExpressController {
     public applyService: ApplyService;
@@ -22,30 +30,29 @@ export class JobSeekerController extends ExpressController {
 
     public initializeRouters() {
         this.router.post('/login', [
-            check('email').not().isEmpty().escape().trim(),
-            check('password').not().isEmpty()
+            // @ts-ignore
+            field.bind(this, 'email', [required, email, minLength(12)], [trim]),
+            field.bind(this, 'password', [required])
         ], this.login.bind(this));
 
         this.router.post('/signup', [
-            body('*').trim(),
-            check('first_name'),
-            check('last_name'),
-            check('email').normalizeEmail().isEmail(),
-            check('password').isLength({ min: 6 }),
-            check('securityQuestion').not().isEmpty().escape(),
-            check('securityAnswer').isLength({ min: 4 }),
+            field.bind(this, 'first_name', [required]),
+            field.bind(this, 'last_name', [required]),
+            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'password', [required]),
+            field.bind(this, 'securityQuestion', [required]),
+            field.bind(this, 'securityAnswer', [required]),
         ], this.signup.bind(this));
 
         // this.router.use(simpleUserAuth.bind(this));
         this.router.put('/update', [
-            body('*').trim(),
-            check('first_name').escape(),
-            check('last_name').escape(),
-            check('description').escape(),
-            check('meta').escape(),
-            check('images'),
-            check('resume'),
-            check('other_uploads'),
+            field.bind(this, 'first_name', [required]),
+            field.bind(this, 'last_name', [required]),
+            field.bind(this, 'description', [required]),
+            field.bind(this, 'meta', [required]),
+            field.bind(this, 'images', [required]),
+            field.bind(this, 'resume', [required]),
+            field.bind(this, 'other_uploads', [required]),
         ], this.updateUserData.bind(this));
 
         this.router.get('/whoami', [], this.whoami.bind(this));
@@ -97,7 +104,7 @@ export class JobSeekerController extends ExpressController {
 
     public async addToFavourites(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any as any);
+            this.handleValidation(req);
 
             const adId = req.params?.adId;
 
@@ -117,7 +124,7 @@ export class JobSeekerController extends ExpressController {
 
     public async removeFromFavourites(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any as any);
+            this.handleValidation(req);
 
             const adId = req.params?.adId;
 
@@ -137,7 +144,7 @@ export class JobSeekerController extends ExpressController {
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
 
             const result = await this.userServices.signup(req);
 
@@ -149,7 +156,7 @@ export class JobSeekerController extends ExpressController {
 
     public async login(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
 
             const { user, token } = await this.userServices.login(req);
 
@@ -169,7 +176,7 @@ export class JobSeekerController extends ExpressController {
 
     public async updateUserData(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
 
             await this.userServices.updateUser(req, req.body);
 

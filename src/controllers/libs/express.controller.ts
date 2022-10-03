@@ -33,7 +33,7 @@ export class ExpressController<TUserType extends BaseUserDocument = JobSeekerDoc
 
     }
 
-    public handleError(req: express.Request) {
+    public handleValidation(req: express.Request) {
         const errors = validate(req);
         if (!errors.isValid) {
             console.log(errors);
