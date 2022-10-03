@@ -92,7 +92,6 @@ export const email: ValidatorFunction = (value: any): ValidationResponse => {
 };
 
 export const minLength: ValidatorFunction = (length: number): any => {
-
     return (value: string): ValidationResponse => {
         if (value.length < length) {
             return {
@@ -106,5 +105,19 @@ export const minLength: ValidatorFunction = (length: number): any => {
             error: ''
         };
     };
+};
+export const maxLength: ValidatorFunction = (length: number): any => {
+    return (value: string): ValidationResponse => {
+        if (value.length > length) {
+            return {
+                isValid: false,
+                error: `Input is too long! The maximum length is ${length} character long`
+            };
+        }
 
+        return {
+            isValid: true,
+            error: ''
+        };
+    };
 };

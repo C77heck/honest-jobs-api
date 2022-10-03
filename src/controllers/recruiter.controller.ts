@@ -26,21 +26,21 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public initializeRouters() {
         this.router.post('/login', [
-            field.bind(this, 'email', [required, email], [trim]),
+            field.bind(this, 'email', [required, email, trim]),
             field.bind(this, 'password', [required])
         ], this.login.bind(this));
 
         this.router.post('/signup', [
             field.bind(this, 'company_name', [required]),
-            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'email', [required, trim, email]),
             field.bind(this, 'password', [required]),
             field.bind(this, 'securityQuestion', [required]),
             field.bind(this, 'securityAnswer', [required]),
         ], this.signup.bind(this));
 
         this.router.put('/update', [
-            field.bind(this, 'company_name', [required]),
-            field.bind(this, 'email', [required], [trim, email]),
+            field.bind(this, 'company_name', []),
+            field.bind(this, 'email', []),
             field.bind(this, 'description', []),
             field.bind(this, 'address', []),
             field.bind(this, 'meta', []),

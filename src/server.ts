@@ -40,6 +40,7 @@ app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
 
     return res.status(err?.code || 500).json({
         error: err.message,
+        payload: err?.payload || {}
     });
 });
 
