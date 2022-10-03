@@ -26,13 +26,13 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public initializeRouters() {
         this.router.post('/login', [
-            field.bind(this, 'email', [required, email, trim]),
+            field.bind(this, 'email', [required, email], [trim]),
             field.bind(this, 'password', [required])
         ], this.login.bind(this));
 
         this.router.post('/signup', [
             field.bind(this, 'company_name', [required]),
-            field.bind(this, 'email', [required, trim, email]),
+            field.bind(this, 'email', [required, email], [trim]),
             field.bind(this, 'password', [required]),
             field.bind(this, 'securityQuestion', [required]),
             field.bind(this, 'securityAnswer', [required]),
@@ -63,7 +63,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
             field.bind(this, 'title', [required]),
             field.bind(this, 'description', [required]),
             field.bind(this, 'meta', []),
-            field.bind(this, 'salary', [required, trim, email]),
+            field.bind(this, 'salary', [required, email], [trim]),
             field.bind(this, 'location', [required]),
             field.bind(this, 'expiresOn', [required, isString]),
             field.bind(this, 'isPremium', [isBoolean]),
@@ -74,7 +74,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
             field.bind(this, 'title', [required]),
             field.bind(this, 'description', [required]),
             field.bind(this, 'meta', []),
-            field.bind(this, 'salary', [required, trim, email]),
+            field.bind(this, 'salary', [required, email], [trim]),
             field.bind(this, 'location', [required]),
             field.bind(this, 'expiresOn', [required, isString]),
             field.bind(this, 'isPremium', [isBoolean]),
