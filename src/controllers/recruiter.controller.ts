@@ -8,7 +8,6 @@ import express, { NextFunction } from 'express';
 import { check } from 'express-validator';
 import { ERROR_MESSAGES, MESSAGE } from '../libs/constants';
 import { handleError } from '../libs/handle-error';
-import { handleValidation } from '../libs/handle-validation';
 import { ExpressController } from './libs/express.controller';
 import { field } from './libs/helpers/validator/field';
 import { trim } from './libs/helpers/validator/formatters';
@@ -178,7 +177,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async signup(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
 
             const result = await this.userServices.signup(req);
 
@@ -218,7 +217,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async updateUserData(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            handleValidation(req as any);
+            this.handleValidation(req);
             await this.userServices.updateUser(req, req.body);
 
             res.status(201).json({ message: MESSAGE.SUCCESS.USER_DATA_UPDATED });

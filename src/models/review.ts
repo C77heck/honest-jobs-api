@@ -1,5 +1,4 @@
 import Mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = Mongoose.Schema;
 
@@ -37,8 +36,6 @@ const reviewSchema = new Schema({
 });
 
 reviewSchema.set('timestamps', true);
-
-reviewSchema.plugin(uniqueValidator);
 
 interface ReviewModel extends Mongoose.Model<any> {
     getReviewsForEmployer(this: Mongoose.Model<any>, employerId: string | number): Promise<ReviewDocument[]>;

@@ -11,7 +11,6 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { startSession } from 'mongoose';
 import { ERROR_MESSAGES } from '../libs/constants';
-import { handleValidation } from '../libs/handle-validation';
 
 export class UserService<T extends BaseUserDocument> extends DocumentService<T> {
     public async signup(req: express.Request) {
@@ -19,7 +18,6 @@ export class UserService<T extends BaseUserDocument> extends DocumentService<T> 
         session.startTransaction();
 
         try {
-            handleValidation(req as any as any);
             const { email, password } = req.body;
 
             const existingUser = await this.collection.findOne({ email: email });

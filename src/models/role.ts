@@ -1,5 +1,4 @@
 import Mongoose from 'Mongoose';
-import uniqueValidator from 'Mongoose-unique-validator';
 
 const Schema = Mongoose.Schema;
 
@@ -14,8 +13,6 @@ const roleSchema = new Schema<RoleDocument>({
 });
 
 roleSchema.set('timestamps', true);
-
-roleSchema.plugin(uniqueValidator);
 
 roleSchema.methods.updateRole = function (data: RoleDocument) {
     this.name = data?.name ?? this.name;

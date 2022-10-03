@@ -1,6 +1,5 @@
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
@@ -38,8 +37,6 @@ const filterSchema = new Schema<FilterDocument>({
 });
 
 filterSchema.set('timestamps', true);
-
-filterSchema.plugin(uniqueValidator);
 
 interface FilterModel extends Mongoose.Model<any> {
     getFilterById(this: Mongoose.Model<any>, employerId: string | number): Promise<FilterDocument>;

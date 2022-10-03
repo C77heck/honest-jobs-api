@@ -1,7 +1,6 @@
 import Ad, { AdDocument } from '@models/ad';
 import { BaseUserDocument } from '@models/user';
 import mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
@@ -49,7 +48,8 @@ const jobSeekerSchema = new Schema<JobSeekerDocument>({
 
 jobSeekerSchema.set('timestamps', true);
 
-jobSeekerSchema.plugin(uniqueValidator);
+// todo check how to validate schema.
+jobSeekerSchema.plugin((schema: mongoose.Schema) => console.log(schema));
 
 jobSeekerSchema.methods.addAppliedJobs = function (job: string) {
     this.appliedForJobs = [...(this.appliedForJobs || []), { id: job, appliedAt: new Date() }];

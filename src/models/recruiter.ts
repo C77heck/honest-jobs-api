@@ -3,7 +3,6 @@ import { PaginationInterface } from '@models/libs/pagination.interface';
 import { BaseUserDocument } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
 import mongoose from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
@@ -60,8 +59,6 @@ recruiterSchema.methods.getPublicData = function () {
 };
 
 recruiterSchema.set('timestamps', true);
-
-recruiterSchema.plugin(uniqueValidator);
 
 recruiterSchema.methods.addToFavourites = function (adId: string) {
     if ((this.favourites || []).find(doc => doc.id.toString() === adId)) {

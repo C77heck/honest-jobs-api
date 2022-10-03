@@ -4,7 +4,6 @@ import { BaseUserDocument, RoleType } from '@models/user';
 import { PaginationOptions } from '@services/libs/mongo-query.service';
 import Mongoose from 'mongoose';
 import mongoose, { Document } from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
 
 const Schema = mongoose.Schema;
 
@@ -74,8 +73,6 @@ const adSchema = new Schema({
 });
 
 adSchema.set('timestamps', true);
-
-adSchema.plugin(uniqueValidator);
 
 adSchema.methods.getIsUserInAlertList = function (user: BaseUserDocument, role: RoleType) {
     switch (role) {
