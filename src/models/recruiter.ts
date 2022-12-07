@@ -62,30 +62,30 @@ recruiterSchema.set('timestamps', true);
 
 recruiterSchema.methods.addToFavourites = function (adId: string) {
     if ((this.favourites || []).find(doc => doc.id.toString() === adId)) {
-        return this.save({ validateModifiedOnly: true });
+        return this.save();
     }
 
     this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 recruiterSchema.methods.removeFromFavourites = function (adId: string) {
     this.favourites = (this.favourites || []).filter(favourite => favourite.id.toString() !== adId);
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 recruiterSchema.methods.addPostedJobs = function (job: string): Promise<RecruiterDocument> {
     this.postedJobs = [...(this.postedJobs || []), job];
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 recruiterSchema.methods.removePostedJob = function (job: string): Promise<RecruiterDocument> {
     this.postedJobs = (this.postedJobs || []).filter((postedJob: any) => postedJob.toString() !== job);
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 recruiterSchema.methods.getPostedJobs = async function (pagination: PaginationOptions, filters = {}, sort = {}): Promise<PaginationInterface<AdDocument>> {

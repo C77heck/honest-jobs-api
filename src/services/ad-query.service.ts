@@ -13,7 +13,6 @@ export class AdQueryService extends MongoQueryService {
                     break;
                 case 'postedAt':
                     filters.createdAt = this.formatDateQuery(rawFilters[key]);
-                    console.log(this.formatDateQuery(rawFilters[key]));
                     break;
                 case 'salaries':
                     filters.salary = { $gte: rawFilters[key] };

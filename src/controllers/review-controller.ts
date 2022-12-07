@@ -12,7 +12,7 @@ import { isDate, required } from './libs/helpers/validator/validators';
 export class ReviewController extends ExpressController<RecruiterDocument> {
     public injectServices() {
         super.injectServices();
-        this.userServices = new UserService(Recruiter);
+        this.userService = new UserService(Recruiter);
     }
 
     public initializeRouters() {
@@ -59,7 +59,7 @@ export class ReviewController extends ExpressController<RecruiterDocument> {
 
     public async getByEmployer(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const userId = this.userServices.getUserId(req);
+            const userId = this.userService.getUserId(req);
 
             const reviews = await Review.getReviewsForEmployer(userId);
 

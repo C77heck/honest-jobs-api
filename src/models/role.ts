@@ -17,7 +17,7 @@ roleSchema.set('timestamps', true);
 roleSchema.methods.updateRole = function (data: RoleDocument) {
     this.name = data?.name ?? this.name;
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 export interface RoleModel extends Mongoose.Model<any> {

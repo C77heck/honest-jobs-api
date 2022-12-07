@@ -1,7 +1,7 @@
 import Ad from '@models/ad';
 import Application from '@models/application';
 import JobSeeker from '@models/job-seeker';
-import { BadRequest } from '@models/libs/error-models/errors';
+import { BadRequest, Unauthorized } from '@models/libs/error-models/errors';
 import { ApplyService } from '@services/apply.service';
 import { UserService } from '@services/user.service';
 import express, { NextFunction } from 'express';
@@ -18,7 +18,7 @@ export class JobSeekerController extends ExpressController {
 
     public injectServices() {
         super.injectServices();
-        this.userServices = new UserService(JobSeeker);
+        this.userService = new UserService(JobSeeker);
         this.applyService = new ApplyService(Application);
     }
 
@@ -43,9 +43,7 @@ export class JobSeekerController extends ExpressController {
             field.bind(this, 'last_name', [required]),
             field.bind(this, 'description', [required]),
             field.bind(this, 'meta', [required]),
-            field.bind(this, 'images', [required]),
-            field.bind(this, 'resume', [required]),
-            field.bind(this, 'other_uploads', [required]),
+            field.bind(this, 'cv', [required]),
         ], this.updateUserData.bind(this));
 
         this.router.get('/whoami', [], this.whoami.bind(this));
@@ -56,9 +54,13 @@ export class JobSeekerController extends ExpressController {
             check('answer').not().isEmpty(),
         ], this.deleteAccount.bind(this));
 
+        this.router.get('/favourites', [], this.getFavourites.bind(this));
+
         this.router.post('/add-view', [], this.addJobView.bind(this));
 
         this.router.put('/add-to-favourites/:adId', [], this.addToFavourites.bind(this));
+
+        this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
 
         this.router.put('/remove-from-favourites/:adId', [], this.removeFromFavourites.bind(this));
 
@@ -67,9 +69,27 @@ export class JobSeekerController extends ExpressController {
         this.router.post('/apply', [], this.apply.bind(this));
     }
 
+    public async getFavourites(req: any, res: any, next: NextFunction) {
+        try {
+            const user = await this.userService.extractUser(req);
+
+            if (!user) {
+                throw new Unauthorized('Unauthorized');
+            }
+
+            const { filters, pagination, sort } = this.adQueryService.getFormattedData(req);
+
+            const paginatedData = await user.getFavourites(pagination, filters, sort);
+
+            res.status(200).json(paginatedData);
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
     public async hasApplied(req: any, res: any, next: NextFunction) {
         try {
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             const ad = await this.adService.getAd(req.params?.adId);
 
@@ -83,7 +103,7 @@ export class JobSeekerController extends ExpressController {
 
     public async apply(req: any, res: any, next: NextFunction) {
         try {
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             const ad = await this.adService.getAd(req.body?.adId);
 
@@ -105,7 +125,7 @@ export class JobSeekerController extends ExpressController {
                 throw new BadRequest('Missing ad id');
             }
 
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             await user.addToFavourites(adId);
 
@@ -125,7 +145,7 @@ export class JobSeekerController extends ExpressController {
                 throw new BadRequest('Missing ad id');
             }
 
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             await user.removeFromFavourites(adId);
 
@@ -139,9 +159,17 @@ export class JobSeekerController extends ExpressController {
         try {
             this.handleValidation(req);
 
-            const result = await this.userServices.signup(req);
+            const { user, token } = await this.userService.signup(req);
 
-            res.json({ result });
+            const userData = user.getPublicData();
+
+            res.json({
+                userData: {
+                    ...userData,
+                    userId: user.id,
+                    token: token,
+                }
+            });
         } catch (err) {
             return next(handleError(err));
         }
@@ -151,7 +179,7 @@ export class JobSeekerController extends ExpressController {
         try {
             this.handleValidation(req);
 
-            const { user, token } = await this.userServices.login(req);
+            const { user, token } = await this.userService.login(req);
 
             const userData = user.getPublicData();
 
@@ -171,7 +199,7 @@ export class JobSeekerController extends ExpressController {
         try {
             this.handleValidation(req);
 
-            await this.userServices.updateUser(req, req.body);
+            await this.userService.updateUser(req, req.body);
 
             res.status(201).json({ message: MESSAGE.SUCCESS.USER_DATA_UPDATED });
         } catch (err) {
@@ -185,7 +213,7 @@ export class JobSeekerController extends ExpressController {
                 throw new BadRequest(ERROR_MESSAGES.MISSING.EMAIL);
             }
 
-            const securityQuestion = await this.userServices.getSecurityQuestion(req);
+            const securityQuestion = await this.userService.getSecurityQuestion(req);
 
             res.status(200).json({ securityQuestion });
         } catch (err) {
@@ -195,7 +223,7 @@ export class JobSeekerController extends ExpressController {
 
     public async deleteAccount(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const jobSeeker = await this.userServices.extractUser(req);
+            const jobSeeker = await this.userService.extractUser(req);
 
             await jobSeeker.remove();
 
@@ -207,7 +235,7 @@ export class JobSeekerController extends ExpressController {
 
     public async whoami(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const jobSeeker = await this.userServices.extractUser(req);
+            const jobSeeker = await this.userService.extractUser(req);
 
             res.status(200).json({ userData: jobSeeker.getPublicData() });
         } catch (err) {
@@ -218,7 +246,7 @@ export class JobSeekerController extends ExpressController {
     public async addJobView(req: express.Request, res: express.Response, next: NextFunction) {
         let jobSeeker;
         try {
-            jobSeeker = await this.userServices.extractUser(req);
+            jobSeeker = await this.userService.extractUser(req);
 
         } catch (e) {
             console.log({ e });
@@ -249,7 +277,7 @@ export class JobSeekerController extends ExpressController {
 
     public async addAppliedFor(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const jobSeeker = await this.userServices.extractUser(req);
+            const jobSeeker = await this.userService.extractUser(req);
 
             await jobSeeker.addAppliedJobs(req.params.adId);
 

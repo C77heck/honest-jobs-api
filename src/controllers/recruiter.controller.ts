@@ -19,7 +19,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public injectServices() {
         super.injectServices();
-        this.userServices = new UserService(Recruiter);
+        this.userService = new UserService(Recruiter);
         this.applyService = new ApplyService(Application);
     }
 
@@ -95,7 +95,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async addOfferMade(req: any, res: any, next: NextFunction) {
         try {
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             const ad = await this.adService.getAd(req.body?.adId);
 
@@ -109,7 +109,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async rejectApplication(req: any, res: any, next: NextFunction) {
         try {
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             const ad = await this.adService.getAd(req.body?.adId);
 
@@ -123,7 +123,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async getApplicants(req: any, res: any, next: NextFunction) {
         try {
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             const ad = await this.adService.getAd(req.params?.adId);
 
@@ -145,7 +145,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
                 throw new BadRequest('Missing ad id');
             }
 
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             await user.addToFavourites(adId);
 
@@ -165,7 +165,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
                 throw new BadRequest('Missing ad id');
             }
 
-            const user = await this.userServices.extractUser(req);
+            const user = await this.userService.extractUser(req);
 
             await user.removeFromFavourites(adId);
 
@@ -179,9 +179,17 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         try {
             this.handleValidation(req);
 
-            const result = await this.userServices.signup(req);
+            const { user, token } = await this.userService.signup(req);
 
-            res.json({ result });
+            const userData = user.getPublicData();
+
+            res.json({
+                userData: {
+                    ...userData,
+                    userId: user.id,
+                    token: token,
+                }
+            });
         } catch (err) {
             return next(handleError(err));
         }
@@ -199,7 +207,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         try {
             this.handleValidation(req);
 
-            const { user, token } = await this.userServices.login(req);
+            const { user, token } = await this.userService.login(req);
 
             const userData = user.getPublicData();
 
@@ -218,7 +226,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
     public async updateUserData(req: express.Request, res: express.Response, next: NextFunction) {
         try {
             this.handleValidation(req);
-            await this.userServices.updateUser(req, req.body);
+            await this.userService.updateUser(req, req.body);
 
             res.status(201).json({ message: MESSAGE.SUCCESS.USER_DATA_UPDATED });
         } catch (err) {
@@ -228,7 +236,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async getAds(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const recruiter = await this.userServices.extractUser(req);
+            const recruiter = await this.userService.extractUser(req);
 
             const { filters, pagination, sort } = this.adQueryService.getFormattedData(req);
 
@@ -244,7 +252,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         try {
             this.handleValidation(req);
 
-            const recruiter = await this.userServices.extractUser(req);
+            const recruiter = await this.userService.extractUser(req);
 
             const createdAd: any = new Ad({ ...req.body, logo: recruiter.logo } as AdDocument);
 
@@ -274,7 +282,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
         try {
             const ad = await this.adService.getAd(req.params?.adId);
 
-            const recruiter = await this.userServices.extractUser(req);
+            const recruiter = await this.userService.extractUser(req);
 
             await recruiter.removePostedJob(ad?._id);
 
@@ -294,7 +302,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
             if (!req.body.email) {
                 throw new BadRequest(ERROR_MESSAGES.MISSING.EMAIL);
             }
-            const securityQuestion = await this.userServices.getSecurityQuestion(req);
+            const securityQuestion = await this.userService.getSecurityQuestion(req);
 
             res.status(200).json({ securityQuestion });
         } catch (err) {
@@ -304,7 +312,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async deleteAccount(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const recruiter = await this.userServices.extractUser(req);
+            const recruiter = await this.userService.extractUser(req);
 
             await recruiter.remove();
 
@@ -316,7 +324,7 @@ export class RecruiterController extends ExpressController<RecruiterDocument> {
 
     public async whoami(req: express.Request, res: express.Response, next: NextFunction) {
         try {
-            const recruiter = await this.userServices.extractUser(req);
+            const recruiter = await this.userService.extractUser(req);
 
             res.status(200).json({ userData: recruiter.getPublicData() });
         } catch (err) {

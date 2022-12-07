@@ -14,7 +14,7 @@ export class ExpressController<TUserType extends BaseUserDocument = JobSeekerDoc
     public router: express.Router;
     public filterService!: FilterService;
     public adQueryService!: AdQueryService;
-    public userServices!: UserService<TUserType>;
+    public userService!: UserService<TUserType>;
     public adService!: AdService;
 
     public constructor() {

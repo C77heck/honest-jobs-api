@@ -1,4 +1,5 @@
 import Ad, { AdDocument } from '@models/ad';
+import { PaginationInterface } from '@models/libs/pagination.interface';
 import { BaseUserDocument } from '@models/user';
 import mongoose from 'mongoose';
 
@@ -8,8 +9,11 @@ export interface JobSeekerDocument extends BaseUserDocument {
     first_name: string;
     last_name: string;
     images?: string[];
-    resume?: string;
-    other_uploads?: string[];
+    cv: string;
+    profileShare: boolean;
+    educationLevel?: string;
+    currentJobTitle?: string;
+    currentSalary?: number;
     appliedForJobs?: { id: string, appliedAt: Date }[];
     viewedAd?: { id: string, viewedAt: Date }[];
     desiredRoles: string[];
@@ -20,6 +24,7 @@ export interface JobSeekerDocument extends BaseUserDocument {
     addView: (adId: string) => Promise<JobSeekerDocument>;
     addToFavourites: (adId: string) => Promise<JobSeekerDocument>;
     removeFromFavourites: (adId: string) => Promise<JobSeekerDocument>;
+    getFavourites: (pagination: any, filters?: {}, sort?: {}) => Promise<PaginationInterface<AdDocument>>;
 }
 
 const jobSeekerSchema = new Schema<JobSeekerDocument>({
@@ -41,9 +46,11 @@ const jobSeekerSchema = new Schema<JobSeekerDocument>({
     description: { type: String },
     logo: { type: String },
     meta: { type: String },
-    images: [{ type: String }],
-    resume: { type: String },
-    other_uploads: { type: [String] },
+    cv: { type: String, required: true },
+    profileShare: { type: Boolean },
+    educationLevel: { type: String },
+    currentJobTitle: { type: String },
+    currentSalary: { type: Number },
 });
 
 jobSeekerSchema.set('timestamps', true);
@@ -54,23 +61,50 @@ jobSeekerSchema.plugin((schema: mongoose.Schema) => console.log(schema));
 jobSeekerSchema.methods.addAppliedJobs = function (job: string) {
     this.appliedForJobs = [...(this.appliedForJobs || []), { id: job, appliedAt: new Date() }];
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 jobSeekerSchema.methods.addToFavourites = function (adId: string) {
     if ((this.favourites || []).find(doc => doc.id.toString() === adId)) {
-        return this.save({ validateModifiedOnly: true });
+        return this.save();
     }
 
     this.favourites = [...(this.favourites || []), { id: adId, addedAt: new Date() }];
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 jobSeekerSchema.methods.removeFromFavourites = function (adId: string) {
     this.favourites = this.favourites.filter(favourite => favourite.id !== adId);
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
+};
+
+jobSeekerSchema.methods.getFavourites = async function (pagination: any, filters?: {}, sort?: {}): Promise<PaginationInterface<AdDocument>> {
+    this.favourites = this.favourites;
+    const limit = pagination?.limit || 5;
+    const page = pagination?.page || 0;
+
+    const items = await Ad.find({
+        ...filters,
+        $in: this.favourites.map(favourite => favourite.id)
+    })
+        .limit(limit)
+        .skip(page * limit)
+        .sort(sort);
+
+    const all = await Ad.find({
+        ...filters,
+        $in: this.favourites.map(favourite => favourite.id)
+    }).count();
+
+    return {
+        items,
+        limit: limit,
+        total: Math.ceil(all / limit),
+        totalItems: all,
+        page: page
+    };
 };
 
 jobSeekerSchema.methods.getPublicData = function () {
@@ -82,9 +116,7 @@ jobSeekerSchema.methods.getPublicData = function () {
         email: this.email,
         description: this?.description || '',
         meta: this?.meta || '',
-        images: this?.images || [''],
-        resume: this?.resume || '',
-        other_uploads: this?.other_uploads || [''],
+        cv: this.cv || '',
         favourites: this?.favourites || [''],
     };
 };
@@ -92,7 +124,7 @@ jobSeekerSchema.methods.getPublicData = function () {
 jobSeekerSchema.methods.removeAppliedJob = function (job: string) {
     this.appliedForJobs = (this.appliedForJobs || []).filter((appliedJob: any) => appliedJob.id.toString() !== job);
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 jobSeekerSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]> {
@@ -102,7 +134,7 @@ jobSeekerSchema.methods.getAppliedJobs = async function (): Promise<AdDocument[]
 jobSeekerSchema.methods.loginAttempts = async function (loginAttempts: number): Promise<JobSeekerDocument> {
     this.status.loginAttempts = loginAttempts;
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 jobSeekerSchema.methods.getUserSecurityQuestion = async function (): Promise<string> {

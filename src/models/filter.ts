@@ -49,7 +49,7 @@ filterSchema.methods.updateFilter = function (data: FilterDocument): Promise<Fil
     this.relatedRoles = data?.relatedRoles ?? this.relatedRoles;
     this.jobType = data?.jobType ?? this.jobType;
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 filterSchema.static('getFilterById', async function (this: Mongoose.Model<any>, employerId: string | number): Promise<FilterDocument> {

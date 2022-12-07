@@ -109,9 +109,10 @@ export const minLength: LengthValidatorFunction = (length: number): ValidatorFun
         };
     };
 };
+
 export const maxLength: LengthValidatorFunction = (length: number): ValidatorFunction => {
     return (value: string): ValidationResponse => {
-        console.log(value, length, value.length);
+
         if (value.length > length) {
             return {
                 isValid: false,

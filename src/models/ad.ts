@@ -103,7 +103,7 @@ adSchema.methods.addUserToAlerts = function (user: BaseUserDocument, role: RoleT
                 return null;
         }
 
-        return this.save({ validateModifiedOnly: true });
+        return this.save();
     } catch (e) {
         console.log(e);
     }
@@ -122,7 +122,7 @@ adSchema.methods.removeUserFromAlerts = function (user: BaseUserDocument, role: 
             return null;
     }
 
-    return this.save({ validateModifiedOnly: true });
+    return this.save();
 };
 
 interface AdModel extends Mongoose.Model<any> {
@@ -188,7 +188,7 @@ adSchema.static('addGuestView', async function (this: Mongoose.Model<AdDocument>
         view.views.push(new Date());
     }
 
-    return ad.save({ validateModifiedOnly: true });
+    return ad.save();
 });
 
 adSchema.static('addRegisteredUserView', async function (this: Mongoose.Model<AdDocument>, userId: string, adId: string | number): Promise<AdDocument | void> {
