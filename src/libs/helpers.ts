@@ -34,13 +34,6 @@ export const objectToArray = <T>(object: T) => {
     return arr;
 };
 
-export const numArray = (number: number, value = false): any[] => {
-    if (!value) {
-        return Array.from({ length: number }, (i, index) => (index + 1));
-    }
-    return Array.from({ length: number }, (i, index) => value || index);
-};
-
 export const round = (number: number, decimal = 100): number => {
     return Math.round(number / decimal) * decimal;
 };

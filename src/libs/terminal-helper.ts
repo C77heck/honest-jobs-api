@@ -1,19 +1,18 @@
-const {exec} = require("child_process");
+const { exec } = require("child_process");
 
-const terminal = (command) => {
-    exec(command, (error, stdout, stderr) => {
+const terminal = (command: string) => {
+    exec(command, (error: any, stdout: string, stderr: string) => {
         if (error) {
-            console.log(`error: ${error.message}`);
-            return;
+            return console.log(`error: ${error.message}`);
         }
         if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
+            return console.log(`stderr: ${stderr}`);
         }
+
         console.log(`stdout: ${stdout}`);
-    })
+    });
     // to call it recursively.
     // setTimeout(() => terminal(command), 4000)
-}
+};
 
 exports.terminal = terminal;
