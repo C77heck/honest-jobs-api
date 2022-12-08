@@ -27,10 +27,7 @@ export default class Application {
 
     public static run() {
         const application = new Application();
-        console.log('RUNNING');
         application.boot();
-
-        console.log(PROCESS.env);
     }
 
     public async boot() {
