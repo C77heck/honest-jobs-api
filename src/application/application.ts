@@ -9,14 +9,9 @@ import mongoose from 'mongoose';
 import { HttpError } from '../models/libs/error-models/errors';
 import api from '../routes/api.routes';
 
-const result2 = dotenv.config({
-    path: `./.env`,
-});
+dotenv.config({ path: `./config/.env` });
 
-if (result2.error) {
-    throw result2.error;
-}
-
+// todo extract the Application to be reusable for tasks.
 export default class Application {
     public port = process.env.PORT || 3131;
     public app: Express;
@@ -31,8 +26,6 @@ export default class Application {
     }
 
     public async boot() {
-        await this.loadEnv();
-
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
@@ -50,11 +43,6 @@ export default class Application {
         await this.connectDB();
 
         await this.startServer();
-    }
-
-    private async loadEnv() {
-        // read from file
-        //
     }
 
     private async startServer() {
