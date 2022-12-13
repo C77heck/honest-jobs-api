@@ -1,0 +1,3 @@
+create a collection of injectables like a provider where we instantiate a class as a singleton
+spread that data depending on requirement of controllers and services and manage the injection of
+services into each other without failing with  circular dependency

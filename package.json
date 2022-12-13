@@ -5,17 +5,9 @@
     "build": "./node_modules/.bin/ts-node ./run-build.ts",
     "lint": "eslint . --ext .ts",
     "start": "node -r module-alias/register ./dist --env=production",
-    "start:dev": "nodemon",
+    "start:dev": "nodemon ./src/server.ts",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec"
-  },
-  "_moduleAliases": {
-    "@services": "dist/services",
-    "@repos": "dist/repos",
-    "@entities": "dist/entities",
-    "@shared": "dist/shared",
-    "@server": "dist/server",
-    "@routes": "dist/routes"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
@@ -58,6 +50,7 @@
     "@types/uuid": "^8.3.4",
     "axios": "^0.26.1",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0-rc.12",
     "command-line-args": "^5.2.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -74,6 +67,8 @@
     "moment": "^2.29.4",
     "mongoose": "^6.2.9",
     "morgan": "^1.10.0",
+    "rxjs": "^7.6.0",
+    "superagent": "^8.0.6",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

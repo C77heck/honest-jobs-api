@@ -12,6 +12,8 @@ import api from '../routes/api.routes';
 dotenv.config({ path: `./config/.env` });
 
 // todo extract the Application to be reusable for tasks.
+// todo need to be able to inject the service and add the service to whomever is asking for it.
+// todo so that each object has the same data reference
 export default class Application {
     public port = process.env.PORT || 3131;
     public app: Express;
@@ -22,6 +24,7 @@ export default class Application {
 
     public static run() {
         const application = new Application();
+
         application.boot();
     }
 
