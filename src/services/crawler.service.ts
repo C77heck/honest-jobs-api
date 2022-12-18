@@ -3,12 +3,10 @@ import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
 import { Service } from './libs/service';
 
-class CrawlerService extends Service{
+class CrawlerService extends Service {
     public hookService: HookService;
     public urls: string[];
     public targetPoints: string[];
-    public errors: any[] = [];
-    public results: any[] = [];
 
     public async run(config: CrawlerConfigInterface) {
         this.urls = config.urls;
@@ -16,24 +14,19 @@ class CrawlerService extends Service{
 
         for (const url of this.urls) {
             try {
-                await this.getSite(url);
+                const siteData = await this.getSite(url);
+                console.log(Object.keys(siteData), siteData.text);
+                this.hookService.$processedData.next(siteData);
             } catch (error) {
-                this.errors.push({ error, url });
+                this.hookService.$errorLog.next({ url, type: 'FetchError', payload: error });
             }
         }
-        this.hookService.$processedData.next(this.results);
     }
 
     public async getSite(url: string) {
-        const response = await superagent
+        return superagent
             .get(url)
             .send();
-
-        // .set('X-API-Key', 'foobar')
-        // .set('accept', 'json')
-
-        this.results.push(response);
-        // todo process the data
     }
 }
 

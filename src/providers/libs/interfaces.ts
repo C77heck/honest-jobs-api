@@ -3,4 +3,5 @@ export interface Constructable<T> {
 }
 
 export interface Provider {
+    initialize?: () => void;
 }

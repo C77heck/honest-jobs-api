@@ -9,7 +9,7 @@ class DataProcessorService extends Service {
     }
 
     public handleDataProcessing(value: any) {
-        console.log({ WE_FUCKING_RUN_ID: value });
+        console.log({ WE_FUCKING_RUN_ID: '' });
     }
 }
 

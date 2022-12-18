@@ -1,14 +1,15 @@
-import { Constructable } from '../providers/libs/interfaces';
 import { ServicesProviders } from '../providers/services.providers';
 import CrawlerService from '../services/crawler.service';
 import DataProcessorService from '../services/data-processor.service';
+import ErrorService from '../services/error.service';
 import HookService from '../services/hook.service';
 
 export class Application {
-    public registeredServices: Constructable<any>[] = [
+    public registeredServices: any[] = [
         HookService,
         CrawlerService,
-        DataProcessorService
+        DataProcessorService,
+        ErrorService,
     ];
 
     public services: Record<any, any> = {};
