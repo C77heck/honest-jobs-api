@@ -4,8 +4,8 @@
   "scripts": {
     "build": "./node_modules/.bin/ts-node ./run-build.ts",
     "lint": "eslint . --ext .ts",
-    "start": "node -r module-alias/register ./dist --env=production",
-    "start:dev": "nodemon ./src/server.ts",
+    "start": "node ./dist --env=production",
+    "start:dev": "nodemon  src/http.server.ts",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec"
   },
@@ -63,7 +63,6 @@
     "jet-logger": "^1.1.5",
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "^8.5.1",
-    "module-alias": "^2.2.2",
     "moment": "^2.29.4",
     "mongoose": "^6.2.9",
     "morgan": "^1.10.0",

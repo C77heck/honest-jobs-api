@@ -1,13 +1,12 @@
-import CrawlerService from '@services/crawler.service';
-import DataProcessorService from '@services/data-processor.service';
-import HookService from '@services/hook.service';
-import { initialize } from './libs/decorators';
-import { ServiceProvider } from './libs/interfaces';
+import { toLowerCase } from '../application/libs/helpers';
 
-const providers: Record<string, ServiceProvider<unknown>> = {
-    HookService: initialize(HookService),
-    CrawlerService: initialize(CrawlerService),
-    DataProcessorService: initialize(DataProcessorService)
-};
+export class ServicesProviders {
+    public static resolve<T>(Class: any): { instance: T; key: string } {
+        const key = toLowerCase(Class.name);
 
-export default providers;
+        const instance = Class.instance;
+
+        return { key, instance };
+    };
+
+}

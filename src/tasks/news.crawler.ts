@@ -1,7 +1,6 @@
 import { newsCrawlerConfig } from '../../config/application-configs/news-crawler.config';
-import providers from '../providers/services.providers';
+import { Crawler } from './libs/crawler';
 
-export const newsCrawler = async () => {
-    const crawlerService = providers.crawlerService;
-    await crawlerService?.run(newsCrawlerConfig);
-};
+const newsCrawlerTask = new Crawler(newsCrawlerConfig);
+
+export default newsCrawlerTask;

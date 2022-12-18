@@ -1,9 +1,11 @@
-import { Service } from '@services/libs/service';
-import providers from '../providers/services.providers';
+import HookService from './hook.service';
+import { Service } from './libs/service';
 
-class DataProcessorService extends Service<any> {
-    public constructor() {
-        providers.HookService.$processedData.subscribe((value: any) => this.handleDataProcessing(value));
+class DataProcessorService extends Service {
+    public hookService: HookService;
+
+    public initialize() {
+        this.hookService.$processedData.subscribe((value: any) => this.handleDataProcessing(value));
     }
 
     public handleDataProcessing(value: any) {

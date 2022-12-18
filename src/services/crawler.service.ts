@@ -1,10 +1,10 @@
-import { Service } from '@services/libs/service';
 import superagent from "superagent";
-import providers from '../providers/services.providers';
+import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
+import { Service } from './libs/service';
 
-// todo hook service that will take care of the saving of data to the db in another service
-class CrawlerService extends Service<any>{
+class CrawlerService extends Service{
+    public hookService: HookService;
     public urls: string[];
     public targetPoints: string[];
     public errors: any[] = [];
@@ -21,8 +21,7 @@ class CrawlerService extends Service<any>{
                 this.errors.push({ error, url });
             }
         }
-        console.log(providers.HookService.$processedData);
-        providers.HookService.$processedData.next(this.results);
+        this.hookService.$processedData.next(this.results);
     }
 
     public async getSite(url: string) {

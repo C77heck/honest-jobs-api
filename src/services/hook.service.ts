@@ -1,8 +1,8 @@
-import { ProcessedDataInterface } from '@services/interfaces/processed-data.interface';
-import { Service } from '@services/libs/service';
 import { Subject } from 'rxjs';
+import { ProcessedDataInterface } from './interfaces/processed-data.interface';
+import { Service } from './libs/service';
 
-class HookService extends Service<any> {
+class HookService extends Service {
     public $processedData = new Subject<ProcessedDataInterface>();
 }
 

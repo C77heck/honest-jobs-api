@@ -1,62 +1,65 @@
-import cors from 'cors';
+import { Constructable } from '../providers/libs/interfaces';
+import { ServicesProviders } from '../providers/services.providers';
+import CrawlerService from '../services/crawler.service';
+import DataProcessorService from '../services/data-processor.service';
+import HookService from '../services/hook.service';
 
-import dotenv from 'dotenv';
+export class Application {
+    public registeredServices: Constructable<any>[] = [
+        HookService,
+        CrawlerService,
+        DataProcessorService
+    ];
 
-import express, { Express, NextFunction, Request, Response } from 'express';
-import 'express-async-errors';
-import logger from 'jet-logger';
-import mongoose from 'mongoose';
-import { HttpError } from '../models/libs/error-models/errors';
-import api from '../routes/api.routes';
-
-dotenv.config({ path: `./config/.env` });
-
-// todo extract the Application to be reusable for tasks.
-// todo need to be able to inject the service and add the service to whomever is asking for it.
-// todo so that each object has the same data reference
-export default class Application {
-    public port = process.env.PORT || 3131;
-    public app: Express;
+    public services: Record<any, any> = {};
 
     public constructor() {
-        this.app = express();
+        this.boot();
     }
 
-    public static run() {
-        const application = new Application();
+    public boot() {
 
-        application.boot();
+        this.initiateServices();
+        this.registerServiceProviders();
+        this.bootServices();
     }
 
-    public async boot() {
-        this.app.use(cors());
-        this.app.use(express.json());
-        this.app.use(express.urlencoded({ extended: true }));
-        this.app.use('/api', api.router);
+    /**
+     * initiate the singleton services
+     */
+    public initiateServices() {
+        for (const service of this.registeredServices) {
+            const { key, instance } = ServicesProviders.resolve<typeof service>(service);
 
-        this.app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
-            logger.err(err, true);
-
-            return res.status(err?.code || 500).json({
-                error: err.message,
-                payload: err?.payload || {}
-            });
-        });
-
-        await this.connectDB();
-
-        await this.startServer();
+            this.services[key] = instance;
+        }
     }
 
-    private async startServer() {
-        await this.app.listen(this.port, () => console.log(`app is listening on port: ${this.port}`));
+    /**
+     * register services into each other and make all available
+     * we will only access whatever is implemented in code though
+     */
+    public registerServiceProviders() {
+        const keys = Object.keys(this.services);
+
+        for (const key of keys) {
+            const currentService = this.services[key];
+            const servicesToInject = keys.filter(k => k !== key);
+
+            for (const serviceToInject of servicesToInject) {
+                currentService[serviceToInject] = this.services[serviceToInject];
+            }
+        }
     }
 
-    private async connectDB() {
-        try {
-            await mongoose.connect(process.env.MONGO_URL || '');
-        } catch (e) {
-            console.log(e);
+    /**
+     * Each service class is extended from a Service base class that has an initialize method on it
+     * this is where we can make hook subscriptions and other things that we would normally do in its
+     * constructor.
+     */
+    public bootServices() {
+        for (const key of Object.keys(this.services)) {
+            this.services[key].initialize();
         }
     }
 }
