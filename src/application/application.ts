@@ -1,4 +1,4 @@
-import { ServiceProviders } from '../providers/service.providers';
+import { Provider } from '../providers/provider';
 import CrawlerService from '../services/crawler.service';
 import DataProcessorService from '../services/data-processor.service';
 import ErrorService from '../services/error.service';
@@ -32,7 +32,7 @@ export class Application extends Singleton {
      */
     private initiateServices() {
         for (const service of this.registeredServices) {
-            const { key, instance } = ServiceProviders.resolve<typeof service>(service);
+            const { key, instance } = Provider.resolve<typeof service>(service);
 
             this.services[key] = instance;
         }

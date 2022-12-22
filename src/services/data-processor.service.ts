@@ -1,5 +1,5 @@
+import { Provider } from '../providers/provider';
 import HookService from './hook.service';
-import { Provider } from './libs/service';
 
 class DataProcessorService extends Provider {
     public hookService: HookService;

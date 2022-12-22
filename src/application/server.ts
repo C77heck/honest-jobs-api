@@ -7,25 +7,17 @@ import 'express-async-errors';
 import logger from 'jet-logger';
 import mongoose from 'mongoose';
 import { HttpError } from '../models/libs/error-models/errors';
+import { Provider } from '../providers/provider';
 import api from '../routes/api.routes';
 
 dotenv.config({ path: `./config/.env` });
 
-export default class Server {
+export class Server extends Provider {
     public port = process.env.PORT || 3131;
     public app: Express;
 
-    public constructor() {
-        this.app = express();
-    }
-
-    public static run() {
-        const application = new Server();
-
-        application.boot();
-    }
-
     public async boot() {
+        this.app = express();
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));

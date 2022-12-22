@@ -1,7 +1,7 @@
 import superagent from "superagent";
+import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
-import { Provider } from './libs/service';
 
 class CrawlerService extends Provider {
     public hookService: HookService;

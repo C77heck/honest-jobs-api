@@ -1,6 +1,7 @@
-import Server from './application/server';
+import { Server } from './application/server';
+import { Provider } from './providers/provider';
 import newsCrawlerTask from './tasks/news.crawler';
 
-Server.run();
+(Server.instance as Provider).boot();
 
 newsCrawlerTask.run();

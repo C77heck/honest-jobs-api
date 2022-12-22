@@ -1,6 +1,11 @@
 import { toLowerCase } from '../application/libs/helpers';
+import { Singleton } from '../application/libs/singleton';
 
-export class ServiceProviders {
+export class Provider extends Singleton {
+    public boot() {
+        //
+    }
+
     public static resolve<T>(Class: any): { instance: T; key: string } {
         const key = toLowerCase(Class.name);
 
@@ -8,5 +13,4 @@ export class ServiceProviders {
 
         return { key, instance };
     };
-
 }
