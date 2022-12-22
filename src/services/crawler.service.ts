@@ -5,14 +5,9 @@ import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
 
 class CrawlerService extends Provider {
     public hookService: HookService;
-    public urls: string[];
-    public targetPoints: string[];
 
     public async run(config: CrawlerConfigInterface) {
-        this.urls = config.urls;
-        this.targetPoints = config.targetPoints;
-
-        for (const url of this.urls) {
+        for (const url of config.urls) {
             try {
                 const siteData = await this.getSite(url);
 
@@ -20,7 +15,10 @@ class CrawlerService extends Provider {
                     throw new Error('We did not get any text body from the request');
                 }
 
-                this.hookService.$processedData.next(siteData.text);
+                this.hookService.$processedData.next({
+                    html: siteData.text,
+                    targetPoints: config.targetPoints
+                });
             } catch (error) {
                 this.hookService.$errorLog.next({ url, type: 'FetchError', payload: error });
             }

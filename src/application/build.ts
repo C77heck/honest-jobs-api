@@ -1,14 +1,10 @@
 import childProcess from 'child_process';
 import fs from 'fs-extra';
 import logger from 'jet-logger';
+import { Provider } from '../providers/provider';
 
-export default class TSBuild {
-    public static run() {
-        const build = new TSBuild();
-        build.build();
-    }
-
-    private async build() {
+export class TSBuild extends Provider {
+    public async build() {
         try {
             await this.remove('./dist/');
             // await this.copy('./src/pre-start/env/production.env', './dist/pre-start/env/production.env');

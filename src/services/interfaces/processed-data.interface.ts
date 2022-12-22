@@ -1,5 +1,6 @@
 export interface ProcessedDataInterface {
-
+    html: string;
+    targetPoints: string[];
 }
 
 export interface ProcessedDataErrorInterface {

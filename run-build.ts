@@ -1,3 +1,3 @@
-import TSBuild from './dist/application/build';
+import { TSBuild } from './src/application/build';
 
-TSBuild.run();
+(TSBuild.instance as TSBuild).build();

@@ -2,7 +2,7 @@ import { CrawlerConfigInterface } from '../../src/services/interfaces/crawler-co
 
 export const newsCrawlerConfig: CrawlerConfigInterface = {
     urls: [
-        'https://edition.cnn.com/',
+        'https://edition.cnn.com/politics/joe-biden',
     ],
     targetPoints: ['breaking', 'breaking news', 'hungary']
 };
