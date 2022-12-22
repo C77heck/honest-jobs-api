@@ -1,6 +1,6 @@
 import { toLowerCase } from '../application/libs/helpers';
 
-export class ServicesProviders {
+export class ServiceProviders {
     public static resolve<T>(Class: any): { instance: T; key: string } {
         const key = toLowerCase(Class.name);
 

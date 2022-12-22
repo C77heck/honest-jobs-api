@@ -13,7 +13,7 @@ export class Crawler implements Task {
         }
 
         this.config = config;
-        this.application = new Application();
+        this.application = Application.instance.boot();
     }
 
     public run() {

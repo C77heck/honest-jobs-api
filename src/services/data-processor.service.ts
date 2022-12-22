@@ -1,10 +1,10 @@
 import HookService from './hook.service';
-import { Service } from './libs/service';
+import { Provider } from './libs/service';
 
-class DataProcessorService extends Service {
+class DataProcessorService extends Provider {
     public hookService: HookService;
 
-    public initialize() {
+    public boot() {
         this.hookService.$processedData.subscribe((value: any) => this.handleDataProcessing(value));
     }
 

@@ -1,11 +1,11 @@
 import HookService from './hook.service';
 import { ProcessedDataErrorInterface } from './interfaces/processed-data.interface';
-import { Service } from './libs/service';
+import { Provider } from './libs/service';
 
-class ErrorService extends Service {
+class ErrorService extends Provider {
     public hookService: HookService;
 
-    public initialize() {
+    public boot() {
         this.hookService.$errorLog.subscribe((data: ProcessedDataErrorInterface) => this.handleIncomingError(data));
     }
 

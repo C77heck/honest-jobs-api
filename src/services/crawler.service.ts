@@ -1,9 +1,9 @@
 import superagent from "superagent";
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
-import { Service } from './libs/service';
+import { Provider } from './libs/service';
 
-class CrawlerService extends Service {
+class CrawlerService extends Provider {
     public hookService: HookService;
     public urls: string[];
     public targetPoints: string[];
@@ -15,8 +15,12 @@ class CrawlerService extends Service {
         for (const url of this.urls) {
             try {
                 const siteData = await this.getSite(url);
-                console.log(Object.keys(siteData), siteData.text);
-                this.hookService.$processedData.next(siteData);
+
+                if (!siteData?.text) {
+                    throw new Error('We did not get any text body from the request');
+                }
+
+                this.hookService.$processedData.next(siteData.text);
             } catch (error) {
                 this.hookService.$errorLog.next({ url, type: 'FetchError', payload: error });
             }

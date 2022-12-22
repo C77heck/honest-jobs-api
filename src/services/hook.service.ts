@@ -3,9 +3,9 @@ import {
     ProcessedDataErrorInterface,
     ProcessedDataInterface
 } from './interfaces/processed-data.interface';
-import { Service } from './libs/service';
+import { Provider } from './libs/service';
 
-class HookService extends Service {
+class HookService extends Provider {
     public $processedData = new Subject<ProcessedDataInterface>();
     public $errorLog = new Subject<ProcessedDataErrorInterface>();
 }

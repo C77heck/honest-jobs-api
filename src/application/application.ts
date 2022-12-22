@@ -1,10 +1,11 @@
-import { ServicesProviders } from '../providers/services.providers';
+import { ServiceProviders } from '../providers/service.providers';
 import CrawlerService from '../services/crawler.service';
 import DataProcessorService from '../services/data-processor.service';
 import ErrorService from '../services/error.service';
 import HookService from '../services/hook.service';
+import { Singleton } from './libs/singleton';
 
-export class Application {
+export class Application extends Singleton {
     public registeredServices: any[] = [
         HookService,
         CrawlerService,
@@ -14,23 +15,24 @@ export class Application {
 
     public services: Record<any, any> = {};
 
-    public constructor() {
-        this.boot();
+    public static get instance() {
+        return new this();
     }
 
     public boot() {
-
         this.initiateServices();
         this.registerServiceProviders();
         this.bootServices();
+
+        return this;
     }
 
     /**
      * initiate the singleton services
      */
-    public initiateServices() {
+    private initiateServices() {
         for (const service of this.registeredServices) {
-            const { key, instance } = ServicesProviders.resolve<typeof service>(service);
+            const { key, instance } = ServiceProviders.resolve<typeof service>(service);
 
             this.services[key] = instance;
         }
@@ -40,7 +42,7 @@ export class Application {
      * register services into each other and make all available
      * we will only access whatever is implemented in code though
      */
-    public registerServiceProviders() {
+    private registerServiceProviders() {
         const keys = Object.keys(this.services);
 
         for (const key of keys) {
@@ -54,13 +56,13 @@ export class Application {
     }
 
     /**
-     * Each service class is extended from a Service base class that has an initialize method on it
+     * Each service class is extended from a Provider base class that has an boot method on it
      * this is where we can make hook subscriptions and other things that we would normally do in its
      * constructor.
      */
-    public bootServices() {
+    private bootServices() {
         for (const key of Object.keys(this.services)) {
-            this.services[key].initialize();
+            this.services[key].boot();
         }
     }
 }

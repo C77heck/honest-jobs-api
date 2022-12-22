@@ -1,11 +1,7 @@
-import { Provider } from '../../providers/libs/interfaces';
+import { Singleton } from '../../application/libs/singleton';
 
-export class Service implements Provider {
-    public static get instance() {
-        return new this();
-    }
-
-    public initialize() {
+export class Provider extends Singleton {
+    public boot() {
         //
     }
 }
