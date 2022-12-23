@@ -16,16 +16,32 @@ class DataProcessorService extends Provider {
     }
 
     public async handleDataProcessing({ html, targetPoints }: ProcessedDataInterface) {
-        await this.log(html);
-
         const $ = cheerio.load(html);
         const texts = $('.layout__wrapper.layout-no-rail__wrapper');
-        // todo -> remove redundant \n and + and so on and thene read out the headlines.
+
+        const anchors = $('a');
         // see if we can grab the links and crawl those too.
-        texts.each(function (index, element) {
-            const text = $(this).text();
-            console.log({ text, elementName: element.name });
+        texts.each((index, element) => {
+            const text = this.stripRedundantText($(element).text());
+            this.log(text.toString());
         });
+    }
+
+    public stripRedundantText(text: string) {
+        console.log('what the fukc');
+        //'fdsasdf jfuc    kfdsa    asd k     kdasd   das  das'
+        // text.replace(/\W/ig, '').split(/[^a-zA-Z]/).join(' ')
+        // we use \W to find non letters and numbers and we split wherever is not a word
+        // it needs improvement.
+        const clearedText = text
+            .replace(/\n/ig, '')
+            .replaceAll(' ', '');
+
+        const trimmedText = clearedText.split(' ').join(' ');
+
+        console.log({ base: text.length, trimmed: trimmedText.length });
+
+        return trimmedText;
     }
 }
 

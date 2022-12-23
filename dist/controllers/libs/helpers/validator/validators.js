@@ -1,9 +1,8 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 exports.maxLength = exports.minLength = exports.email = exports.isString = exports.isDate = exports.isBoolean = exports.isNumber = exports.required = void 0;
 const required = (value) => {
     if (!value) {
-        console.log({ value });
         return {
             isValid: false,
             error: 'Required'
