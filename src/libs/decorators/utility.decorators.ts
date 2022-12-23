@@ -1,25 +1,20 @@
+export type DescriptorValue = (...args: any[]) => any;
+
 function readonly(target: any, name: string, descriptor: any) {
     descriptor.writable = false;
     return descriptor;
 }
 
-//
-// function log(name: string) {
-//     return function decorator(t, n, descriptor) {
-//         const original = descriptor.value;
-//         if (typeof original === 'function') {
-//             descriptor.value = function(...args) {
-//                 console.log(`Arguments for ${name}: ${args}`);
-//                 try {
-//                     const result = original.apply(this, args);
-//                     console.log(`Result from ${name}: ${result}`);
-//                     return result;
-//                 } catch (e) {
-//                     console.log(`Error from ${name}: ${e}`);
-//                     throw e;
-//                 }
-//             }
-//         }
-//         return descriptor;
-//     };
-// }
+export function log() {
+    return function (target: Object, key: string, descriptor: PropertyDescriptor) {
+        const original: DescriptorValue = descriptor.value;
+
+        descriptor.value = function (...args: any[]) {
+            console.time(key);
+            const value: unknown = original.apply(this, args);
+            console.timeEnd(key);
+
+            return value;
+        };
+    };
+}
