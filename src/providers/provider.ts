@@ -1,7 +1,10 @@
 import { toLowerCase } from '../application/libs/helpers';
 import { Singleton } from '../application/libs/singleton';
 
-export class Provider extends Singleton {
+export interface IProvider extends Function {
+}
+
+export class Provider extends Singleton implements IProvider {
     public boot() {
         //
     }
