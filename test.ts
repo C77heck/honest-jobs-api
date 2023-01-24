@@ -21,6 +21,7 @@ export interface Constructable {
 
 function RegisterProvider() {
     // return function (target: any, key: string) {
+    // todo finish the metadata reading and injection process. the initialization should be left for last
     return function (target: Function) {
         const name = target.name;
 
