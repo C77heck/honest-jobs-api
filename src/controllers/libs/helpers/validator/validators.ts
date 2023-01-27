@@ -9,7 +9,6 @@ export type LengthValidatorFunction = (length: number) => ValidatorFunction;
 
 export const required: ValidatorFunction = (value: any): ValidationResponse => {
     if (!value) {
-        console.log({ value });
         return {
             isValid: false,
             error: 'Required'

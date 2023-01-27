@@ -2,8 +2,6 @@ import { Unauthorized } from '@models/libs/error-models/errors';
 import { ERROR_MESSAGES } from './constants';
 
 export const handleError = (err: any) => {
-    console.log({ err });
-
     if (process.env.NODE_ENV === 'development') {
         console.log(err);
     }

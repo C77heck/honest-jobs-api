@@ -6,7 +6,6 @@ export class Application extends Singleton {
     public services: Record<any, any> = {};
 
     public static get instance() {
-        // todo return the static _instance.
         return new this();
     }
 
@@ -28,7 +27,6 @@ export class Application extends Singleton {
             const { key, instance } = Provider.resolve<typeof service>(service);
             this.services[key] = instance;
         }
-
     }
 
     private getServicesBySymbol() {
@@ -36,7 +34,6 @@ export class Application extends Singleton {
 
         for (const key of Object.keys(this.services)) {
             const instance = this.services[key];
-
             servicesBySymbol[instance.uniqueId as keyof Object] = instance;
         }
 
