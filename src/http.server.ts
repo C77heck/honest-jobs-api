@@ -1,7 +1,7 @@
 import { Server } from './application/server';
 import { Provider } from './providers/provider';
-import newsCrawlerTask from './tasks/news.crawler';
+import { TaskManager } from './tasks/task-manager';
 
 (Server.instance as Provider).boot();
 
-newsCrawlerTask.run();
+TaskManager.instance.run('ingatlanHu');

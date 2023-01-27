@@ -1,7 +1,6 @@
 import * as cheerio from 'cheerio';
 import fs from 'fs';
 import { Inject } from '../application/libs/inject.decorator';
-import { Register } from '../application/libs/register.decorator';
 import { log } from '../libs/decorators/utility.decorators';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
@@ -12,7 +11,9 @@ class DataProcessorService extends Provider {
     public hookService: HookService;
 
     public boot() {
-        this.hookService.$processedData.subscribe(async (value: ProcessedDataInterface) => this.handleDataProcessing(value));
+        this.hookService
+            .$processedData
+            .subscribe(async (value: ProcessedDataInterface) => this.handleDataProcessing(value));
     }
 
     public async log(data: string) {
@@ -22,21 +23,31 @@ class DataProcessorService extends Provider {
     public async handleDataProcessing({ html, targetPoints }: ProcessedDataInterface) {
         const $ = cheerio.load(html);
         // todo to get the inner most element that has all the text we need without redundancies.
-        const texts = $('.layout__wrapper.layout-no-rail__wrapper');
-
-        const anchors = $('a');
+        const texts = $('.listing__card');
+        const articles: any[] = [];
+        // will need the matching added into config somehow or worst comes worst to move
+        // the logic of fetching and grabbing to the individual crawler service
         // see if we can grab the links and crawl those too.
         texts.each((index, element) => {
-            const text = this.stripRedundantText($(element).text());
+
+            const text = $(element).children('a').text();
+            // todo will need the base url.
+            const hrefs = $(element).children('a').attr('href');
+            const strippedText = this.stripRedundantText(text);
+            articles.push({ text, hrefs });
+
             this.log(text.toString());
         });
+        console.log(articles);
     }
 
     @log()
     public stripRedundantText(text: string) {
+        // const clearedText = text
+        //     .replaceAll('  ', '')
+        //     .replace(/\n/ig, '');
         const clearedText = text
-            .replace(/\n/ig, '')
-            .replaceAll(' ', '');
+            .replaceAll('  ', '');
 
         const splitText = clearedText.split(/[^a-zA-Z]/);
 

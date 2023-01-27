@@ -1,6 +1,5 @@
 import superagent from "superagent";
 import { Inject } from '../application/libs/inject.decorator';
-import { Register } from '../application/libs/register.decorator';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
@@ -23,7 +22,11 @@ class CrawlerService extends Provider {
                     targetPoints: config.targetPoints
                 });
             } catch (error) {
-                this.hookService.$errorLog.next({ url, type: 'FetchError', payload: error });
+                this.hookService.$errorLog.next({
+                    url,
+                    type: 'FetchError',
+                    payload: error
+                });
             }
         }
     }
