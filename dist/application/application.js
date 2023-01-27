@@ -25,7 +25,6 @@ class Application {
     }
     static run() {
         const application = new Application();
-        console.log('RUNNING');
         application.boot();
     }
     boot() {

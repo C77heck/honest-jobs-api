@@ -1,20 +1,12 @@
-import { IProvider, Provider } from '../providers/provider';
-import CrawlerService from '../services/crawler.service';
-import DataProcessorService from '../services/data-processor.service';
-import ErrorService from '../services/error.service';
-import HookService from '../services/hook.service';
+import { Provider } from '../providers/provider';
+import { IocContainer } from './ioc-container';
 import { Singleton } from './libs/singleton';
 
 export class Application extends Singleton {
-    public static registeredServices: IProvider[] = [
-        HookService,
-        CrawlerService,
-        DataProcessorService,
-        ErrorService,
-    ];
     public services: Record<any, any> = {};
 
     public static get instance() {
+        // todo return the static _instance.
         return new this();
     }
 
@@ -30,11 +22,25 @@ export class Application extends Singleton {
      * initiate the singleton services
      */
     private initiateServices() {
-        for (const service of Application.registeredServices) {
-            const { key, instance } = Provider.resolve<typeof service>(service);
+        const ioc = IocContainer.instance.boot();
 
+        for (const service of ioc.services) {
+            const { key, instance } = Provider.resolve<typeof service>(service);
             this.services[key] = instance;
         }
+
+    }
+
+    private getServicesBySymbol() {
+        const servicesBySymbol: Object = {};
+
+        for (const key of Object.keys(this.services)) {
+            const instance = this.services[key];
+
+            servicesBySymbol[instance.uniqueId as keyof Object] = instance;
+        }
+
+        return servicesBySymbol;
     }
 
     /**
@@ -42,15 +48,20 @@ export class Application extends Singleton {
      * we will only access whatever is implemented in code though
      */
     private registerServiceProviders() {
-        const keys = Object.keys(this.services);
+        const serviceBySymbol: any = this.getServicesBySymbol();
 
-        for (const key of keys) {
+        for (const key of Object.keys(this.services)) {
             const currentService = this.services[key];
-            const servicesToInject = keys.filter(k => k !== key);
+            const properties = Object.keys(currentService);
+            properties.forEach(property => {
+                const type = Reflect.getMetadata("design:type", currentService, property);
 
-            for (const serviceToInject of servicesToInject) {
-                currentService[serviceToInject] = this.services[serviceToInject];
-            }
+                if (!type || !serviceBySymbol?.[type]) {
+                    return;
+                }
+
+                currentService[property] = serviceBySymbol[type];
+            });
         }
     }
 
@@ -60,8 +71,6 @@ export class Application extends Singleton {
      * constructor.
      */
     private bootServices() {
-        for (const key of Object.keys(this.services)) {
-            this.services[key].boot();
-        }
+        Object.keys(this.services).forEach(key => this.services[key].boot());
     }
 }

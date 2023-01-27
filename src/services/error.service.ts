@@ -1,8 +1,11 @@
+import { Inject } from '../application/libs/inject.decorator';
+import { Register } from '../application/libs/register.decorator';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { ProcessedDataErrorInterface } from './interfaces/processed-data.interface';
 
 class ErrorService extends Provider {
+    @Inject()
     public hookService: HookService;
 
     public boot() {

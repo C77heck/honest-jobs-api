@@ -1,11 +1,14 @@
 import * as cheerio from 'cheerio';
 import fs from 'fs';
+import { Inject } from '../application/libs/inject.decorator';
+import { Register } from '../application/libs/register.decorator';
 import { log } from '../libs/decorators/utility.decorators';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { ProcessedDataInterface } from './interfaces/processed-data.interface';
 
 class DataProcessorService extends Provider {
+    @Inject()
     public hookService: HookService;
 
     public boot() {

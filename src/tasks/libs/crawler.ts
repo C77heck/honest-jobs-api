@@ -17,6 +17,7 @@ export class Crawler implements Task {
     }
 
     public run() {
+        console.log(this.application.services);
         this.application.services.crawlerService.run(this.config).then(() => process.exit(0));
     }
 }

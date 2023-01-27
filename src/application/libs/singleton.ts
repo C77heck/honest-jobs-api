@@ -5,7 +5,6 @@ export class Singleton extends Function {
     }
 
     public static get instance() {
-        // todo return the static _instance.
         return new this();
     }
 }

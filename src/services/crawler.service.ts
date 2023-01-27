@@ -1,9 +1,12 @@
 import superagent from "superagent";
+import { Inject } from '../application/libs/inject.decorator';
+import { Register } from '../application/libs/register.decorator';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
 
 class CrawlerService extends Provider {
+    @Inject()
     public hookService: HookService;
 
     public async run(config: CrawlerConfigInterface) {
