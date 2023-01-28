@@ -1,13 +1,15 @@
-import cnnBiden from './cnn-biden.crawler';
-import ingatlanHu from './hungarian-real-estate.crawler';
+import { cnnBidenCrawlerConfig } from '../../config/application-configs/cnn-biden-crawler.config';
+import {
+    ingatlanHuCrawlerConfig
+} from '../../config/application-configs/ingatlan.hu-crawler.config';
 import { Crawler } from './libs/crawler';
 
 export type CrawlerTypes = 'cnnBiden' | 'ingatlanHu';
 
 export class TaskManager {
     private crawlers: Record<CrawlerTypes, Crawler> = {
-        cnnBiden,
-        ingatlanHu,
+        cnnBiden: new Crawler(cnnBidenCrawlerConfig),
+        ingatlanHu: new Crawler(ingatlanHuCrawlerConfig),
     };
 
     public static get instance() {

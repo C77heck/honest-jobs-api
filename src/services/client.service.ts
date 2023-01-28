@@ -4,7 +4,7 @@ import { Provider } from '../providers/provider';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
 
-class CrawlerService extends Provider {
+class ClientService extends Provider {
     @Inject()
     public hookService: HookService;
 
@@ -18,8 +18,9 @@ class CrawlerService extends Provider {
                 }
 
                 this.hookService.$processedData.next({
+                    crawlerName: config.crawlerName,
                     html: siteData.text,
-                    targetPoints: config.targetPoints
+                    targetPoints: config.targetPoints,
                 });
             } catch (error) {
                 this.hookService.$errorLog.next({
@@ -38,4 +39,4 @@ class CrawlerService extends Provider {
     }
 }
 
-export default CrawlerService;
+export default ClientService;
