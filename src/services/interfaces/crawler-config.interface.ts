@@ -1,7 +1,8 @@
 import { CrawlerTypes } from '../../tasks/task-manager';
 
 export interface CrawlerConfigInterface {
-    urls: string[];
+    baseUrl: string;
+    url: string;
     targetPoints: string[];
     crawlerName: CrawlerTypes;
 }

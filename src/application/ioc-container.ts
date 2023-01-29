@@ -1,5 +1,6 @@
 import { IProvider } from '../providers/provider';
 import ClientService from '../services/client.service';
+import CrawlerService from '../services/crawler.service';
 import AggregationService from '../services/data-aggregator/aggregation.service';
 import DataProcessorService from '../services/data-processor/data-processor.service';
 import ErrorService from '../services/error.service';
@@ -17,6 +18,7 @@ export class IocContainer {
         DataProcessorService,
         ErrorService,
         AggregationService,
+        CrawlerService,
     ];
 
     public services: RegisteredProvider[] = [];

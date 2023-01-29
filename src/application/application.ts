@@ -25,6 +25,7 @@ export class Application extends Singleton {
 
         for (const service of ioc.services) {
             const { key, instance } = Provider.resolve<typeof service>(service);
+
             this.services[key] = instance;
         }
     }

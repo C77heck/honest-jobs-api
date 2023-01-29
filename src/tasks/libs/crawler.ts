@@ -1,9 +1,8 @@
 import { Application } from '../../application/application';
 import { InternalServerError } from '../../models/libs/error-models/errors';
 import { CrawlerConfigInterface } from '../../services/interfaces/crawler-config.interface';
-import { Task } from './interfaces';
 
-export class Crawler implements Task {
+export class Crawler {
     public application: Application;
     public config: any;
 
@@ -14,9 +13,5 @@ export class Crawler implements Task {
 
         this.config = config;
         this.application = Application.instance.boot();
-    }
-
-    public run() {
-        this.application.services.clientService.run(this.config);
     }
 }

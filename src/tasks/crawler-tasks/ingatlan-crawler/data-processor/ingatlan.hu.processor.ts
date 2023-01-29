@@ -7,11 +7,22 @@ export class IngatlanHuProcessor {
         this.html = html;
     }
 
-    public getRawData() {
+    public async getPageNumber(): Promise<number> {
+        const $ = cheerio.load(this.html);
+        const pagination = $('.pagination__page-number');
 
+        const content = pagination.text().split(' ');
+
+        const numberOfPages = +content?.[3];
+
+        if (numberOfPages < 2) {
+            return 1;
+        }
+
+        return numberOfPages - 1;
     }
 
-    public getPageData() {
+    public async getPageData() {
         const $ = cheerio.load(this.html);
         const links = $('.listing__link');
         const articles: any[] = [];

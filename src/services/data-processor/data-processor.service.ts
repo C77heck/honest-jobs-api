@@ -2,11 +2,11 @@ import fs from 'fs';
 import { BadRequest } from '../../../dist/models/libs/error-models/errors';
 import { Inject } from '../../application/libs/inject.decorator';
 import { Provider } from '../../providers/provider';
+import {
+    IngatlanHuProcessor
+} from '../../tasks/crawler-tasks/ingatlan-crawler/data-processor/ingatlan.hu.processor';
 import HookService from '../hook.service';
 import { ProcessedDataInterface } from '../interfaces/processed-data.interface';
-
-import { bidenCnnProcessor } from './data-processors/biden-cnn.processor';
-import { ingatlanHuProcessor } from './data-processors/ingatlan.hu.processor';
 
 class DataProcessorService extends Provider {
     @Inject()
@@ -23,17 +23,17 @@ class DataProcessorService extends Provider {
     }
 
     public async handleDataProcessing({ html, targetPoints, crawlerName }: ProcessedDataInterface) {
-        // todo propably to send to another service with a hook
-        console.log({ crawlerName });
         switch (crawlerName) {
             case 'ingatlanHu':
-                return this.hookService.$rawData.next({ data: ingatlanHuProcessor(html) });
-            case 'cnnBiden':
-                return this.hookService.$rawData.next({ data: bidenCnnProcessor(html) });
+                const processor = new IngatlanHuProcessor(html);
+
+                return this.hookService.$rawData.next({
+                    crawlerName,
+                    data: await processor.getPageData()
+                });
             default:
                 throw new BadRequest('Unknown crawler type provided');
         }
-
     }
 }
 

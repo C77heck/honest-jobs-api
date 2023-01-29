@@ -1,6 +1,11 @@
+import { BadRequest } from '../../../dist/models/libs/error-models/errors';
 import { Inject } from '../../application/libs/inject.decorator';
 import { Provider } from '../../providers/provider';
+import {
+    IngatlanHuAggregate
+} from '../../tasks/crawler-tasks/ingatlan-crawler/aggregate-processor/ingatlan.hu.aggregate';
 import HookService from '../hook.service';
+import { RawData } from '../interfaces/processed-data.interface';
 
 class AggregationService extends Provider {
     @Inject()
@@ -9,12 +14,19 @@ class AggregationService extends Provider {
     public boot() {
         this.hookService
             .$rawData
-            .subscribe(async (data: any) => this.handleDataAggregation(data));
+            .subscribe(async (data: RawData) => this.handleDataAggregation(data));
     }
 
-    public handleDataAggregation(data: any) {
-        // save down this to the appropiate database.
-        console.log({ WeGotHere: data });
+    public handleDataAggregation({ crawlerName, data }: RawData) {
+        switch (crawlerName) {
+            case 'ingatlanHu':
+                const processor = new IngatlanHuAggregate(data);
+                // we need an injected mongodb service to manage the data persisting and processing. extracted out of the aggregator.
+                // then we end this process.
+                return;
+            default:
+                throw new BadRequest('Unknown crawler type provided');
+        }
     }
 
 }

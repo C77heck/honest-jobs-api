@@ -8,6 +8,7 @@ export interface ProcessedDataInterface {
 
 export interface RawData {
     data: any[];
+    crawlerName: CrawlerTypes;
 }
 
 export interface ProcessedDataErrorInterface {
