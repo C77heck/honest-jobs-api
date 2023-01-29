@@ -5,6 +5,7 @@ import AggregationService from '../services/data-aggregator/aggregation.service'
 import DataProcessorService from '../services/data-processor/data-processor.service';
 import ErrorService from '../services/error.service';
 import HookService from '../services/hook.service';
+import { MongodbService } from '../services/mongodb-service/mongodb.service';
 
 export interface RegisteredProvider {
     id: symbol,
@@ -15,6 +16,7 @@ export class IocContainer {
     private serviceProviders: IProvider[] = [
         HookService,
         ClientService,
+        MongodbService,
         DataProcessorService,
         ErrorService,
         AggregationService,

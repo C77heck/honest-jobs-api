@@ -6,10 +6,14 @@ import {
 } from '../../tasks/crawler-tasks/ingatlan-crawler/aggregate-processor/ingatlan.hu.aggregate';
 import HookService from '../hook.service';
 import { RawData } from '../interfaces/processed-data.interface';
+import { MongodbService } from '../mongodb-service/mongodb.service';
 
 class AggregationService extends Provider {
     @Inject()
     public hookService: HookService;
+
+    @Inject()
+    public mongodbService: MongodbService;
 
     public boot() {
         this.hookService
@@ -20,6 +24,7 @@ class AggregationService extends Provider {
     public handleDataAggregation({ crawlerName, data }: RawData) {
         switch (crawlerName) {
             case 'ingatlanHu':
+                // todo we need the mongodbService
                 const processor = new IngatlanHuAggregate(data);
                 // we need an injected mongodb service to manage the data persisting and processing. extracted out of the aggregator.
                 // then we end this process.
