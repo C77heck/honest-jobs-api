@@ -6,14 +6,14 @@ import {
 } from '../../tasks/crawler-tasks/ingatlan-crawler/aggregate-processor/ingatlan.hu.aggregate';
 import HookService from '../hook.service';
 import { RawData } from '../interfaces/processed-data.interface';
-import { MongodbService } from '../mongodb-service/mongodb.service';
+import { PropertyDocument } from '../document-services/property.document';
 
 class AggregationService extends Provider {
     @Inject()
     public hookService: HookService;
 
     @Inject()
-    public mongodbService: MongodbService;
+    public mongodbService: PropertyDocument;
 
     public boot() {
         this.hookService

@@ -1,3 +1,4 @@
+import { Property } from '@models/documents/ingatlan.hu/property.document';
 import { CrawlerTypes } from '../../tasks/task-manager';
 
 export interface ProcessedDataInterface {
@@ -7,12 +8,12 @@ export interface ProcessedDataInterface {
 }
 
 export interface RawData {
-    data: any[];
+    data: Property[];
     crawlerName: CrawlerTypes;
 }
 
-export interface ProcessedDataErrorInterface {
-    type: 'FetchError';
-    url: string;
+export interface CatchError {
+    type: 'FetchError' | 'MongodbError';
+    url?: string;
     payload: any;
 }

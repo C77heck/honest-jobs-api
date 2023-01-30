@@ -1,19 +1,19 @@
 import { Inject } from '../application/libs/inject.decorator';
 import { Provider } from '../providers/provider';
 import HookService from './hook.service';
-import { ProcessedDataErrorInterface } from './interfaces/processed-data.interface';
+import { CatchError } from './interfaces/processed-data.interface';
 
 class ErrorService extends Provider {
     @Inject()
     public hookService: HookService;
 
     public boot() {
-        this.hookService.$errorLog.subscribe((data: ProcessedDataErrorInterface) => this.handleIncomingError(data));
+        this.hookService.$errorLog.subscribe((data: CatchError) => this.handleIncomingError(data));
     }
 
-    public handleIncomingError(data: ProcessedDataErrorInterface) {
+    public handleIncomingError(error: CatchError) {
         // todo -> probably save it to file in a child process.
-        console.log({ ProcessedDataErrorInterface: data });
+        console.log({ error });
     }
 }
 

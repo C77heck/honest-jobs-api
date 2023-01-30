@@ -1,3 +1,4 @@
+import { Property } from '@models/documents/ingatlan.hu/property.document';
 import * as cheerio from 'cheerio';
 
 export class IngatlanHuProcessor {
@@ -22,7 +23,7 @@ export class IngatlanHuProcessor {
         return numberOfPages - 1;
     }
 
-    public async getPageData() {
+    public async getPageData(): Promise<Property[]> {
         const $ = cheerio.load(this.html);
         const links = $('.listing__link');
         const articles: any[] = [];
