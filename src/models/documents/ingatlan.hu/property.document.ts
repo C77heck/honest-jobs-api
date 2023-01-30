@@ -21,6 +21,7 @@ export interface PropertyDocument extends Document, Property {
 
 const PropertySchema = new Schema<PropertyDocument>({
     crawlerName: { type: String },
+    address: { type: String },
     sqmPrice: { type: Number },
     total: { type: Number },
     href: { type: String }

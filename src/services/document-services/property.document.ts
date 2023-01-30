@@ -23,7 +23,10 @@ export class PropertyDocument extends Provider implements DatabaseInterface {
     public async saveData(data: RawData) {
         try {
             await this.document.insertMany(data.data.map(property => ({
-                ...data.data,
+                address: property.address,
+                sqmPrice: property.sqmPrice,
+                total: property.total,
+                href: property.href,
                 crawlerName: data.crawlerName
             })));
         } catch (e) {
@@ -32,13 +35,5 @@ export class PropertyDocument extends Provider implements DatabaseInterface {
                 payload: e,
             });
         }
-        // for (const property of data.data) {
-        //     const document = new this.document({
-        //         ...property,
-        //         crawlerName: data.crawlerName
-        //     });
-        //
-        //     await document.save();
-        // }
     }
 }

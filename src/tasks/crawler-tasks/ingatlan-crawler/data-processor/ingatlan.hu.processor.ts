@@ -48,7 +48,8 @@ export class IngatlanHuProcessor {
                 .children('.price--sqm ')
                 .text()
                 .replace('Ft/m2', '')
-                .trim();
+                .trim()
+                .replace(' ', '');
 
             const address = $(element)
                 .children('.listing__header')
@@ -56,7 +57,11 @@ export class IngatlanHuProcessor {
                 .children('.listing__address')
                 .text();
 
-            articles.push({ address, sqmPrice, total, href });
+            articles.push({
+                address, href,
+                sqmPrice: parseFloat(sqmPrice),
+                total: parseFloat(total)
+            });
         });
 
         return articles;
