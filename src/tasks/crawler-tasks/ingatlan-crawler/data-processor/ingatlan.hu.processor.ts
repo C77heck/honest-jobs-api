@@ -20,7 +20,7 @@ export class IngatlanHuProcessor {
             return 1;
         }
 
-        return numberOfPages - 1;
+        return numberOfPages;
     }
 
     public async getPageData(): Promise<Property[]> {
@@ -60,7 +60,7 @@ export class IngatlanHuProcessor {
             articles.push({
                 address, href,
                 sqmPrice: parseFloat(sqmPrice),
-                total: parseFloat(total)
+                total: parseFloat(total) * 1000000
             });
         });
 
