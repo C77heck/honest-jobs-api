@@ -1,5 +1,5 @@
-import { Property } from '@models/documents/ingatlan.hu/property.document';
 import * as cheerio from 'cheerio';
+import { Property } from '../../../../models/documents/ingatlan.hu/property.document';
 
 export class IngatlanHuProcessor {
     private html: any;

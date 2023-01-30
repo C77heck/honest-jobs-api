@@ -5,7 +5,7 @@ import { CatchError } from './interfaces/processed-data.interface';
 
 class ErrorService extends Provider {
     @Inject()
-    public hookService: HookService;
+    private hookService: HookService;
 
     public boot() {
         this.hookService.$errorLog.subscribe((data: CatchError) => this.handleIncomingError(data));

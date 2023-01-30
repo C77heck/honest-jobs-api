@@ -19,13 +19,13 @@ export interface PropertyDocument extends Document, Property {
     crawlerName: CrawlerTypes;
 }
 
-const PropertyScema = new Schema<PropertyDocument>({
+const PropertySchema = new Schema<PropertyDocument>({
     crawlerName: { type: String },
     sqmPrice: { type: Number },
     total: { type: Number },
     href: { type: String }
 });
 
-PropertyScema.set('timestamps', true);
+PropertySchema.set('timestamps', true);
 
-export default mongoose.model<PropertyDocument, PropertyModel>('Property', PropertyScema);
+export default mongoose.model<PropertyDocument, PropertyModel>('Property', PropertySchema);

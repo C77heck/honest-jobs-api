@@ -7,10 +7,10 @@ import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
 
 class CrawlerService extends Provider {
     @Inject()
-    public hookService: HookService;
+    private hookService: HookService;
 
     @Inject()
-    public clientService: ClientService;
+    private clientService: ClientService;
 
     public async run(config: CrawlerConfigInterface, taskManager: Task) {
         try {

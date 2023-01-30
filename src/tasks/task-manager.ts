@@ -18,7 +18,6 @@ export class TaskManager {
     }
 
     public run(crawler: CrawlerTypes) {
-        console.log(this.crawlerRegistry.ingatlanHu, this.crawlerRegistry[crawler]);
         this.crawlerRegistry[crawler].run();
 
         // this.endProcess();

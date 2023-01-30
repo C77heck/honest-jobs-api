@@ -1,5 +1,5 @@
-import { UnprocessableEntity } from '@models/libs/error-models/errors';
 import express from 'express';
+import { UnprocessableEntity } from '../../models/libs/error-models/errors';
 import { validate } from './helpers/validator/validate';
 
 export class ExpressController<TUserType> {

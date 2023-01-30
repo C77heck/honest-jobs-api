@@ -1,4 +1,4 @@
-import { Property } from '@models/documents/ingatlan.hu/property.document';
+import { Property } from '../../models/documents/ingatlan.hu/property.document';
 import { CrawlerTypes } from '../../tasks/task-manager';
 
 export interface ProcessedDataInterface {

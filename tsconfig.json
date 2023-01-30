@@ -85,23 +85,23 @@
     /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true,
     /* Disallow inconsistently-cased references to the same file. */
-    "paths": {
-      "@repos/*": [
-        "src/repos/*"
-      ],
-      "@models/*": [
-        "src/models/*"
-      ],
-      "@shared/*": [
-        "src/shared/*"
-      ],
-      "@server": [
-        "src/server"
-      ],
-      "@routes/*": [
-        "src/routes/*"
-      ]
-    },
+    //    "paths": {
+    //      "@repos/*": [
+    //        "src/repos/*"
+    //      ],
+    //      "@models/*": [
+    //        "src/models/*"
+    //      ],
+    //      "@shared/*": [
+    //        "src/shared/*"
+    //      ],
+    //      "@server": [
+    //        "src/server"
+    //      ],
+    //      "@routes/*": [
+    //        "src/routes/*"
+    //      ]
+    //    },
     "useUnknownInCatchVariables": false
   },
   "include": [

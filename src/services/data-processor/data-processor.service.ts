@@ -10,7 +10,7 @@ import { ProcessedDataInterface } from '../interfaces/processed-data.interface';
 
 class DataProcessorService extends Provider {
     @Inject()
-    public hookService: HookService;
+    private hookService: HookService;
 
     public boot() {
         this.hookService
