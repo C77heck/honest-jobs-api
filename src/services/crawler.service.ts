@@ -21,6 +21,8 @@ class CrawlerService extends Provider {
             }
 
             this.hookService.$processedData.next({
+                location: config.location,
+                baseUrl: config.baseUrl,
                 crawlerName: config.crawlerName,
                 html: siteData.text,
                 targetPoints: config.targetPoints,

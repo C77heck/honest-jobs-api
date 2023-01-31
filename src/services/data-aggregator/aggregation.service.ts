@@ -21,7 +21,9 @@ class AggregationService extends Provider {
 
     public handleDataAggregation(data: RawData) {
         switch (data.crawlerName) {
-            case 'ingatlanHu':
+            case 'ingatlanHuFlat':
+                return this.mongodbService.saveData(data);
+            case 'ingatlanHuHouse':
                 return this.mongodbService.saveData(data);
             default:
                 throw new BadRequest('Unknown crawler type provided');

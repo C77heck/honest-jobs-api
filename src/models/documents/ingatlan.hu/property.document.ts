@@ -8,21 +8,25 @@ export interface PropertyModel extends Mongoose.Model<any> {
 
 }
 
-export interface Property {
+export interface PropertyData {
+    location: string;
     address: string;
     sqmPrice: number;
+    size: number;
     total: number;
     href: string;
 }
 
-export interface PropertyDocument extends Document, Property {
+export interface PropertyDocument extends Document, PropertyData {
     crawlerName: CrawlerTypes;
 }
 
 const PropertySchema = new Schema<PropertyDocument>({
+    location: { type: String },
     crawlerName: { type: String },
     address: { type: String },
     sqmPrice: { type: Number },
+    size: { type: Number },
     total: { type: Number },
     href: { type: String }
 });

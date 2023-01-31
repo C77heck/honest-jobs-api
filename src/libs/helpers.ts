@@ -52,3 +52,7 @@ export const priceFormat = (amount: number, decimal = 1, currency: string = 'GBP
         .replace(/hun/i, 'Ft')
         .replace(/GBP/i, "£");
 };
+
+export const sleep = async (ms: number) => {
+    return new Promise(resolve => setTimeout(() => resolve(null), ms));
+};

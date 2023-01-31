@@ -22,19 +22,31 @@ class DataProcessorService extends Provider {
         return fs.writeFileSync(`${__dirname}/logs.txt`, data);
     }
 
-    public async handleDataProcessing({ html, targetPoints, crawlerName }: ProcessedDataInterface) {
+    public async handleDataProcessing(data: ProcessedDataInterface) {
+        const { crawlerName, location, baseUrl, html } = data;
+        
         switch (crawlerName) {
-            case 'ingatlanHu':
-                const processor = new IngatlanHuProcessor(html);
+            case 'ingatlanHuFlat':
+                const flatProcessor = new IngatlanHuProcessor(html);
 
                 return this.hookService.$rawData.next({
+                    location,
                     crawlerName,
-                    data: await processor.getPageData()
+                    data: await flatProcessor.getPageData(baseUrl)
+                });
+            case 'ingatlanHuHouse':
+                const houseProcessor = new IngatlanHuProcessor(html);
+
+                return this.hookService.$rawData.next({
+                    location,
+                    crawlerName,
+                    data: await houseProcessor.getPageData(baseUrl)
                 });
             default:
                 throw new BadRequest('Unknown crawler type provided');
         }
     }
+
 }
 
 export default DataProcessorService;

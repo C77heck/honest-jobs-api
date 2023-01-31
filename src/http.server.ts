@@ -4,4 +4,4 @@ import { TaskManager } from './tasks/task-manager';
 
 (Server.instance as Provider).boot();
 
-TaskManager.instance.run('ingatlanHu');
+TaskManager.instance.run('kecskemet');
