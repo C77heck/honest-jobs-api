@@ -5,7 +5,7 @@
     "build": "./node_modules/.bin/ts-node ./run-build.ts",
     "lint": "eslint . --ext .ts",
     "start": "node ./dist --env=production",
-    "start:dev": "nodemon  src/http.server.ts",
+    "start:dev": "nodemon  src/server.ts",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec"
   },

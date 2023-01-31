@@ -1,0 +1,8 @@
+we will need the data analytics too.
+like: trying to figure if a property is the same thing. based on its adress. or perhaps image uploaded.
+check the string matching.
+and see if they decrease their price. also how long they have been up.
+
+the whole point is to get the data out. of it.
+
+create an processed analytical data db for it.
