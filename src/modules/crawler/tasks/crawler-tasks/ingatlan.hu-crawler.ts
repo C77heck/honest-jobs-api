@@ -6,21 +6,22 @@ import { IngatlanHuProcessor } from './ingatlan-crawler/data-processor/ingatlan.
 export class IngatlanHuCrawler extends Crawler implements Task {
     public async run() {
         const pages = await this.getPageNumber();
+
         for (const page of pages) {
             if (page === 1) {
-                await this.application.services.crawlerService.run(this.config);
+                await this.services.crawlerService.run(this.config);
 
                 continue;
             }
 
             const url = `${this.config.url}?page=${page}`;
 
-            await this.application.services.crawlerService.run({ ...this.config, url });
+            await this.services.crawlerService.run({ ...this.config, url });
         }
     }
 
     public async getPageNumber(): Promise<number[]> {
-        const html = await this.application.services.clientService.fetch(this.config.url);
+        const html = await this.services.clientService.fetch(this.config.url);
 
         const processor = new IngatlanHuProcessor(html.text);
 

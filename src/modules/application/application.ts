@@ -5,7 +5,7 @@ import { Server } from './server';
 
 export class Application {
     private server: Server;
-    private iocContainer: IocContainer;
+    public iocContainer: IocContainer;
 
     public static get instance() {
         return new this();
