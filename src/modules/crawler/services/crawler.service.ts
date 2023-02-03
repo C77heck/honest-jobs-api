@@ -1,6 +1,5 @@
 import { Inject } from '../../application/libs/inject.decorator';
 import { Provider } from '../providers/provider';
-import { Task } from '../tasks/libs/interfaces';
 import ClientService from './client.service';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
@@ -12,7 +11,7 @@ class CrawlerService extends Provider {
     @Inject()
     private clientService: ClientService;
 
-    public async run(config: CrawlerConfigInterface, taskManager: Task) {
+    public async run(config: CrawlerConfigInterface) {
         try {
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
 

@@ -8,7 +8,7 @@ export interface DocumentInterface {
     saveData: (data: RawData) => Promise<void>;
 }
 
-export class PropertyDocument extends Provider implements DocumentInterface {
+export class PropertyService extends Provider implements DocumentInterface {
     @Inject()
     private hookService: HookService;
 
@@ -20,15 +20,17 @@ export class PropertyDocument extends Provider implements DocumentInterface {
 
     public async saveData(data: RawData) {
         try {
-            await this.document.insertMany(data.data.map(property => ({
-                location: property.location,
+            const properties = data.data.map(property => ({
+                location: data.location,
                 address: property.address,
                 sqmPrice: property.sqmPrice,
                 size: property.size,
                 total: property.total,
                 href: property.href,
                 crawlerName: data.crawlerName
-            })));
+            }));
+
+            await this.document.insertMany(properties);
         } catch (e) {
             this.hookService.$errorLog.next({
                 type: 'MongodbError',

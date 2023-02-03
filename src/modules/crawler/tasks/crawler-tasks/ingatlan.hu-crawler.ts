@@ -7,9 +7,6 @@ export class IngatlanHuCrawler extends Crawler implements Task {
     public async run() {
         const pages = await this.getPageNumber();
         for (const page of pages) {
-
-            await sleep(30);
-
             if (page === 1) {
                 await this.application.services.crawlerService.run(this.config);
 

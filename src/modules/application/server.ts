@@ -5,15 +5,17 @@ import dotenv from 'dotenv';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
 import logger from 'jet-logger';
-import mongoose from 'mongoose';
 import { HttpError } from '../crawler/models/libs/error-models/errors';
-import { Provider } from '../crawler/providers/provider';
 
 dotenv.config({ path: `./config/.env` });
 
-export class Server extends Provider {
+export class Server {
     public port = process.env.PORT || 3131;
     public app: Express;
+
+    public static get instance() {
+        return new this();
+    }
 
     public async boot(api: { router: any }) {
         this.app = express();
@@ -31,20 +33,10 @@ export class Server extends Provider {
             });
         });
 
-        await this.connectDB();
-
-        await this.startServer();
+        await this.start();
     }
 
-    private async startServer() {
+    private async start() {
         await this.app.listen(this.port, () => console.log(`app is listening on port: ${this.port}`));
-    }
-
-    private async connectDB() {
-        try {
-            await mongoose.connect(process.env.MONGO_URL || '');
-        } catch (e) {
-            console.log(e);
-        }
     }
 }

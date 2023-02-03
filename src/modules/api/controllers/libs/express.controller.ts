@@ -8,9 +8,6 @@ export abstract class ExpressController extends Provider {
 
     public boot() {
         this.router = express.Router();
-    }
-
-    public initializeRouters(): void {
         this.routers();
     }
 

@@ -1,64 +1,84 @@
-import { PropertyController } from '../api/controllers/property.controller';
-import { PropertyDbService } from '../api/services/property-db.service';
-import { IProvider } from '../crawler/providers/provider';
-import ClientService from '../crawler/services/client.service';
-import CrawlerService from '../crawler/services/crawler.service';
-import AggregationService from '../crawler/services/data-aggregator/aggregation.service';
-import DataProcessorService from '../crawler/services/data-processor/data-processor.service';
-import { PropertyDocument } from '../crawler/services/document-services/property.document';
-import ErrorService from '../crawler/services/error.service';
-import HookService from '../crawler/services/hook.service';
-
-export interface RegisteredProvider {
-    id: symbol,
-    implementation: IProvider;
-}
+import { Provider } from '../crawler/providers/provider';
+import { ProviderRegistry } from './provider.registry';
 
 export class IocContainer {
-    private serviceProviders: IProvider[] = [
-        HookService,
-        ClientService,
-        PropertyDocument,
-        DataProcessorService,
-        ErrorService,
-        AggregationService,
-        CrawlerService,
-        PropertyDbService,
-    ];
-
-    private controllerProviders: IProvider[] = [
-        PropertyController,
-    ];
-
-    public services: RegisteredProvider[] = [];
-    public controllers: RegisteredProvider[] = [];
-
-    public boot() {
-        this.registerServices();
-        this.registerControllers();
-
-        return this;
-    }
+    public services: Record<any, any> = {};
+    public controllers: Record<any, any> = {};
 
     public static get instance() {
         return new this();
     }
 
-    private registerServices() {
-        this.services = this.serviceProviders.map(service => {
-            return {
-                id: Symbol.for(service.name),
-                implementation: service
-            };
-        });
+    public boot() {
+        this.initiate();
+        this.register();
+        this.bootProviders();
+
+        return this;
     }
 
-    private registerControllers() {
-        this.controllers = this.controllerProviders.map(service => {
-            return {
-                id: Symbol.for(service.name),
-                implementation: service
-            };
-        });
+    public initiate() {
+        const ioc = ProviderRegistry.instance.boot();
+        this.initiateProviders(this.services, ioc);
+        this.initiateProviders(this.controllers, ioc);
+    }
+
+    /**
+     * initiate the singleton services
+     */
+    private initiateProviders(providers: Record<any, any>, ioc: ProviderRegistry) {
+        for (const service of ioc.services) {
+            const { key, instance } = Provider.resolve<typeof service>(service);
+
+            providers[key] = instance;
+        }
+    }
+
+    private getServicesBySymbol() {
+        const servicesBySymbol: Object = {};
+
+        for (const key of Object.keys(this.services)) {
+            const instance = this.services[key];
+            servicesBySymbol[instance.uniqueId as keyof Object] = instance;
+        }
+
+        return servicesBySymbol;
+    }
+
+    private register() {
+        const serviceBySymbol: any = this.getServicesBySymbol();
+
+        this.registerProviders(this.services, serviceBySymbol);
+        this.registerProviders(this.controllers, serviceBySymbol);
+    }
+
+    /**
+     * register services into each other and make all available
+     * we will only access whatever is implemented in code though
+     */
+    private registerProviders(initiatiedProviders: Record<any, any>, serviceBySymbol: any) {
+        for (const key of Object.keys(initiatiedProviders)) {
+            const currentProvider = initiatiedProviders[key];
+            const properties = Object.keys(currentProvider);
+            properties.forEach(property => {
+                const type = Reflect.getMetadata("design:type", currentProvider, property);
+
+                if (!type || !serviceBySymbol?.[type]) {
+                    return;
+                }
+
+                currentProvider[property] = serviceBySymbol[type];
+            });
+        }
+    }
+
+    /**
+     * Each service class is extended from a Provider base class that has a boot method on it
+     * this is where we can make hook subscriptions and other things that we would normally do in its
+     * constructor.
+     */
+    private bootProviders() {
+        Object.keys(this.services).forEach(key => this.services[key].boot());
+        Object.keys(this.controllers).forEach(key => this.controllers[key].boot());
     }
 }

@@ -1,4 +1,6 @@
-import { Application } from '../../../application/application';
+import apiRoutes from '../../../api/routes/api.routes';
+import { Application } from '../../../application/ioc-container';
+import { Server } from '../../../application/server';
 import { InternalServerError } from '../../models/libs/error-models/errors';
 import { CrawlerConfigInterface } from '../../services/interfaces/crawler-config.interface';
 
@@ -12,6 +14,6 @@ export class Crawler {
         }
 
         this.config = config;
-        this.application = Application.instance.boot();
+        this.application = Server.instance.boot(apiRoutes);
     }
 }

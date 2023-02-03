@@ -4,12 +4,9 @@ import { CrawlerTypes } from '../../../tasks/task-manager';
 
 const Schema = mongoose.Schema;
 
-export interface PropertyModel extends Mongoose.Model<any> {
-
-}
-
 export interface PropertyData {
     location: string;
+    crawlerName: string;
     address: string;
     sqmPrice: number;
     size: number;
@@ -19,6 +16,10 @@ export interface PropertyData {
 
 export interface PropertyDocument extends Document, PropertyData {
     crawlerName: CrawlerTypes;
+}
+
+export interface PropertyModel extends Mongoose.Model<PropertyDocument> {
+
 }
 
 const Property = new Schema<PropertyDocument>({

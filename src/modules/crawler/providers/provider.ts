@@ -1,4 +1,4 @@
-import { RegisteredProvider } from '../../application/ioc-container';
+import { RegisteredProvider } from '../../application/provider.registry';
 import { toLowerCase } from '../../application/libs/helpers';
 import { Singleton } from '../../application/libs/singleton';
 
