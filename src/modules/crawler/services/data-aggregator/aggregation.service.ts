@@ -1,6 +1,5 @@
-import { Inject } from '../../../application/libs/inject.decorator';
-import { BadRequest } from '../../models/libs/error-models/errors';
-import { Provider } from '../../providers/provider';
+import { Inject } from '../../../../application/libs/inject.decorator';
+import { Provider } from '../../../../application/provider';
 import { PropertyService } from '../document-services/property.service';
 
 import HookService from '../hook.service';
@@ -20,16 +19,7 @@ class AggregationService extends Provider {
     }
 
     public async handleDataAggregation(data: RawData) {
-        switch (data.crawlerName) {
-            case 'ingatlanHuFlat':
-                await this.mongodbService.saveData(data);
-                break;
-            case 'ingatlanHuHouse':
-                await this.mongodbService.saveData(data);
-                break;
-            default:
-                throw new BadRequest('Unknown crawler type provided');
-        }
+        await this.mongodbService.saveData(data);
     }
 
 }

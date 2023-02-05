@@ -1,6 +1,6 @@
 import { NextFunction } from 'express';
+import { Inject } from '../../../application/libs/inject.decorator';
 import { handleError } from '../../../libs/handle-error';
-import { Inject } from '../../application/libs/inject.decorator';
 import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
 

@@ -1,5 +1,5 @@
-import { Inject } from '../../application/libs/inject.decorator';
-import { Provider } from '../providers/provider';
+import { Inject } from '../../../application/libs/inject.decorator';
+import { Provider } from '../../../application/provider';
 import ClientService from './client.service';
 import HookService from './hook.service';
 import { CrawlerConfigInterface } from './interfaces/crawler-config.interface';
@@ -13,6 +13,7 @@ class CrawlerService extends Provider {
 
     public async run(config: CrawlerConfigInterface) {
         try {
+            console.log('run is being runned');
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
 
             if (!siteData?.text) {

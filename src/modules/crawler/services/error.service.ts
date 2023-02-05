@@ -1,5 +1,6 @@
-import { Inject } from '../../application/libs/inject.decorator';
-import { Provider } from '../providers/provider';
+
+import { Inject } from '../../../application/libs/inject.decorator';
+import { Provider } from '../../../application/provider';
 import HookService from './hook.service';
 import { CatchError } from './interfaces/processed-data.interface';
 

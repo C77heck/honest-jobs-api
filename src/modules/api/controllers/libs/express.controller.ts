@@ -1,6 +1,6 @@
 import express from 'express';
-import { UnprocessableEntity } from '../../../crawler/models/libs/error-models/errors';
-import { Provider } from '../../../crawler/providers/provider';
+import { UnprocessableEntity } from '../../../../application/models/errors';
+import { Provider } from '../../../../application/provider';
 import { validate } from './helpers/validator/validate';
 
 export abstract class ExpressController extends Provider {

@@ -1,7 +1,6 @@
 import Redis from "ioredis";
 
 import { CONSTANTS } from './constants';
-import { json } from "./helpers";
 
 const { REDIS } = CONSTANTS;
 
@@ -14,7 +13,7 @@ const redis = new Redis({
 const get = async (key: string): Promise<any> => {
     try {
         const val = await redis.get(key);
-        return json(val);
+        return JSON.parse(val || '');
     } catch (e) {
         console.log(e);
         return false;

@@ -1,4 +1,4 @@
-import { InternalServerError } from '../../models/libs/error-models/errors';
+import { InternalServerError } from '../../../../application/models/errors';
 import { CrawlerConfigInterface } from '../../services/interfaces/crawler-config.interface';
 
 export class Crawler {

@@ -1,4 +1,4 @@
-import { Server } from './modules/application/server';
+import { Server } from './modules/api/server';
 
 Server.instance
     .boot()

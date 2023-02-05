@@ -1,4 +1,4 @@
-import { Unauthorized } from '../../dist/models/libs/error-models/errors';
+import { Unauthorized } from '../application/models/errors';
 import { ERROR_MESSAGES } from './constants';
 
 export const handleError = (err: any) => {

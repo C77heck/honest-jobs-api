@@ -22,12 +22,14 @@ export class IngatlanHuCrawler extends Crawler implements Task {
     }
 
     public async getPageNumber(): Promise<number[]> {
-        const html = await this.services.clientService.fetch(this.config.url);
+        try {
+            const html = await this.services.clientService.fetch(this.config.url);
+            const processor = new IngatlanHuProcessor(html.text);
+            const numberOfPages = await processor.getPageNumber();
 
-        const processor = new IngatlanHuProcessor(html.text);
-
-        const numberOfPages = await processor.getPageNumber();
-
-        return Array.from({ length: numberOfPages }).map((i, index) => index + 1);
+            return Array.from({ length: numberOfPages }).map((i, index) => index + 1);
+        } catch (e) {
+            return [];
+        }
     }
 }

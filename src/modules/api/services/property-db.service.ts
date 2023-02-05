@@ -1,7 +1,7 @@
+import { Provider } from '../../../application/provider';
 import Property, {
     PropertyData
 } from '../../crawler/models/documents/ingatlan.hu/property.document';
-import { Provider } from '../../crawler/providers/provider';
 
 export interface PropertyQueryOptions {
     location?: string;

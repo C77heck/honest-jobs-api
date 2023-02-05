@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { Provider } from '../providers/provider';
+import { Provider } from '../../../application/provider';
 import { CatchError, ProcessedDataInterface, RawData } from './interfaces/processed-data.interface';
 
 class HookService extends Provider {

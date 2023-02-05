@@ -1,6 +1,6 @@
-import { Inject } from '../../../application/libs/inject.decorator';
+import { Inject } from '../../../../application/libs/inject.decorator';
+import { Provider } from '../../../../application/provider';
 import Property, { PropertyModel } from '../../models/documents/ingatlan.hu/property.document';
-import { Provider } from '../../providers/provider';
 import HookService from '../hook.service';
 import { RawData } from '../interfaces/processed-data.interface';
 
@@ -29,7 +29,7 @@ export class PropertyService extends Provider implements DocumentInterface {
                 href: property.href,
                 crawlerName: data.crawlerName
             }));
-
+            console.log({ insertion: properties.length });
             await this.document.insertMany(properties);
         } catch (e) {
             this.hookService.$errorLog.next({
