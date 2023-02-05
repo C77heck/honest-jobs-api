@@ -1,6 +1,11 @@
 import express from 'express';
+import { Inject } from '../../application/libs/inject.decorator';
+import { PropertyController } from '../controllers/property.controller';
 
 class ExpressApiRouter {
+    @Inject()
+    public propertyController: PropertyController;
+
     public router: express.Router;
 
     public constructor() {
@@ -9,8 +14,8 @@ class ExpressApiRouter {
     }
 
     public initalizeRoutes() {
-        // this.router.use('/users/recruiter', recruiterController.router);
+        this.router.use('/property', this.propertyController.router);
     }
 }
 
-export default new ExpressApiRouter();
+export default ExpressApiRouter;

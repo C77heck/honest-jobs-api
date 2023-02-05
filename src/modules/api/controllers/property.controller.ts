@@ -8,7 +8,7 @@ export class PropertyController extends ExpressController {
     @Inject()
     public databaseService: PropertyDbService;
 
-    public routers() {
+    public routes() {
         this.router.get('/:location', [], this.getByLocation.bind(this));
     }
 

@@ -1,9 +1,10 @@
+import { ExpressController } from '../api/controllers/libs/express.controller';
 import { Provider } from '../crawler/providers/provider';
 import { ProviderRegistry } from './provider.registry';
 
 export class IocContainer {
     public services: Record<any, any> = {};
-    public controllers: Record<any, any> = {};
+    public controllers: Record<string, ExpressController> = {};
 
     public static get instance() {
         return new this();

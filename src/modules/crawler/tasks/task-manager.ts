@@ -14,10 +14,12 @@ export class TaskManager {
     }
 
     private initializeCrawlerRegistry() {
+        const applicationServices = this.application.iocContainer.services;
+
         this.crawlerRegistry = {
             kecskemet: {
-                ingatlanHuFlat: new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, this.application.iocContainer.services),
-                ingatlanHuHouse: new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, this.application.iocContainer.services),
+                ingatlanHuFlat: new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
+                ingatlanHuHouse: new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, applicationServices),
             }
         };
     }
@@ -28,8 +30,7 @@ export class TaskManager {
         await this.initializeCrawlerRegistry();
         await this.crawlerRegistry[crawler].ingatlanHuFlat.run();
         await this.crawlerRegistry[crawler].ingatlanHuHouse.run();
-        // todo create a proxy server with nginx and see how we could save progress here to continue with a new proxy
-        // and how to dynamically do that.
+
         console.log('CRAWLER DONE');
     }
 }

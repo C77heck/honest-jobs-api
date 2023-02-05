@@ -8,10 +8,10 @@ export abstract class ExpressController extends Provider {
 
     public boot() {
         this.router = express.Router();
-        this.routers();
+        this.routes();
     }
 
-    public abstract routers(): void;
+    public abstract routes(): void;
 
     public handleValidation(req: express.Request) {
         const errors = validate(req);
