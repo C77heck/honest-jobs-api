@@ -1,14 +1,10 @@
 import cors from 'cors';
 
-import dotenv from 'dotenv';
-
 import express, { Express, NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
 import logger from 'jet-logger';
 import { HttpError } from '../crawler/models/libs/error-models/errors';
 import { Application } from './application';
-
-dotenv.config({ path: `./config/.env` });
 
 export class Server {
     private port = process.env.PORT || 3131;

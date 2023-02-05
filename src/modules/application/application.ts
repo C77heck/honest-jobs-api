@@ -1,9 +1,10 @@
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { IocContainer } from './ioc-container';
-import { Server } from './server';
+
+dotenv.config({ path: `./config/.env` });
 
 export class Application {
-    private server: Server;
     public iocContainer: IocContainer;
 
     public static get instance() {
@@ -12,22 +13,17 @@ export class Application {
 
     public async boot() {
         this.iocContainer = IocContainer.instance.boot();
-        this.server = Server.instance;
 
         return this;
     }
 
-    public async startServer() {
-        await this.connectDB();
-        await this.server.boot();
-        return this;
-    };
-
     public async connectDB() {
+        console.log(process.env);
         try {
             await mongoose.connect(process.env.MONGO_URL || '');
         } catch (e) {
             console.log(e);
+            throw e;
         } finally {
             return this;
         }

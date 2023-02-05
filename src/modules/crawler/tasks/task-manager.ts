@@ -25,12 +25,14 @@ export class TaskManager {
     }
 
     public async run(crawler: CrawlerTypes) {
+        console.time('crawler');
         await this.application.boot();
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();
         await this.crawlerRegistry[crawler].ingatlanHuFlat.run();
         await this.crawlerRegistry[crawler].ingatlanHuHouse.run();
+        console.timeEnd('crawler');
 
-        console.log('CRAWLER DONE');
+        console.log('CRAWLER TASK IS COMPLETE');
     }
 }
