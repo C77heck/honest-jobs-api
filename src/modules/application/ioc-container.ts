@@ -1,6 +1,6 @@
 import { ExpressController } from '../api/controllers/libs/express.controller';
 import { Provider } from '../crawler/providers/provider';
-import { ProviderRegistry } from './provider.registry';
+import { ProviderRegistry, RegisteredProvider } from './provider.registry';
 
 export class IocContainer {
     public services: Record<any, any> = {};
@@ -20,15 +20,15 @@ export class IocContainer {
 
     public initiate() {
         const ioc = ProviderRegistry.instance.boot();
-        this.initiateProviders(this.services, ioc);
-        this.initiateProviders(this.controllers, ioc);
+        this.initiateProviders(this.services, ioc.services);
+        this.initiateProviders(this.controllers, ioc.controllers);
     }
 
     /**
      * initiate the singleton services
      */
-    private initiateProviders(providers: Record<any, any>, ioc: ProviderRegistry) {
-        for (const service of ioc.services) {
+    private initiateProviders(providers: Record<any, any>, registeredpPoviders: RegisteredProvider[]) {
+        for (const service of registeredpPoviders) {
             const { key, instance } = Provider.resolve<typeof service>(service);
 
             providers[key] = instance;

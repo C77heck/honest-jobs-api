@@ -6,26 +6,27 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
 import logger from 'jet-logger';
 import { HttpError } from '../crawler/models/libs/error-models/errors';
-import { IocContainer } from './ioc-container';
+import { Application } from './application';
 
 dotenv.config({ path: `./config/.env` });
 
 export class Server {
     private port = process.env.PORT || 3131;
     private app: Express;
-    private iocContainer: IocContainer;
+    private application: Application;
 
     public static get instance() {
         return new this();
     }
 
     public async boot() {
-        this.iocContainer = IocContainer.instance.boot();
+        this.application = await Application.instance.boot();
+        await this.application.connectDB();
         this.app = express();
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        this.app.use('/api', this.iocContainer.controllers.propertyController.router);
+        this.app.use('/api', this.application.iocContainer.controllers.propertyController.router);
 
         this.app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
             logger.err(err, true);
@@ -36,10 +37,10 @@ export class Server {
             });
         });
 
-        await this.start();
+        return this;
     }
 
-    private async start() {
+    public async start() {
         await this.app.listen(this.port, () => console.log(`app is listening on port: ${this.port}`));
     }
 }
