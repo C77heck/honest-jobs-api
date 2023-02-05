@@ -12,11 +12,13 @@ export class ProviderRegistry {
 
     public registerServiceProviders(services: IProvider[]) {
         this.serviceProviders = [...this.serviceProviders, ...services];
+
         return this;
     }
 
     public registerControllerProviders(controllers: IProvider[]) {
-        this.serviceProviders = [...this.controllerProviders, ...controllers];
+        this.controllerProviders = [...this.controllerProviders, ...controllers];
+
         return this;
     }
 

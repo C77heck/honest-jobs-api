@@ -10,7 +10,7 @@ import { PropertyService } from '../crawler/services/document-services/property.
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
 
-export class Analytics {
+export class AnalyticsManager {
     private application: Application;
 
     public static get instance() {
@@ -33,6 +33,5 @@ export class Analytics {
             .boot();
 
         this.application = await Application.instance.boot(providerRegistry);
-
     }
 }

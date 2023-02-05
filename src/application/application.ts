@@ -14,6 +14,7 @@ export class Application {
 
     public async boot(registeredProviders: ProviderRegistry) {
         this.iocContainer = new IocContainer(registeredProviders);
+        await this.iocContainer.boot();
 
         return this;
     }

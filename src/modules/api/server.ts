@@ -26,7 +26,7 @@ export class Server {
     }
 
     public async boot() {
-        await this.application.connectDB();
+        await this.initializeApplication();
         this.app = express();
         this.app.use(cors());
         this.app.use(express.json());
@@ -59,9 +59,10 @@ export class Server {
             ])
             .registerControllerProviders([PropertyController])
             .boot();
-        
-        this.application = await Application.instance.boot(providerRegistry);
 
+        this.application = await Application.instance.boot(providerRegistry);
+        console.log(this.application);
+        await this.application.connectDB();
     }
 
     public async start() {
