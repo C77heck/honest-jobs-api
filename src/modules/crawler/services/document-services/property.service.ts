@@ -29,7 +29,7 @@ export class PropertyService extends Provider implements DocumentInterface {
                 href: property.href,
                 crawlerName: data.crawlerName
             }));
-            console.log({ insertion: properties.length });
+
             await this.document.insertMany(properties);
         } catch (e) {
             this.hookService.$errorLog.next({

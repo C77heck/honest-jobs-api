@@ -8,6 +8,7 @@
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec",
     "start": "node ./dist --env=production",
     "start:crawler": "nodemon  src/crawler.ts",
+    "start:analytics": "nodemon  src/analytics.ts",
     "start:api": "nodemon  src/api.ts"
   },
   "eslintConfig": {

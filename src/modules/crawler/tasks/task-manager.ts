@@ -24,7 +24,7 @@ export class TaskManager {
     }
 
     private async initializeCrawlerRegistry() {
-        const applicationServices = this.application.iocContainer.services;
+        const applicationServices = this.application.services;
 
         this.crawlerRegistry = [
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
@@ -49,7 +49,7 @@ export class TaskManager {
                 CrawlerService,
                 PropertyDbService,])
             .boot();
-        
+
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();

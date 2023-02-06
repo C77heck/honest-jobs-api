@@ -31,7 +31,7 @@ export class Server {
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        this.app.use('/api', this.application.iocContainer.controllers.propertyController.router);
+        this.app.use('/api', this.application.controllers.propertyController.router);
 
         this.app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
             logger.err(err, true);

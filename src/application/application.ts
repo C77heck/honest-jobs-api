@@ -6,7 +6,9 @@ import { ProviderRegistry } from './provider.registry';
 dotenv.config({ path: `./config/.env` });
 
 export class Application {
-    public iocContainer: IocContainer;
+    private iocContainer: IocContainer;
+    public services: Record<any, any>;
+    public controllers: Record<any, any>;
 
     public static get instance() {
         return new this();
@@ -15,6 +17,9 @@ export class Application {
     public async boot(registeredProviders: ProviderRegistry) {
         this.iocContainer = new IocContainer(registeredProviders);
         await this.iocContainer.boot();
+
+        this.services = this.iocContainer.services;
+        this.controllers = this.iocContainer.controllers;
 
         return this;
     }

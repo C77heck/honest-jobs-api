@@ -17,9 +17,8 @@ export type MongoQuery = any;
 export class PropertyDbService extends Provider {
     private document = Property;
 
-    public async get(rawQuery: PropertyQueryOptions): Promise<any> {
+    public async get(rawQuery?: PropertyQueryOptions): Promise<any> {
         const query = this.buildQuery(rawQuery);
-        console.log({ query });
         //  location: 'Kecskemét'
         const fuck = await Property.find();
         console.log({ fuck });
@@ -29,8 +28,12 @@ export class PropertyDbService extends Provider {
         return document;
     }
 
-    private buildQuery(rawQuery: PropertyQueryOptions): MongoQuery {
+    private buildQuery(rawQuery?: PropertyQueryOptions): MongoQuery {
         const query: Record<keyof PropertyData | any, any> = {};
+
+        if (!rawQuery) {
+            return query;
+        }
 
         const keys = Object.keys(rawQuery) as Array<keyof PropertyQueryOptions>;
 
