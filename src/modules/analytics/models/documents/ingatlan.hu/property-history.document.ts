@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 
 export interface PropertyData {
     propertyId: string;
-    location: string;
     propertyDocument: { id: { type: mongoose.Types.ObjectId, ref: any } }[];
 }
 
@@ -17,7 +16,6 @@ export interface PropertyHistoryModel extends Mongoose.Model<PropertyHistoryDocu
 }
 
 const PropertyHistory = new Schema<PropertyHistoryDocument>({
-    location: { type: String },
     propertyId: { type: String },
     propertyDocument: [{ id: { type: mongoose.Types.ObjectId, ref: 'Property' } }],
 });

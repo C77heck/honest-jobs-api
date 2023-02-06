@@ -21,7 +21,6 @@ export class PropertyDbService extends Provider {
         const query = this.buildQuery(rawQuery);
         //  location: 'Kecskemét'
         const fuck = await Property.find();
-        console.log({ fuck });
 
         const document = await this.document.find({});
 

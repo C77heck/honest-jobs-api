@@ -61,7 +61,7 @@ export class Server {
             .boot();
 
         this.application = await Application.instance.boot(providerRegistry);
-        console.log(this.application);
+
         await this.application.connectDB();
     }
 

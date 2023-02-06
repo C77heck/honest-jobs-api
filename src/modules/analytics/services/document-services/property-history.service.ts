@@ -6,7 +6,7 @@ import PropertyHistory, {
 } from '../../models/documents/ingatlan.hu/property-history.document';
 
 export interface DocumentInterface {
-    saveHistory: (propertyDocId: string) => Promise<void>;
+    saveHistory: (groups: any[]) => Promise<void>;
 }
 
 export class PropertyHistoryService extends Provider implements DocumentInterface {
@@ -23,9 +23,9 @@ export class PropertyHistoryService extends Provider implements DocumentInterfac
         return this.document.find({});
     }
 
-    public async saveHistory(propertyDocId: string) {
+    public async saveHistory(groups: any[]) {
         try {
-
+            await this.document.insertMany(groups);
         } catch (e) {
             this.hookService.$errorLog.next({
                 type: 'MongodbError',

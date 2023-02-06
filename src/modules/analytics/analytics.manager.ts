@@ -4,6 +4,7 @@ import { PropertyDbService } from '../api/services/property-db.service';
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
 import { AnalyticsService } from './services/analytics.service';
+import { DatasetService } from './services/dataset.service';
 import { PropertyHistoryService } from './services/document-services/property-history.service';
 
 export class AnalyticsManager {
@@ -14,7 +15,7 @@ export class AnalyticsManager {
     }
 
     public async run() {
-        await this.application.services.analyticsService.groupProperties();
+        await this.application.services.datasetService.getDataSet();
     }
 
     public async boot() {
@@ -22,7 +23,7 @@ export class AnalyticsManager {
             .registerServiceProviders([
                 ErrorService,
                 HookService,
-                AnalyticsService,
+                DatasetService,
                 PropertyHistoryService,
                 AnalyticsService,
                 PropertyDbService
