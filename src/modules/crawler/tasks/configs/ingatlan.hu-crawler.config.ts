@@ -16,5 +16,21 @@ export const ingatlanHuCrawlerConfig: Record<string, Record<string, CrawlerConfi
             baseUrl: 'https://ingatlan.com',
             targetPoints: []
         }
-    }
+    },
+    budapest: {
+        flat: {
+            location: 'Budapest',
+            crawlerName: 'ingatlanHuFlat',
+            baseUrl: 'https://ingatlan.com',
+            url: 'https://ingatlan.com/lista/elado+lakas+budapest',
+            targetPoints: []
+        },
+        house: {
+            location: 'Budapest',
+            url: 'https://ingatlan.com/szukites/elado+haz+budapest',
+            crawlerName: 'ingatlanHuHouse',
+            baseUrl: 'https://ingatlan.com',
+            targetPoints: []
+        }
+    },
 };

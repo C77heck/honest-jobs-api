@@ -6,10 +6,7 @@ import logger from 'jet-logger';
 import { Application } from '../../application/application';
 import { HttpError } from '../../application/models/errors';
 import { ProviderRegistry } from '../../application/provider.registry';
-import ClientService from '../crawler/services/client.service';
-import CrawlerService from '../crawler/services/crawler.service';
-import AggregationService from '../crawler/services/data-aggregator/aggregation.service';
-import DataProcessorService from '../crawler/services/data-processor/data-processor.service';
+import { DatasetService } from '../analytics/services/dataset.service';
 import { PropertyService } from '../crawler/services/document-services/property.service';
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
@@ -49,15 +46,14 @@ export class Server {
         const providerRegistry = ProviderRegistry.instance
             .registerServiceProviders([
                 HookService,
-                ClientService,
                 PropertyService,
-                DataProcessorService,
                 ErrorService,
-                AggregationService,
-                CrawlerService,
                 PropertyDbService,
+                DatasetService,
             ])
-            .registerControllerProviders([PropertyController])
+            .registerControllerProviders([
+                PropertyController
+            ])
             .boot();
 
         this.application = await Application.instance.boot(providerRegistry);

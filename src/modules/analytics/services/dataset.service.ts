@@ -17,10 +17,23 @@ export class DatasetService extends Provider {
         const groups = this.getPropertyGroups(properties);
 
         const newOnes = this.getNewOnes(groups);
-        // todo interesting data for me. create a frontend
-        // and show it with downloaded images and shit.
-        // also a scraper that takes the images of these
-        return newOnes;
+
+        const lowestSqmPrice = this.getLowestSqmPrice(groups);
+
+        return { newOnes, lowestSqmPrice };
+    }
+
+    public getNewOnes(groups: any[]) {
+        return groups
+            .filter(group => group.length === 1)
+            .flat()
+            .sort((a, b) => a.sqmPrice - b.sqmPrice);
+    }
+
+    public getLowestSqmPrice(groups: any[]) {
+        return groups
+            .sort((a, b) => a[0].sqmPrice - b[0].sqmPrice)
+            .flat();
     }
 
     public getPropertyGroups(properties: PropertyDocument[]): any[] {
@@ -37,12 +50,5 @@ export class DatasetService extends Provider {
         }
 
         return array;
-    }
-
-    public getNewOnes(groups: any[]) {
-        return groups
-            .filter(group => group.length === 1)
-            .flat()
-            .sort((a, b) => a.sqmPrice - b.sqmPrice);
     }
 }

@@ -29,6 +29,8 @@ export class TaskManager {
         this.crawlerRegistry = [
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
         ];
     }
 
