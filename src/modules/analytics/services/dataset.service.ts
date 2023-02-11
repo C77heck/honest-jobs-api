@@ -14,7 +14,15 @@ export class DatasetService extends Provider {
 
     public async getProperties(location: string, crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat') {
         // todo implement sort
-        const properties = await this.propertyDbService.find({ location, crawlerName });
+        const properties = await this.propertyDbService.find(
+            {
+                location,
+                crawlerName
+            },
+            {
+                limit: 20
+            }
+        );
 
         const groups = this.getPropertyGroups(properties);
 

@@ -15,9 +15,9 @@ export type MongoQuery = any;
 export class PropertyDbService extends Provider {
     private document = Property;
 
-    public async find(query = {}): Promise<any> {
+    public async find(query = {}, options = {}): Promise<any> {
         //  location: 'Kecskemét'
-        const document = await this.document.find(query);
+        const document = await this.document.find(query, {}, options);
 
         return document;
     }
