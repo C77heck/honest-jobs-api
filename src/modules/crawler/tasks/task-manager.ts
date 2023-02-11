@@ -29,8 +29,8 @@ export class TaskManager {
         this.crawlerRegistry = [
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
         ];
     }
 
@@ -55,7 +55,7 @@ export class TaskManager {
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();
-
+        // todo we need a logger that shows where are we, what we do
         await Promise.all(this.crawlerRegistry.map(crawler => crawler.run()));
 
         console.log('CRAWLER TASK IS COMPLETE');

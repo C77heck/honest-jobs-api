@@ -13,7 +13,7 @@ export class AnalyticsService extends Provider {
 
     public async groupProperties() {
         const existingGroups = await this.propertyHistoryService.getAll();
-        const unprocessedProperties = await this.propertyDbService.get();
+        const unprocessedProperties = await this.propertyDbService.find();
         const groups = this.getPropertyGroups(unprocessedProperties);
 
         if (!existingGroups) {

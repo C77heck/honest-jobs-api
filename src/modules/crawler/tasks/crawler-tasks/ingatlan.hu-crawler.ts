@@ -1,3 +1,4 @@
+import { sleep } from '../../../../libs/helpers';
 import { Crawler } from '../libs/crawler';
 import { Task } from '../libs/interfaces';
 import { IngatlanHuProcessor } from './ingatlan-crawler/data-processor/ingatlan.hu.processor';
@@ -7,6 +8,8 @@ export class IngatlanHuCrawler extends Crawler implements Task {
         const pages = await this.getPageNumber();
 
         for (const page of pages) {
+            await sleep(500);
+
             if (page === 1) {
                 await this.services.crawlerService.run(this.config);
 
@@ -19,6 +22,8 @@ export class IngatlanHuCrawler extends Crawler implements Task {
 
             await this.services.crawlerService.run(paginatedConfig);
         }
+
+        console.log(this.services.crawlerService.failedFetches);
     }
 
     public async getPageNumber(): Promise<number[]> {

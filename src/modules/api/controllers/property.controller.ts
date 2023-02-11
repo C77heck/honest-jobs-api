@@ -1,9 +1,11 @@
 import { NextFunction } from 'express';
 import { Inject } from '../../../application/libs/inject.decorator';
+import { BadRequest } from '../../../application/models/errors';
 import { handleError } from '../../../libs/handle-error';
 import { DatasetService } from '../../analytics/services/dataset.service';
 import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
+import { locations } from './libs/locations';
 
 export class PropertyController extends ExpressController {
     @Inject()
@@ -13,12 +15,20 @@ export class PropertyController extends ExpressController {
     public datasetService: DatasetService;
 
     public routes() {
-        this.router.get('/analytics', [], this.getAnalytics.bind(this));
+        this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
         this.router.get('/by-location/:location', [], this.getByLocation.bind(this));
     }
 
     private async getAnalytics(req: any, res: any, next: NextFunction) {
-        const analyzedData = await this.datasetService.getDataSet();
+        const location = locations[req.params.location];
+
+        if (!location) {
+            throw new BadRequest('Missing location');
+        }
+
+        const type = req.params.type === 'flat' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
+
+        const analyzedData = await this.datasetService.getProperties(location, type);
 
         res.status(200).json(analyzedData);
     }
@@ -27,7 +37,7 @@ export class PropertyController extends ExpressController {
         try {
             const location = req.params?.location || '';
 
-            const data = await this.databaseService.get({ location });
+            const data = await this.databaseService.find({ location });
 
             res.status(200).json(data);
         } catch (err) {

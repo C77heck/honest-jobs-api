@@ -11,9 +11,10 @@ class CrawlerService extends Provider {
     @Inject()
     private clientService: ClientService;
 
+    public failedFetches: any[] = [];
+
     public async run(config: CrawlerConfigInterface) {
         try {
-            console.log('run is being runned');
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
 
             if (!siteData?.text) {
@@ -28,6 +29,7 @@ class CrawlerService extends Provider {
                 targetPoints: config.targetPoints,
             });
         } catch (error) {
+            this.failedFetches.push(config.url);
             this.hookService.$errorLog.next({
                 url: config.url,
                 type: 'FetchError',

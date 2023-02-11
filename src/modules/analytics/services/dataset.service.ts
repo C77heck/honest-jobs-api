@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Inject } from '../../../application/libs/inject.decorator';
 import { Provider } from '../../../application/provider';
 import { PropertyDbService } from '../../api/services/property-db.service';
@@ -11,23 +12,31 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyDbService: PropertyDbService;
 
-    public async getDataSet() {
-        const properties = await this.propertyDbService.get();
+    public async getProperties(location: string, crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat') {
+        // todo implement sort
+        const properties = await this.propertyDbService.find({ location, crawlerName });
 
         const groups = this.getPropertyGroups(properties);
 
-        const newOnes = this.getNewOnes(groups);
-
         const lowestSqmPrice = this.getLowestSqmPrice(groups);
 
-        return { newOnes, lowestSqmPrice };
+        return lowestSqmPrice;
     }
 
-    public getNewOnes(groups: any[]) {
-        return groups
+    public async getNewAndRemovedOnes() {
+        const properties = await this.propertyDbService.find({});
+
+        const groups = this.getPropertyGroups(properties);
+
+        const singleOnes = groups
             .filter(group => group.length === 1)
             .flat()
-            .sort((a, b) => a.sqmPrice - b.sqmPrice);
+            .sort((a, b) => a.sqmPrice - b.sqmPrice) as any;
+
+        const newOnes = singleOnes.filter((property: any) => moment(property.createdAt).isAfter(moment().add(-2, 'days')));
+        const removedOnes = singleOnes.filter((property: any) => moment(property.createdAt).isBefore(moment().add(-2, 'days')));
+
+        return { newOnes, removedOnes };
     }
 
     public getLowestSqmPrice(groups: any[]) {

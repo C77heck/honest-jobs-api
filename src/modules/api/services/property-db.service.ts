@@ -1,7 +1,5 @@
 import { Provider } from '../../../application/provider';
-import Property, {
-    PropertyData
-} from '../../crawler/models/documents/ingatlan.hu/property.document';
+import Property from '../../crawler/models/documents/ingatlan.hu/property.document';
 
 export interface PropertyQueryOptions {
     location?: string;
@@ -17,51 +15,10 @@ export type MongoQuery = any;
 export class PropertyDbService extends Provider {
     private document = Property;
 
-    public async get(rawQuery?: PropertyQueryOptions): Promise<any> {
-        const query = this.buildQuery(rawQuery);
+    public async find(query = {}): Promise<any> {
         //  location: 'Kecskemét'
-        const fuck = await Property.find();
-
-        const document = await this.document.find({});
+        const document = await this.document.find(query);
 
         return document;
     }
-
-    private buildQuery(rawQuery?: PropertyQueryOptions): MongoQuery {
-        const query: Record<keyof PropertyData | any, any> = {};
-
-        if (!rawQuery) {
-            return query;
-        }
-
-        const keys = Object.keys(rawQuery) as Array<keyof PropertyQueryOptions>;
-
-        for (const key of keys) {
-            switch (key) {
-                case 'type':
-                    query.type = {};
-                    continue;
-                case 'location':
-                    query.location = rawQuery.location;
-                    continue;
-                case 'priceLessThan':
-                    query.price = {};
-                    continue;
-                case 'priceMoreThan':
-                    query.price = {};
-                    continue;
-                case 'sizeLessThan':
-                    query.size = {};
-                    continue;
-                case 'sizeMoreThan':
-                    query.size = {};
-                    continue;
-                default:
-                    continue;
-            }
-        }
-
-        return query;
-    }
-
 }
