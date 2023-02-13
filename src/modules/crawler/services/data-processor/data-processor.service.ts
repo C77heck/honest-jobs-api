@@ -25,7 +25,7 @@ class DataProcessorService extends Provider {
         const { crawlerName, location, baseUrl, html } = data;
         const houseProcessor = new IngatlanHuProcessor(html);
         const pageData = await houseProcessor.getPageData(baseUrl);
-        console.log(pageData.length);
+
         return this.hookService.$rawData.next({
             location,
             crawlerName,

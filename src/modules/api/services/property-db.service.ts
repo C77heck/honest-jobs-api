@@ -10,12 +10,13 @@ export interface PropertyQueryOptions {
     sizeMoreThan?: number;
 }
 
-export type MongoQuery = any;
+export type MongoQuery = {};
+export type MongoOptions = {};
 
 export class PropertyDbService extends Provider {
     private document = Property;
 
-    public async find(query = {}, options = {}): Promise<any> {
+    public async find(query: MongoQuery = {}, options: MongoOptions = {}): Promise<any> {
         //  location: 'Kecskemét'
         const document = await this.document.find(query, {}, options);
 

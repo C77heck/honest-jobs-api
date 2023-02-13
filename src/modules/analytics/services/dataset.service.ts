@@ -1,9 +1,15 @@
 import moment from 'moment';
 import { Inject } from '../../../application/libs/inject.decorator';
 import { Provider } from '../../../application/provider';
-import { PropertyDbService } from '../../api/services/property-db.service';
+import { MongoOptions, PropertyDbService } from '../../api/services/property-db.service';
 import { PropertyDocument } from '../../crawler/models/documents/ingatlan.hu/property.document';
 import { PropertyHistoryService } from './document-services/property-history.service';
+
+export interface GetPropertyOptions {
+    sortQuery: MongoOptions;
+    crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat';
+    location: string;
+}
 
 export class DatasetService extends Provider {
     @Inject()
@@ -12,7 +18,7 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyDbService: PropertyDbService;
 
-    public async getProperties(location: string, crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat') {
+    public async getProperties({ location, crawlerName, sortQuery }: GetPropertyOptions) {
         // todo implement sort
         const properties = await this.propertyDbService.find(
             {
@@ -20,8 +26,9 @@ export class DatasetService extends Provider {
                 crawlerName
             },
             {
+                sort: sortQuery,
                 limit: 20
-            }
+            },
         );
 
         const groups = this.getPropertyGroups(properties);

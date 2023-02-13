@@ -26,9 +26,15 @@ export class PropertyController extends ExpressController {
             throw new BadRequest('Missing location');
         }
 
-        const type = req.params.type === 'flat' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
+        const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
 
-        const analyzedData = await this.datasetService.getProperties(location, type);
+        const sortQuery = req.query?.sort || {};
+
+        const analyzedData = await this.datasetService.getProperties({
+            location,
+            crawlerName,
+            sortQuery
+        });
 
         res.status(200).json(analyzedData);
     }

@@ -30,7 +30,7 @@ export class IngatlanHuProcessor {
 
         links.each((index, element) => {
             const url = $(element).attr('href');
-            const total = $(element)
+            const totalElement = $(element)
                 .children('.listing__header')
                 .children('.listing__featured-parameters')
                 .children('.listing__price')
@@ -40,35 +40,27 @@ export class IngatlanHuProcessor {
                 .replace('M Ft', '')
                 .trim();
 
-            const sqmPrice = $(element)
-                .children('.listing__header')
-                .children('.listing__featured-parameters')
-                .children('.listing__price')
-                .children('.price__container ')
-                .children('.price--sqm ')
-                .text()
-                .replace('Ft/m2', '')
-                .trim()
-                .replace(' ', '');
-
             const address = $(element)
                 .children('.listing__header')
                 .children('.listing__featured-parameters')
                 .children('.listing__address')
                 .text();
 
-            const size = $(element)
+            const sizeElement = $(element)
                 .children('.listing__parameters')
                 .children('.listing__data--area-size')
                 .text()
                 .split(' ');
 
+            const size = +sizeElement[1];
+            const total = parseFloat(totalElement) * 1000000;
+
             articles.push({
                 address,
-                size: +size[1],
+                size,
+                total,
                 href: `${baseUrl}${url}`,
-                sqmPrice: parseFloat(sqmPrice),
-                total: parseFloat(total) * 1000000
+                sqmPrice: parseFloat((total / size).toString()),
             });
         });
 
