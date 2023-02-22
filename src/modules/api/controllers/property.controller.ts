@@ -5,6 +5,7 @@ import { handleError } from '../../../libs/handle-error';
 import { DatasetService } from '../../analytics/services/dataset.service';
 import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
+import { getPaginationOptions } from './libs/helpers/get-pagination-options';
 import { locations } from './libs/locations';
 
 export class PropertyController extends ExpressController {
@@ -19,7 +20,6 @@ export class PropertyController extends ExpressController {
         this.router.get('/by-location/:location', [], this.getByLocation.bind(this));
     }
 
-
     private async getAnalytics(req: any, res: any, next: NextFunction) {
         const location = locations[req.params.location];
 
@@ -31,9 +31,8 @@ export class PropertyController extends ExpressController {
 
         const sortQuery = req.query?.sort || {};
 
-        const limit = req.query?.limit || 20;
-        const skip = (req.query?.page || 0) * limit;
-        const {limit, skip} = this.extractPaginationOptions(req.query);
+        const { limit, skip } = getPaginationOptions(req.query);
+
         const analyzedData = await this.datasetService.getProperties({
             location,
             crawlerName,
