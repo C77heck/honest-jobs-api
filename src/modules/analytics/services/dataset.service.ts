@@ -9,6 +9,8 @@ export interface GetPropertyOptions {
     sortQuery: MongoOptions;
     crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat';
     location: string;
+    limit: number;
+    skip: number;
 }
 
 export class DatasetService extends Provider {
@@ -18,24 +20,17 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyDbService: PropertyDbService;
 
-    public async getProperties({ location, crawlerName, sortQuery }: GetPropertyOptions) {
-        // todo implement sort
+    public async getProperties(propertyOptions: GetPropertyOptions) {
+        const { location, crawlerName, sortQuery, limit, skip } = propertyOptions;
+
         const properties = await this.propertyDbService.find(
-            {
-                location,
-                crawlerName
-            },
-            {
-                sort: sortQuery,
-                limit: 20
-            },
+            { location, crawlerName },
+            { limit, skip, sort: sortQuery }
         );
 
-        const groups = this.getPropertyGroups(properties);
+        const groups = this.getPropertyGroups(properties).flat();
 
-        const lowestSqmPrice = this.getLowestSqmPrice(groups);
-
-        return lowestSqmPrice;
+        return groups;
     }
 
     public async getNewAndRemovedOnes() {
@@ -54,12 +49,6 @@ export class DatasetService extends Provider {
         return { newOnes, removedOnes };
     }
 
-    public getLowestSqmPrice(groups: any[]) {
-        return groups
-            .sort((a, b) => a[0].sqmPrice - b[0].sqmPrice)
-            .flat();
-    }
-
     public getPropertyGroups(properties: PropertyDocument[]): any[] {
         const groups: any = {};
 
@@ -72,7 +61,11 @@ export class DatasetService extends Provider {
         for (const key of Object.keys(groups)) {
             array.push(groups[key]);
         }
-
+        array.map(group => {
+            const daysOn = group.length;
+            // todo since how long. use moment between dates
+            return { ...group[0], daysOn };
+        });
         return array;
     }
 }

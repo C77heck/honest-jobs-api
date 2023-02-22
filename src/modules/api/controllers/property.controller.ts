@@ -19,6 +19,7 @@ export class PropertyController extends ExpressController {
         this.router.get('/by-location/:location', [], this.getByLocation.bind(this));
     }
 
+
     private async getAnalytics(req: any, res: any, next: NextFunction) {
         const location = locations[req.params.location];
 
@@ -30,10 +31,15 @@ export class PropertyController extends ExpressController {
 
         const sortQuery = req.query?.sort || {};
 
+        const limit = req.query?.limit || 20;
+        const skip = (req.query?.page || 0) * limit;
+        const {limit, skip} = this.extractPaginationOptions(req.query);
         const analyzedData = await this.datasetService.getProperties({
             location,
             crawlerName,
-            sortQuery
+            sortQuery,
+            limit,
+            skip
         });
 
         res.status(200).json(analyzedData);
