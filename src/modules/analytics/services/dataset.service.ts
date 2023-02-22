@@ -13,6 +13,12 @@ export interface GetPropertyOptions {
     skip: number;
 }
 
+export interface PaginationResponse<TData> {
+    data: TData[];
+    page: number;
+    total: number;
+}
+
 export class DatasetService extends Provider {
     @Inject()
     public propertyHistoryService: PropertyHistoryService;
@@ -20,7 +26,7 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyDbService: PropertyDbService;
 
-    public async getProperties(propertyOptions: GetPropertyOptions) {
+    public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyDocument>> {
         const { location, crawlerName, sortQuery, limit, skip } = propertyOptions;
 
         const properties = await this.propertyDbService.find(
@@ -30,7 +36,7 @@ export class DatasetService extends Provider {
 
         const groups = this.getPropertyGroups(properties).flat();
 
-        return groups;
+        return { data: groups, page: Math.floor(skip / limit), total: 300 };
     }
 
     public async getNewAndRemovedOnes() {

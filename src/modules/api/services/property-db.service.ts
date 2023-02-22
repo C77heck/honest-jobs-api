@@ -19,7 +19,7 @@ export class PropertyDbService extends Provider {
     public async find(query: MongoQuery = {}, options: MongoOptions = {}): Promise<any> {
         //  location: 'Kecskemét'
         const document = await this.document.find(query, {}, options);
-
+        
         return document;
     }
 }

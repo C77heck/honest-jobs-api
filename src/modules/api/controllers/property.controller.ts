@@ -34,9 +34,9 @@ export class PropertyController extends ExpressController {
         const { limit, skip } = getPaginationOptions(req.query);
 
         const analyzedData = await this.datasetService.getProperties({
-            location,
             crawlerName,
             sortQuery,
+            location,
             limit,
             skip
         });
