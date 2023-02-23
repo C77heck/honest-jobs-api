@@ -1,11 +1,11 @@
 import { Application } from '../../application/application';
 import { ProviderRegistry } from '../../application/provider.registry';
 import { PropertyDbService } from '../api/services/property-db.service';
+import { PropertyGroupDbService } from '../api/services/property-group-db.service';
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
 import { AnalyticsService } from './services/analytics.service';
 import { DatasetService } from './services/dataset.service';
-import { PropertyHistoryService } from './services/document-services/property-history.service';
 
 export class AnalyticsManager {
     private application: Application;
@@ -15,7 +15,8 @@ export class AnalyticsManager {
     }
 
     public async run() {
-        await this.application.services.datasetService.getDataSet();
+        await this.application.services.analyticsService.run();
+        console.log('ANALYTICS COMPLETE');
     }
 
     public async boot() {
@@ -24,9 +25,9 @@ export class AnalyticsManager {
                 ErrorService,
                 HookService,
                 DatasetService,
-                PropertyHistoryService,
                 AnalyticsService,
-                PropertyDbService
+                PropertyDbService,
+                PropertyGroupDbService
             ])
             .boot();
 

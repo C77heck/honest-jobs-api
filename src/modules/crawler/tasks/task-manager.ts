@@ -55,7 +55,7 @@ export class TaskManager {
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();
-        // todo we need a logger that shows where are we, what we do
+
         await Promise.all(this.crawlerRegistry.map(crawler => crawler.run()));
 
         console.log('CRAWLER TASK IS COMPLETE');

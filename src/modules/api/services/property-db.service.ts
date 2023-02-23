@@ -1,5 +1,7 @@
 import { Provider } from '../../../application/provider';
-import Property from '../../crawler/models/documents/ingatlan.hu/property.document';
+import Property, {
+    PropertyDocument
+} from '../../crawler/models/documents/ingatlan.hu/property.document';
 
 export interface PropertyQueryOptions {
     location?: string;
@@ -16,10 +18,9 @@ export type MongoOptions = {};
 export class PropertyDbService extends Provider {
     private document = Property;
 
-    public async find(query: MongoQuery = {}, options: MongoOptions = {}): Promise<any> {
-        //  location: 'Kecskemét'
-        const document = await this.document.find(query, {}, options);
-        
-        return document;
+    public async find(query: MongoQuery = {}): Promise<PropertyDocument[]> {
+        const properties = await this.document.find(query);
+
+        return properties;
     }
 }
