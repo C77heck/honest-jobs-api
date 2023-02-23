@@ -17,10 +17,10 @@ export class PropertyController extends ExpressController {
 
     public routes() {
         this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
-        this.router.get('/by-location/:location', [], this.getByLocation.bind(this));
+        this.router.get('/by-location/:location/:type', [], this.getByLocation.bind(this));
     }
 
-    private async getAnalytics(req: any, res: any, next: NextFunction) {
+    private async getByLocation(req: any, res: any, next: NextFunction) {
         const location = locations[req.params.location];
 
         if (!location) {
@@ -44,11 +44,17 @@ export class PropertyController extends ExpressController {
         res.status(200).json(analyzedData);
     }
 
-    private async getByLocation(req: any, res: any, next: NextFunction) {
+    private async getAnalytics(req: any, res: any, next: NextFunction) {
         try {
             const location = req.params?.location || '';
 
-            const data = await this.databaseService.find({ location });
+            if (!location) {
+                throw new BadRequest('Missing location');
+            }
+
+            const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
+
+            const data = await this.datasetService.getAnalytics({ location, crawlerName });
 
             res.status(200).json(data);
         } catch (err) {
