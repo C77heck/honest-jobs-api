@@ -14,6 +14,13 @@ export interface GetPropertyOptions {
 
 export type AnalyticsOptions = Pick<GetPropertyOptions, 'crawlerName' | 'location'>;
 
+export interface AnalyticsData {
+    sqmPrices: number[];
+    datesOn: Date[];
+    totalPrices: number[];
+    sizes: number[];
+}
+
 export interface PaginationResponse<TData> {
     data: TData[];
     page: number;
@@ -42,23 +49,34 @@ export class DatasetService extends Provider {
         };
     }
 
-    public async getAnalytics({ location, crawlerName }: AnalyticsOptions): Promise<any> {
-
+    public async getAnalytics({ location, crawlerName }: AnalyticsOptions): Promise<AnalyticsData> {
         const data = await this.propertyDbService.find({
             location,
             crawlerName
         });
-        // todo -> dataset for how long its been on
-        // todo -> price  changes
-        // todo -> spread of sizes
-        //  todo -> spread of sqm prices
-        console.log(data);
+
+        const datesOn: Date[] = data.map((d: any) => d.createdAt);
+
+        const properties = await this.propertyGroupDbService.find({
+            location,
+            crawlerName
+        });
+
+        const sqmPrices = [];
+        const totalPrices = [];
+        const sizes = [];
+
+        for (const property of properties) {
+            sqmPrices.push(property.sqmPrice);
+            totalPrices.push(property.total);
+            sizes.push(property.size);
+        }
 
         return {
-            sqmPrices: [],
-            dateOn: [],
-            totalPrices: [],
-            sizes: []
+            sqmPrices,
+            totalPrices,
+            sizes,
+            datesOn
         };
     }
 }

@@ -46,7 +46,7 @@ export class PropertyController extends ExpressController {
 
     private async getAnalytics(req: any, res: any, next: NextFunction) {
         try {
-            const location = req.params?.location || '';
+            const location = locations[req.params.location];
 
             if (!location) {
                 throw new BadRequest('Missing location');
