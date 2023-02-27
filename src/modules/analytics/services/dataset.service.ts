@@ -2,7 +2,9 @@ import { Inject } from '../../../application/libs/inject.decorator';
 import { Provider } from '../../../application/provider';
 import { MongoOptions, PropertyDbService } from '../../api/services/property-db.service';
 import { PropertyGroupDbService } from '../../api/services/property-group-db.service';
-import { PropertyDocument } from '../../crawler/models/documents/ingatlan.hu/property.document';
+import {
+    PropertyGroupData
+} from '../../crawler/models/documents/ingatlan.hu/property-group.document';
 
 export interface GetPropertyOptions {
     sortQuery: MongoOptions;
@@ -16,7 +18,7 @@ export type AnalyticsOptions = Pick<GetPropertyOptions, 'crawlerName' | 'locatio
 
 export interface AnalyticsData {
     sqmPrices: number[];
-    datesOn: Date[];
+    daysOn: number[];
     totalPrices: number[];
     sizes: number[];
 }
@@ -34,7 +36,7 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyGroupDbService: PropertyGroupDbService;
 
-    public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyDocument>> {
+    public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyGroupData>> {
         const { location, crawlerName, sortQuery, limit, skip } = propertyOptions;
 
         const { properties, total } = await this.propertyGroupDbService.paginate(
@@ -50,13 +52,6 @@ export class DatasetService extends Provider {
     }
 
     public async getAnalytics({ location, crawlerName }: AnalyticsOptions): Promise<AnalyticsData> {
-        const data = await this.propertyDbService.find({
-            location,
-            crawlerName
-        });
-
-        const datesOn: Date[] = data.map((d: any) => d.createdAt);
-
         const properties = await this.propertyGroupDbService.find({
             location,
             crawlerName
@@ -65,18 +60,20 @@ export class DatasetService extends Provider {
         const sqmPrices = [];
         const totalPrices = [];
         const sizes = [];
+        const daysOn = [];
 
         for (const property of properties) {
-            sqmPrices.push(property.sqmPrice);
-            totalPrices.push(property.total);
+            sqmPrices.push(Math.round(property.sqmPrice));
+            totalPrices.push(Math.round(property.total));
             sizes.push(property.size);
+            daysOn.push(property.numberOfDaysAdvertised);
         }
 
         return {
             sqmPrices,
             totalPrices,
             sizes,
-            datesOn
+            daysOn
         };
     }
 }

@@ -1,6 +1,7 @@
 import { Application } from '../../../application/application';
 import { ProviderRegistry } from '../../../application/provider.registry';
 import { log } from '../../../libs/decorators/utility.decorators';
+import { ProgressBar } from '../../../libs/load-bar';
 import { PropertyDbService } from '../../api/services/property-db.service';
 import ClientService from '../services/client.service';
 import CrawlerService from '../services/crawler.service';
@@ -55,8 +56,8 @@ export class TaskManager {
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();
-
-        await Promise.all(this.crawlerRegistry.map(crawler => crawler.run()));
+        const progressBar = new ProgressBar();
+        await Promise.all(this.crawlerRegistry.map(crawler => crawler.run(progressBar)));
 
         console.log('CRAWLER TASK IS COMPLETE');
     }

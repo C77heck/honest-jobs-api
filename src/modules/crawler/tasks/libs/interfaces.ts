@@ -1,3 +1,5 @@
+import { ProgressBar } from '../../../../libs/load-bar';
+
 export interface Task {
-    run: () => void;
+    run: (progressBar: ProgressBar) => void;
 }

@@ -1,13 +1,17 @@
 import { sleep } from '../../../../libs/helpers';
+import { ProgressBar } from '../../../../libs/load-bar';
 import { Crawler } from '../libs/crawler';
 import { Task } from '../libs/interfaces';
 import { IngatlanHuProcessor } from './ingatlan-crawler/data-processor/ingatlan.hu.processor';
 
 export class IngatlanHuCrawler extends Crawler implements Task {
-    public async run() {
+    public async run(progressBar: ProgressBar) {
         const pages = await this.getPageNumber();
+        progressBar.initialize(pages.length, '\x1b[36m');
 
         for (const page of pages) {
+            progressBar.next(page);
+
             await sleep(500);
 
             if (page === 1) {
