@@ -30,6 +30,12 @@ export interface PaginationResponse<TData> {
 
 export type SpecialFollowTab = 'studioFlats' | 'cheapFlats' | 'cheapHouses';
 
+export interface FollowTab {
+    tab: SpecialFollowTab;
+    limit: number;
+    page: number;
+}
+
 export class DatasetService extends Provider {
     @Inject()
     public propertyDbService: PropertyDbService;
@@ -37,37 +43,38 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyGroupDbService: PropertyGroupDbService;
 
-    public async getFollowTab(tab: SpecialFollowTab): Promise<PaginationResponse<PropertyGroupData>> {
+    public async getFollowTab(options: FollowTab): Promise<PaginationResponse<PropertyGroupData>> {
+        const { tab, limit, page } = options;
         const million = 1000000;
-        const baseQuery: any = {};
+        const paginationOption = { skip: page * limit, limit: limit };
 
         switch (tab) {
             case 'studioFlats':
                 return this.propertyGroupDbService.paginate({
                     crawlerName: 'ingatlanHuFlat',
                     size: { $lt: 40 }
-                });
+                }, paginationOption);
             case 'cheapFlats':
                 return this.propertyGroupDbService.paginate({
                     crawlerName: 'ingatlanHuFlat',
                     $or: [
                         { sqmPrice: { $lt: 600000 } },
-                        { price: { $lt: 16 * million } },
+                        { total: { $lt: 16 * million } },
                     ]
-                });
+                }, paginationOption);
             case 'cheapHouses':
                 return this.propertyGroupDbService.paginate({
                     crawlerName: 'ingatlanHuHouse',
                     $or: [
                         { sqmPrice: { $lt: 600000 } },
-                        { price: { $lt: 35 * million } },
+                        { total: { $lt: 35 * million } },
                     ]
-                });
+                }, paginationOption);
             default:
                 return this.propertyGroupDbService.paginate({
                     crawlerName: 'ingatlanHuFlat',
                     size: { $lt: 40 },
-                });
+                }, paginationOption);
         }
     }
 

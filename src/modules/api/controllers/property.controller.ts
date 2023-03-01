@@ -66,10 +66,12 @@ export class PropertyController extends ExpressController {
     private async getSpecialFollow(req: any, res: any, next: NextFunction) {
         try {
             const tab = req.params?.tab || 'studioFlats';
+            const page = +(req.query?.page || 0);
+            const limit = +(req.query?.limit || 20);
 
-            const data = await this.datasetService.getFollowTab(tab);
+            const data = await this.datasetService.getFollowTab({ tab, page, limit });
 
-            res.status(200).json(data);
+            res.status(200).json({ ...data, page });
         } catch (err) {
             return next(handleError(err));
         }
