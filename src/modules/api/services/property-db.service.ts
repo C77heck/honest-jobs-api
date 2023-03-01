@@ -13,7 +13,8 @@ export interface PropertyQueryOptions {
 }
 
 export type MongoQuery = {};
-export type MongoOptions = {};
+export type MongoOptions = { sort?: any };
+export type PaginationOptions = { limit: number; skip: number; } & MongoOptions;
 
 export class PropertyDbService extends Provider {
     private document = Property;

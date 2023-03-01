@@ -2,7 +2,7 @@ import { Provider } from '../../../application/provider';
 import PropertyGroupDocument, {
     PropertyGroupData
 } from '../../crawler/models/documents/ingatlan.hu/property-group.document';
-import { MongoOptions, MongoQuery } from './property-db.service';
+import { MongoOptions, MongoQuery, PaginationOptions } from './property-db.service';
 
 export class PropertyGroupDbService extends Provider {
     private document = PropertyGroupDocument;
@@ -13,11 +13,11 @@ export class PropertyGroupDbService extends Provider {
         return properties;
     }
 
-    public async paginate(query: MongoQuery = {}, options: MongoOptions = {}): Promise<{ data: PropertyGroupData[]; total: number }> {
+    public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{ data: PropertyGroupData[]; total: number }> {
         const data = await this.document.find(query, {}, options);
-        const total = await this.document.count(query);
+        const count = await this.document.count(query);
 
-        return { data, total };
+        return { data, total: Math.ceil(count / options.limit) };
     }
 
     public async create(data: PropertyGroupData) {

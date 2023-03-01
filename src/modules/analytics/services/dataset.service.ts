@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Inject } from '../../../application/libs/inject.decorator';
 import { Provider } from '../../../application/provider';
 import { MongoOptions, PropertyDbService } from '../../api/services/property-db.service';
@@ -28,7 +29,7 @@ export interface PaginationResponse<TData> {
     total: number;
 }
 
-export type SpecialFollowTab = 'studioFlats' | 'cheapFlats' | 'cheapHouses';
+export type SpecialFollowTab = 'studioFlats' | 'cheapFlats' | 'cheapHouses' | 'newPostings';
 
 export interface FollowTab {
     tab: SpecialFollowTab;
@@ -46,34 +47,51 @@ export class DatasetService extends Provider {
     public async getFollowTab(options: FollowTab): Promise<PaginationResponse<PropertyGroupData>> {
         const { tab, limit, page } = options;
         const million = 1000000;
-        const paginationOption = { skip: page * limit, limit: limit };
+        const paginationOption = { limit, skip: page * limit, sort: { total: 1, size: -1 } };
+        const baseQuery = {
+            lastDayOn: { $gte: moment().add(-1, 'day').toDate() },
+            address: { $not: /(műkertváros|kossuthváros|erzsébetváros)/ig }
+        };
 
         switch (tab) {
             case 'studioFlats':
                 return this.propertyGroupDbService.paginate({
+                    ...baseQuery,
                     crawlerName: 'ingatlanHuFlat',
                     size: { $lt: 40 }
                 }, paginationOption);
             case 'cheapFlats':
                 return this.propertyGroupDbService.paginate({
+                    ...baseQuery,
                     crawlerName: 'ingatlanHuFlat',
+                    size: { $gt: 57 },
                     $or: [
-                        { sqmPrice: { $lt: 600000 } },
-                        { total: { $lt: 16 * million } },
+                        { sqmPrice: { $lt: 450000 } },
+                        { total: { $lt: 27 * million } },
                     ]
                 }, paginationOption);
             case 'cheapHouses':
                 return this.propertyGroupDbService.paginate({
+                    ...baseQuery,
                     crawlerName: 'ingatlanHuHouse',
+                    size: { $lte: 120 },
                     $or: [
                         { sqmPrice: { $lt: 600000 } },
                         { total: { $lt: 35 * million } },
                     ]
                 }, paginationOption);
+            case 'newPostings':
+                return this.propertyGroupDbService.paginate({
+                    ...baseQuery,
+                    numberOfDaysAdvertised: { $lt: 3 },
+                    size: { $lte: 150 },
+                    total: { $lt: 60 * million }
+                }, paginationOption);
             default:
                 return this.propertyGroupDbService.paginate({
+                    ...baseQuery,
                     crawlerName: 'ingatlanHuFlat',
-                    size: { $lt: 40 },
+                    size: { $lt: 40 }
                 }, paginationOption);
         }
     }
