@@ -25,9 +25,10 @@ export interface AnalyticsData {
 
 export interface PaginationResponse<TData> {
     data: TData[];
-    page: number;
     total: number;
 }
+
+export type SpecialFollowTab = 'studioFlats' | 'cheapFlats' | 'cheapHouses';
 
 export class DatasetService extends Provider {
     @Inject()
@@ -36,18 +37,51 @@ export class DatasetService extends Provider {
     @Inject()
     public propertyGroupDbService: PropertyGroupDbService;
 
+    public async getFollowTab(tab: SpecialFollowTab): Promise<PaginationResponse<PropertyGroupData>> {
+        const million = 1000000;
+        const baseQuery: any = {};
+
+        switch (tab) {
+            case 'studioFlats':
+                return this.propertyGroupDbService.paginate({
+                    crawlerName: 'ingatlanHuFlat',
+                    size: { $lt: 40 }
+                });
+            case 'cheapFlats':
+                return this.propertyGroupDbService.paginate({
+                    crawlerName: 'ingatlanHuFlat',
+                    $or: [
+                        { sqmPrice: { $lt: 600000 } },
+                        { price: { $lt: 16 * million } },
+                    ]
+                });
+            case 'cheapHouses':
+                return this.propertyGroupDbService.paginate({
+                    crawlerName: 'ingatlanHuHouse',
+                    $or: [
+                        { sqmPrice: { $lt: 600000 } },
+                        { price: { $lt: 35 * million } },
+                    ]
+                });
+            default:
+                return this.propertyGroupDbService.paginate({
+                    crawlerName: 'ingatlanHuFlat',
+                    size: { $lt: 40 },
+                });
+        }
+    }
+
     public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyGroupData>> {
         const { location, crawlerName, sortQuery, limit, skip } = propertyOptions;
 
-        const { properties, total } = await this.propertyGroupDbService.paginate(
+        const { data, total } = await this.propertyGroupDbService.paginate(
             { location, crawlerName },
             { limit, skip, sort: sortQuery }
         );
 
         return {
+            data,
             total: Math.floor(total / limit),
-            data: properties,
-            page: Math.floor(skip / limit)
         };
     }
 

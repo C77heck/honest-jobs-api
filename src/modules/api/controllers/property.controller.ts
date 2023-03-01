@@ -17,6 +17,7 @@ export class PropertyController extends ExpressController {
 
     public routes() {
         this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
+        this.router.get('/special-follows/:tab', [], this.getSpecialFollow.bind(this));
         this.router.get('/by-location/:location/:type', [], this.getByLocation.bind(this));
     }
 
@@ -55,6 +56,18 @@ export class PropertyController extends ExpressController {
             const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
 
             const data = await this.datasetService.getAnalytics({ location, crawlerName });
+
+            res.status(200).json(data);
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    private async getSpecialFollow(req: any, res: any, next: NextFunction) {
+        try {
+            const tab = req.params?.tab || 'studioFlats';
+
+            const data = await this.datasetService.getFollowTab(tab);
 
             res.status(200).json(data);
         } catch (err) {

@@ -13,11 +13,11 @@ export class PropertyGroupDbService extends Provider {
         return properties;
     }
 
-    public async paginate(query: MongoQuery = {}, options: MongoOptions = {}): Promise<{ properties: PropertyGroupData[]; total: number }> {
-        const properties = await this.document.find(query, {}, options);
+    public async paginate(query: MongoQuery = {}, options: MongoOptions = {}): Promise<{ data: PropertyGroupData[]; total: number }> {
+        const data = await this.document.find(query, {}, options);
         const total = await this.document.count(query);
 
-        return { properties, total };
+        return { data, total };
     }
 
     public async create(data: PropertyGroupData) {
