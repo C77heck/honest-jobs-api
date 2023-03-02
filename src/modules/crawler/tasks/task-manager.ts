@@ -59,8 +59,7 @@ export class TaskManager {
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
         await this.initializeCrawlerRegistry();
-        const progressBar = new ProgressBar();
-        await Promise.all(this.crawlerRegistry.map(crawler => crawler.run(progressBar)));
+        await Promise.all(this.crawlerRegistry.map(crawler => crawler.run(new ProgressBar())));
 
         console.log('CRAWLER TASK IS COMPLETE');
     }
