@@ -7,7 +7,12 @@ import { IngatlanHuProcessor } from './ingatlan-crawler/data-processor/ingatlan.
 export class IngatlanHuCrawler extends Crawler implements Task {
     public async run(progressBar: ProgressBar) {
         const pages = await this.getPageNumber();
-        progressBar.initialize(pages.length, '\x1b[36m');
+
+        progressBar.initialize({
+            barLength: pages.length,
+            name: `${this.config.location}: ${this.config.crawlerName}`,
+            colour: '\x1b[36m'
+        });
 
         for (const page of pages) {
             progressBar.next(page);

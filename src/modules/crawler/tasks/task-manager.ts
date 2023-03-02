@@ -40,8 +40,7 @@ export class TaskManager {
         return process.exit(0);
     }
 
-    @log()
-    public async run() {
+    private async bootKernel() {
         const providerRegistry = ProviderRegistry.instance
             .registerServiceProviders([
                 HookService,
@@ -58,9 +57,22 @@ export class TaskManager {
 
         this.application = await Application.instance.boot(providerRegistry);
         await this.application.connectDB();
+    }
+
+    @log()
+    public async run() {
+        await this.bootKernel();
         await this.initializeCrawlerRegistry();
         await Promise.all(this.crawlerRegistry.map(crawler => crawler.run(new ProgressBar())));
 
         console.log('CRAWLER TASK IS COMPLETE');
+    }
+
+    @log()
+    public async runFailedFetches() {
+        await this.bootKernel();
+
+        await this.application.services.failedFetchService.run();
+        console.log('FAILED FETCHES TASK IS COMPLETE');
     }
 }

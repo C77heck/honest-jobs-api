@@ -1,12 +1,20 @@
+export interface ProgressBarOptions {
+    barLength: number;
+    name: string;
+    colour?: string;
+}
+
 export class ProgressBar {
     public barLength: number;
     public isActive: boolean;
     public colour: string;
+    public name: string;
     private resetColour = '\x1b[0m';
 
-    public initialize(barLength: number, colour = '\x1b[31m') {
-        this.barLength = barLength;
-        this.colour = colour;
+    public initialize(options: ProgressBarOptions) {
+        this.barLength = options.barLength;
+        this.name = options.name;
+        this.colour = options?.colour || '\x1b[31m';
         this.isActive = true;
     }
 
@@ -20,7 +28,7 @@ export class ProgressBar {
 
         process.stdout.clearLine(-1);
         process.stdout.cursorTo(0);
-        process.stdout.write(this.colour + `[${progressBar}>] ${percent}%` + this.resetColour);
+        process.stdout.write(this.colour + `[${progressBar}>] ${percent}% => ${this.name}` + this.resetColour);
 
         this.checkProgress(progress);
     }
