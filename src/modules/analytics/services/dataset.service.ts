@@ -58,6 +58,7 @@ export class DatasetService extends Provider {
                 return this.propertyGroupDbService.paginate({
                     ...baseQuery,
                     crawlerName: 'ingatlanHuFlat',
+                    total: { $lt: 20 * million },
                     size: { $lt: 40 }
                 }, paginationOption);
             case 'cheapFlats':

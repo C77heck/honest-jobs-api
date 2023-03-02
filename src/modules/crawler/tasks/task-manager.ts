@@ -12,13 +12,12 @@ import ErrorService from '../services/error.service';
 import HookService from '../services/hook.service';
 import { ingatlanHuCrawlerConfig } from './configs/ingatlan.hu-crawler.config';
 import { IngatlanHuCrawler } from './crawler-tasks/ingatlan.hu-crawler';
-import { Task } from './libs/interfaces';
 
-export type CrawlerTypes = 'ingatlanHuFlat' | 'ingatlanHuHouse';
+export type CrawlerTypes = 'ingatlanHuFlat' | 'ingatlanHuHouse' | 'ingatlanHuOffice';
 
 export class TaskManager {
     private application: Application;
-    private crawlerRegistry: Task[];
+    private crawlerRegistry: IngatlanHuCrawler[];
 
     public static get instance() {
         return new (this as any)();
@@ -30,8 +29,9 @@ export class TaskManager {
         this.crawlerRegistry = [
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, applicationServices),
-            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
-            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.office, applicationServices),
         ];
     }
 

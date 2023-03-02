@@ -13,7 +13,7 @@ class CrawlerService extends Provider {
 
     public failedFetches: any[] = [];
 
-    public async run(config: CrawlerConfigInterface) {
+    public async run(config: CrawlerConfigInterface, saveFailedFetches = true) {
         try {
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
 
@@ -29,12 +29,9 @@ class CrawlerService extends Provider {
                 targetPoints: config.targetPoints,
             });
         } catch (error) {
-            this.failedFetches.push(config.url);
-            this.hookService.$errorLog.next({
-                url: config.url,
-                type: 'FetchError',
-                payload: error
-            });
+            if (saveFailedFetches) {
+                this.hookService.$failedFetches.next(config);
+            }
         }
     }
 }
