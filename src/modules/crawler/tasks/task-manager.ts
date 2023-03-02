@@ -7,6 +7,7 @@ import ClientService from '../services/client.service';
 import CrawlerService from '../services/crawler.service';
 import AggregationService from '../services/data-aggregator/aggregation.service';
 import DataProcessorService from '../services/data-processor/data-processor.service';
+import { FailedFetchService } from '../services/document-services/failed-fetch.service';
 import { PropertyService } from '../services/document-services/property.service';
 import ErrorService from '../services/error.service';
 import HookService from '../services/hook.service';
@@ -50,7 +51,9 @@ export class TaskManager {
                 ErrorService,
                 AggregationService,
                 CrawlerService,
-                PropertyDbService,])
+                FailedFetchService,
+                PropertyDbService
+            ])
             .boot();
 
         this.application = await Application.instance.boot(providerRegistry);

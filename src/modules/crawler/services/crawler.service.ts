@@ -11,8 +11,6 @@ class CrawlerService extends Provider {
     @Inject()
     private clientService: ClientService;
 
-    public failedFetches: any[] = [];
-
     public async run(config: CrawlerConfigInterface, saveFailedFetches = true) {
         try {
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
