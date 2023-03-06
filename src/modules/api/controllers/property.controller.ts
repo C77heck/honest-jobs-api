@@ -16,9 +16,24 @@ export class PropertyController extends ExpressController {
     public datasetService: DatasetService;
 
     public routes() {
+        this.router.get('/location-options', [], this.getLocations.bind(this));
         this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
         this.router.get('/special-follows/:tab', [], this.getSpecialFollow.bind(this));
         this.router.get('/by-location/:location/:type', [], this.getByLocation.bind(this));
+    }
+
+    private async getLocations(req: any, res: any, next: NextFunction) {
+        try {
+            const locations = [
+                { title: 'Kecskemét', value: 'Kecskemét' },
+                { title: 'Budapest agglomeració', value: 'Budapest agglomeració' },
+                { title: 'Budapest', value: 'Budapest' },
+            ];
+
+            res.status(200).json({ locations });
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     private async getByLocation(req: any, res: any, next: NextFunction) {

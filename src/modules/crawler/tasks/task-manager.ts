@@ -63,8 +63,10 @@ export class TaskManager {
     public async run() {
         await this.bootKernel();
         await this.initializeCrawlerRegistry();
-        await Promise.all(this.crawlerRegistry.map(crawler => crawler.run(new ProgressBar())));
-
+        const progressBar = new ProgressBar();
+        for (const crawler of this.crawlerRegistry) {
+            await crawler.run(progressBar);
+        }
         console.log('CRAWLER TASK IS COMPLETE');
     }
 
