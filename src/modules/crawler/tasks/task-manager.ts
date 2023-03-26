@@ -33,6 +33,8 @@ export class TaskManager {
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
             new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.office, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.flat, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.house, applicationServices),
         ];
     }
 

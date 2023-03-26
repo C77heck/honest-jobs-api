@@ -35,6 +35,7 @@ export interface FollowTab {
     tab: SpecialFollowTab;
     limit: number;
     page: number;
+    location: string;
 }
 
 export class DatasetService extends Provider {
@@ -45,12 +46,13 @@ export class DatasetService extends Provider {
     public propertyGroupDbService: PropertyGroupDbService;
 
     public async getFollowTab(options: FollowTab): Promise<PaginationResponse<PropertyGroupData>> {
-        const { tab, limit, page } = options;
+        const { tab, limit, page, location } = options;
         const million = 1000000;
         const paginationOption = { limit, skip: page * limit, sort: { total: 1, size: -1 } };
         const baseQuery = {
+            location,
             lastDayOn: { $gte: moment().add(-1, 'day').toDate() },
-            address: { $not: /(műkertváros|kossuthváros|erzsébetváros)/ig }
+            address: { $not: /(műkertváros|kossuthváros|erzsébetváros)/ig },
         };
 
         switch (tab) {

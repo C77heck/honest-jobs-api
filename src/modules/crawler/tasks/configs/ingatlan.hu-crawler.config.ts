@@ -38,7 +38,7 @@ export const ingatlanHuCrawlerConfig: Record<string, Record<string, CrawlerConfi
             location: 'Budapest',
             crawlerName: 'ingatlanHuFlat',
             baseUrl: 'https://ingatlan.com',
-            url: 'https://ingatlan.com/szukites/elado+lakas+budapest+40-mFt-ig+60-m2-felett',
+            url: 'https://ingatlan.com/szukites/elado+lakas+budapest+35-mFt-ig+70-m2-alatt',
             targetPoints: []
         },
         house: {
