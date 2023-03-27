@@ -49,11 +49,14 @@ export class DatasetService extends Provider {
         const { tab, limit, page, location } = options;
         const million = 1000000;
         const paginationOption = { limit, skip: page * limit, sort: { total: 1, size: -1 } };
-        const baseQuery = {
-            location,
+        const baseQuery: any = {
             lastDayOn: { $gte: moment().add(-1, 'day').toDate() },
             address: { $not: /(műkertváros|kossuthváros|erzsébetváros)/ig },
         };
+
+        if (location) {
+            baseQuery.location = location;
+        }
 
         switch (tab) {
             case 'studioFlats':
