@@ -6,7 +6,6 @@ import { DatasetService } from '../../analytics/services/dataset.service';
 import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
 import { getPaginationOptions } from './libs/helpers/get-pagination-options';
-import { locations } from './libs/locations';
 
 export class PropertyController extends ExpressController {
     @Inject()
@@ -37,7 +36,7 @@ export class PropertyController extends ExpressController {
     }
 
     private async getByLocation(req: any, res: any, next: NextFunction) {
-        const location = locations[req.params.location];
+        const location = req?.params?.location || '';
 
         if (!location) {
             throw new BadRequest('Missing location');
@@ -46,10 +45,12 @@ export class PropertyController extends ExpressController {
         const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
 
         const sortQuery = req.query?.sort || {};
+        const searchQuery = req.query?.search || '';
 
         const { limit, skip } = getPaginationOptions(req.query);
 
         const analyzedData = await this.datasetService.getProperties({
+            searchQuery,
             crawlerName,
             sortQuery,
             location,
@@ -62,7 +63,7 @@ export class PropertyController extends ExpressController {
 
     private async getAnalytics(req: any, res: any, next: NextFunction) {
         try {
-            const location = locations[req.params.location];
+            const location = req?.params?.location || '';
 
             if (!location) {
                 throw new BadRequest('Missing location');
@@ -81,12 +82,18 @@ export class PropertyController extends ExpressController {
     private async getSpecialFollow(req: any, res: any, next: NextFunction) {
         try {
             const location = req?.query?.location || '';
-            console.log({ location });
             const tab = req.params?.tab || 'studioFlats';
             const page = +(req.query?.page || 0);
             const limit = +(req.query?.limit || 20);
+            const searchQuery = req.query?.search || '';
 
-            const data = await this.datasetService.getFollowTab({ tab, page, limit, location });
+            const data = await this.datasetService.getFollowTab({
+                tab,
+                page,
+                limit,
+                location,
+                searchQuery
+            });
 
             res.status(200).json({ ...data, page });
         } catch (err) {

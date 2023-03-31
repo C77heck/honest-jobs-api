@@ -25,12 +25,14 @@ export interface PropertyModel extends Mongoose.Model<PropertyDocument> {
 const Property = new Schema<PropertyDocument>({
     location: { type: String },
     crawlerName: { type: String },
-    address: { type: String },
+    address: { type: String, index: 'text' },
     sqmPrice: { type: Number },
     size: { type: Number },
     total: { type: Number },
     href: { type: String }
 });
+
+Property.index({ address: 'text' });
 
 Property.set('timestamps', true);
 

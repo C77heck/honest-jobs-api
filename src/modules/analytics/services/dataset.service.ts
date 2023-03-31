@@ -8,6 +8,7 @@ import {
 } from '../../crawler/models/documents/ingatlan.hu/property-group.document';
 
 export interface GetPropertyOptions {
+    searchQuery: string;
     sortQuery: MongoOptions;
     crawlerName: 'ingatlanHuHouse' | 'ingatlanHuFlat';
     location: string;
@@ -36,6 +37,7 @@ export interface FollowTab {
     limit: number;
     page: number;
     location: string;
+    searchQuery: string;
 }
 
 export class DatasetService extends Provider {
@@ -46,12 +48,14 @@ export class DatasetService extends Provider {
     public propertyGroupDbService: PropertyGroupDbService;
 
     public async getFollowTab(options: FollowTab): Promise<PaginationResponse<PropertyGroupData>> {
-        const { tab, limit, page, location } = options;
+        const { tab, limit, page, location, searchQuery } = options;
         const million = 1000000;
         const paginationOption = { limit, skip: page * limit, sort: { total: 1, size: -1 } };
+        const regex = new RegExp(searchQuery, "i");
+
         const baseQuery: any = {
             lastDayOn: { $gte: moment().add(-1, 'day').toDate() },
-            address: { $not: /(műkertváros|kossuthváros|erzsébetváros)/ig },
+            address: { $regex: regex, $not: /(műkertváros|kossuthváros|erzsébetváros)/ig }
         };
 
         if (location) {
@@ -89,7 +93,7 @@ export class DatasetService extends Provider {
             case 'newPostings':
                 return this.propertyGroupDbService.paginate({
                     ...baseQuery,
-                    numberOfDaysAdvertised: { $lt: 3 },
+                    numberOfDaysAdvertised: { $lt: 7 },
                     size: { $lte: 150 },
                     total: { $lt: 60 * million }
                 }, paginationOption);
@@ -103,10 +107,15 @@ export class DatasetService extends Provider {
     }
 
     public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyGroupData>> {
-        const { location, crawlerName, sortQuery, limit, skip } = propertyOptions;
+        const { location, crawlerName, sortQuery, limit, skip, searchQuery } = propertyOptions;
+        const regex = new RegExp(searchQuery, "i");
 
         const { data, total } = await this.propertyGroupDbService.paginate(
-            { location, crawlerName },
+            {
+                location,
+                crawlerName,
+                address: { $regex: regex }
+            },
             { limit, skip, sort: sortQuery }
         );
 

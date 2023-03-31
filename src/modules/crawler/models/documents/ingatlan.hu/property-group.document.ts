@@ -36,6 +36,8 @@ const PropertyGroup = new Schema<PropertyGroupDocument>({
     lastDayOn: { type: Date }
 });
 
+PropertyGroup.index({ address: 'text' });
+
 PropertyGroup.set('timestamps', true);
 
 export default mongoose.model<PropertyGroupDocument, PropertyGroupModel>('PropertyGroup', PropertyGroup);
