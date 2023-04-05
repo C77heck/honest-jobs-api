@@ -5,6 +5,7 @@ import { handleError } from '../../../libs/handle-error';
 import { DatasetService } from '../../analytics/services/dataset.service';
 import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
+import { WatchedDbService } from '../services/watched-db.service';
 import { getPaginationOptions } from './libs/helpers/get-pagination-options';
 
 export class PropertyController extends ExpressController {
@@ -14,11 +15,59 @@ export class PropertyController extends ExpressController {
     @Inject()
     public datasetService: DatasetService;
 
+    @Inject()
+    public watchedDbService: WatchedDbService;
+
     public routes() {
         this.router.get('/location-options', [], this.getLocations.bind(this));
         this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
         this.router.get('/special-follows/:tab', [], this.getSpecialFollow.bind(this));
         this.router.get('/by-location/:location/:type', [], this.getByLocation.bind(this));
+        this.router.get('/get-watched', [], this.getWatched.bind(this));
+        this.router.post('/add-to-watched/:href', [], this.addToWatched.bind(this));
+        this.router.delete('/remove-from-watch/:id', [], this.removeFromWatched.bind(this));
+    }
+
+    private async getWatched(req: any, res: any, next: NextFunction) {
+        try {
+            const watched = await this.watchedDbService.find();
+
+            res.status(200).json({ watched });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    private async addToWatched(req: any, res: any, next: NextFunction) {
+        try {
+            const href = req?.params?.href;
+
+            if (!href) {
+                throw new BadRequest('Missing href');
+            }
+
+            const watched = await this.watchedDbService.add({ href });
+
+            res.status(200).json({ watched });
+        } catch (err) {
+            return next(handleError(err));
+        }
+    }
+
+    private async removeFromWatched(req: any, res: any, next: NextFunction) {
+        try {
+            const id = req?.params?.id;
+
+            if (!id) {
+                throw new BadRequest('Missing id');
+            }
+
+            await this.watchedDbService.remove(id);
+
+            res.status(200);
+        } catch (err) {
+            return next(handleError(err));
+        }
     }
 
     private async getLocations(req: any, res: any, next: NextFunction) {

@@ -55,7 +55,7 @@ export class DatasetService extends Provider {
 
         const baseQuery: any = {
             lastDayOn: { $gte: moment().add(-1, 'day').toDate() },
-            address: { $regex: regex, $not: /(műkertváros|kossuthváros|erzsébetváros)/ig }
+            address: { $regex: regex, $not: /(műkertváros|kossuthváros|erzsébetváros|muszáj)/ig }
         };
 
         if (location) {

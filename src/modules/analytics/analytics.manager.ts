@@ -2,6 +2,7 @@ import { Application } from '../../application/application';
 import { ProviderRegistry } from '../../application/provider.registry';
 import { PropertyDbService } from '../api/services/property-db.service';
 import { PropertyGroupDbService } from '../api/services/property-group-db.service';
+import { WatchedDbService } from '../api/services/watched-db.service';
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
 import { AnalyticsService } from './services/analytics.service';
@@ -27,6 +28,7 @@ export class AnalyticsManager {
                 DatasetService,
                 AnalyticsService,
                 PropertyDbService,
+                WatchedDbService,
                 PropertyGroupDbService
             ])
             .boot();

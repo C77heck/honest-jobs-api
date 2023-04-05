@@ -13,6 +13,7 @@ import HookService from '../crawler/services/hook.service';
 import { PropertyController } from './controllers/property.controller';
 import { PropertyDbService } from './services/property-db.service';
 import { PropertyGroupDbService } from './services/property-group-db.service';
+import { WatchedDbService } from './services/watched-db.service';
 
 export class Server {
     private port = process.env.PORT || 3131;
@@ -50,6 +51,7 @@ export class Server {
                 PropertyService,
                 ErrorService,
                 PropertyDbService,
+                WatchedDbService,
                 PropertyGroupDbService,
                 DatasetService,
             ])
