@@ -14,10 +14,38 @@ export class PropertyGroupDbService extends Provider {
     }
 
     public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{ data: PropertyGroupData[]; total: number }> {
-        const data = await this.document.find(query, {}, options);
-        const count = await this.document.count(query);
+        const sort = options?.sort || { createdAt: -1 };
+        console.log(sort, options);
+        const [result] = await this.document.aggregate([
+            {
+                $facet: {
+                    count: [
+                        { $match: query },
+                        { $group: { _id: '$href' } },
+                        { $count: 'total' }
+                    ],
+                    docs: [
+                        { $match: query },
+                        {
+                            $lookup: {
+                                from: 'watch',
+                                localField: 'href',
+                                foreignField: 'href',
+                                as: 'watched'
+                            }
+                        },
+                        { $sort: sort },
+                        { $skip: options.skip },
+                        { $limit: options.limit },
+                    ],
+                }
+            },
+        ]);
 
-        return { data, total: Math.ceil(count / options.limit) };
+        return {
+            data: result.docs,
+            total: Math.ceil((result.count?.[0]?.total || 1) / options.limit)
+        };
     }
 
     public async create(data: PropertyGroupData) {

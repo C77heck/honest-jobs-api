@@ -109,20 +109,19 @@ export class DatasetService extends Provider {
     public async getProperties(propertyOptions: GetPropertyOptions): Promise<PaginationResponse<PropertyGroupData>> {
         const { location, crawlerName, sortQuery, limit, skip, searchQuery } = propertyOptions;
         const regex = new RegExp(searchQuery, "i");
-
-        const { data, total } = await this.propertyGroupDbService.paginate(
-            {
-                location,
-                crawlerName,
-                address: { $regex: regex }
-            },
-            { limit, skip, sort: sortQuery }
-        );
-
-        return {
-            data,
-            total: Math.floor(total / limit),
-        };
+        try {
+            return this.propertyGroupDbService.paginate(
+                {
+                    location,
+                    crawlerName,
+                    address: { $regex: regex }
+                },
+                { limit, skip, sort: sortQuery }
+            );
+        } catch (e) {
+            console.log(e);
+            return null as any;
+        }
     }
 
     public async getAnalytics({ location, crawlerName }: AnalyticsOptions): Promise<AnalyticsData> {

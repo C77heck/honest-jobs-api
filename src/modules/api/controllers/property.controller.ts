@@ -23,9 +23,9 @@ export class PropertyController extends ExpressController {
         this.router.get('/analytics/:location/:type', [], this.getAnalytics.bind(this));
         this.router.get('/special-follows/:tab', [], this.getSpecialFollow.bind(this));
         this.router.get('/by-location/:location/:type', [], this.getByLocation.bind(this));
-        this.router.get('/get-watched', [], this.getWatched.bind(this));
-        this.router.post('/add-to-watched/:href', [], this.addToWatched.bind(this));
-        this.router.delete('/remove-from-watch/:id', [], this.removeFromWatched.bind(this));
+        this.router.get('/get-watch-list', [], this.getWatched.bind(this));
+        this.router.post('/add-to-watch-list', [], this.addToWatched.bind(this));
+        this.router.delete('/remove-from-watch-list/:id', [], this.removeFromWatched.bind(this));
     }
 
     private async getWatched(req: any, res: any, next: NextFunction) {
@@ -40,7 +40,7 @@ export class PropertyController extends ExpressController {
 
     private async addToWatched(req: any, res: any, next: NextFunction) {
         try {
-            const href = req?.params?.href;
+            const href = req?.body?.href;
 
             if (!href) {
                 throw new BadRequest('Missing href');
@@ -93,7 +93,7 @@ export class PropertyController extends ExpressController {
 
         const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
 
-        const sortQuery = req.query?.sort || {};
+        const sortQuery = req.query?.sort || null;
         const searchQuery = req.query?.search || '';
 
         const { limit, skip } = getPaginationOptions(req.query);
