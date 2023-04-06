@@ -15,7 +15,7 @@ export class PropertyGroupDbService extends Provider {
 
     public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{ data: PropertyGroupData[]; total: number }> {
         const sort = options?.sort || { createdAt: -1 };
-        console.log(sort, options);
+
         const [result] = await this.document.aggregate([
             {
                 $facet: {
@@ -26,17 +26,28 @@ export class PropertyGroupDbService extends Provider {
                     ],
                     docs: [
                         { $match: query },
+                        { $sort: sort },
+                        { $skip: options.skip },
+                        { $limit: options.limit },
                         {
                             $lookup: {
                                 from: 'watch',
                                 localField: 'href',
                                 foreignField: 'href',
-                                as: 'watched'
+                                as: 'isWatched'
                             }
                         },
-                        { $sort: sort },
-                        { $skip: options.skip },
-                        { $limit: options.limit },
+                        {
+                            $addFields: {
+                                isWatched: {
+                                    $cond: {
+                                        if: { $gt: [{ $size: '$isWatched' }, 0] },
+                                        then: true,
+                                        else: false,
+                                    },
+                                },
+                            },
+                        },
                     ],
                 }
             },
