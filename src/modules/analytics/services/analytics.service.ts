@@ -17,7 +17,6 @@ export class AnalyticsService extends Provider {
 
     public async run() {
         await this.propertyGroupDbService.clearDB();
-
         const unprocessedProperties = await this.propertyDbService.find();
         const processedData = this.getPropertyGroups(unprocessedProperties);
 
@@ -39,6 +38,8 @@ export class AnalyticsService extends Provider {
             const lastAdvertised = (groupedAds?.[key] || [])
                 .sort((a: any, b: any) => moment(a.createdAt).isAfter(moment(b.createdAt)) ? -1 : 1)?.[0] || {};
 
+            const hrefId = (lastAdvertised?.href || '')?.match(/\/(\d+)/);
+
             flattenedAds.push({
                 location: lastAdvertised.location,
                 crawlerName: lastAdvertised.crawlerName,
@@ -47,6 +48,7 @@ export class AnalyticsService extends Provider {
                 size: lastAdvertised.size,
                 total: lastAdvertised.total,
                 href: lastAdvertised.href,
+                hrefId: hrefId?.[1] || '',
                 lastDayOn: lastAdvertised.createdAt,
                 numberOfDaysAdvertised: (groupedAds?.[key] || []).length
             });

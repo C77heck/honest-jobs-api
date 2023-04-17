@@ -1,26 +1,53 @@
+import { Inject } from '../../../application/libs/inject.decorator';
 import { Provider } from '../../../application/provider';
+import {
+    PropertyGroupDocument
+} from '../../crawler/models/documents/ingatlan.hu/property-group.document';
 import WatchedDocument, {
-    WatchDocument,
-    WatchModel
+    WatchDocument
 } from '../../crawler/models/documents/ingatlan.hu/watched.document';
+import { PropertyGroupDbService } from './property-group-db.service';
 
 export class WatchedDbService extends Provider {
+    @Inject()
+    public propertyGroupDbService: PropertyGroupDbService;
+
     private document = WatchedDocument;
 
-    public async findOne(id: string): Promise<WatchModel | null> {
-        const property = await this.document.find({ _id: id });
+    public async findOne(id: string): Promise<WatchDocument | null> {
+        const property = await this.document.findById(id);
 
         if (!property) {
             return null;
         }
 
-        return property as any;
+        return property;
     }
 
-    public async find(query: any = {}): Promise<WatchDocument[]> {
-        const properties = await this.document.find(query);
+    public async find(query: any = {}): Promise<PropertyGroupDocument[]> {
+        return this.document.aggregate([
+            { $match: query },
+            { $sort: { createdAt: -1 } },
+            {
+                $lookup: {
+                    from: 'propertygroups',
+                    localField: 'href',
+                    foreignField: 'hrefId',
+                    as: 'data'
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: [
+                            { $arrayElemAt: ["$data", 0] },
+                            { watchlistId: '$_id' }
+                        ]
+                    }
+                }
+            }
 
-        return properties;
+        ]);
     }
 
     public async add(options: { href: string }): Promise<WatchDocument> {

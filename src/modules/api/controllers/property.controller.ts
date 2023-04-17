@@ -30,9 +30,9 @@ export class PropertyController extends ExpressController {
 
     private async getWatched(req: any, res: any, next: NextFunction) {
         try {
-            const watched = await this.watchedDbService.find();
+            const data = await this.watchedDbService.find();
 
-            res.status(200).json({ watched });
+            res.status(200).json({ data });
         } catch (err) {
             return next(handleError(err));
         }
@@ -48,7 +48,7 @@ export class PropertyController extends ExpressController {
 
             const watched = await this.watchedDbService.add({ href });
 
-            res.status(200).json({ watched });
+            res.status(200).json(watched);
         } catch (err) {
             return next(handleError(err));
         }
@@ -64,7 +64,7 @@ export class PropertyController extends ExpressController {
 
             await this.watchedDbService.remove(id);
 
-            res.status(200);
+            res.json({ message: 'Success' });
         } catch (err) {
             return next(handleError(err));
         }

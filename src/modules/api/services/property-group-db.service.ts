@@ -13,6 +13,12 @@ export class PropertyGroupDbService extends Provider {
         return properties;
     }
 
+    public async findOne(query: MongoQuery = {}, options: MongoOptions = {}): Promise<PropertyGroupData | null> {
+        const property = await this.document.findOne(query, {}, options);
+
+        return property;
+    }
+
     public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{ data: PropertyGroupData[]; total: number }> {
         const sort = options?.sort || { createdAt: -1 };
 
@@ -31,21 +37,22 @@ export class PropertyGroupDbService extends Provider {
                         { $limit: options.limit },
                         {
                             $lookup: {
-                                from: 'watch',
-                                localField: 'href',
+                                from: 'watches',
+                                localField: 'hrefId',
                                 foreignField: 'href',
-                                as: 'isWatched'
+                                as: 'watched'
                             }
                         },
                         {
                             $addFields: {
                                 isWatched: {
                                     $cond: {
-                                        if: { $gt: [{ $size: '$isWatched' }, 0] },
+                                        if: { $gt: [{ $size: '$watched' }, 0] },
                                         then: true,
                                         else: false,
                                     },
                                 },
+                                watchlistId: { $ifNull: [{ $first: "$watched._id" }, ''] }
                             },
                         },
                     ],

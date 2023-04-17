@@ -12,6 +12,7 @@ export interface PropertyGroupData {
     size: number;
     total: number;
     href: string;
+    hrefId: string;
     numberOfDaysAdvertised: number;
     lastDayOn: Date;
 }
@@ -32,6 +33,7 @@ const PropertyGroup = new Schema<PropertyGroupDocument>({
     size: { type: Number },
     total: { type: Number },
     href: { type: String },
+    hrefId: { type: String },
     numberOfDaysAdvertised: { type: Number },
     lastDayOn: { type: Date }
 });
