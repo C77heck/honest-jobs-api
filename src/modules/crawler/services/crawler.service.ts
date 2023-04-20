@@ -13,6 +13,8 @@ class CrawlerService extends Provider {
 
     public async run(config: CrawlerConfigInterface, saveFailedFetches = true) {
         try {
+            console.log(config.url);
+
             const siteData = await this.clientService.fetch<{ text: string }>(config.url);
 
             if (!siteData?.text) {

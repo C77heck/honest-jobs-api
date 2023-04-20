@@ -66,6 +66,7 @@ export class TaskManager {
         await this.bootKernel();
         await this.initializeCrawlerRegistry();
         const progressBar = new ProgressBar();
+
         for (const crawler of this.crawlerRegistry) {
             await crawler.run(progressBar);
         }

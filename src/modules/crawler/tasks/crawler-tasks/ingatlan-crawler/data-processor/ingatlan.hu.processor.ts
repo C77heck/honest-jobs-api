@@ -10,11 +10,10 @@ export class IngatlanHuProcessor {
 
     public async getPageNumber(): Promise<number> {
         const $ = cheerio.load(this.html);
-        const pagination = $('.pagination__page-number');
+        const pagination = $('.text-battleship');
+        const content = pagination.text().split('/ ');
 
-        const content = pagination.text().split(' ');
-
-        const numberOfPages = +content?.[3];
+        const numberOfPages = +content?.[1];
 
         if (numberOfPages < 2) {
             return 1;
@@ -25,10 +24,11 @@ export class IngatlanHuProcessor {
 
     public async getPageData(baseUrl: string): Promise<PropertyData[]> {
         const $ = cheerio.load(this.html);
-        const links = $('.listing__link');
+        const links = $('.listing-card');
         const articles: any[] = [];
-
         links.each((index, element) => {
+            console.log({ links: $(element).attr('data-listing-id') });
+
             const url = $(element).attr('href');
             const totalElement = $(element)
                 .children('.listing__header')

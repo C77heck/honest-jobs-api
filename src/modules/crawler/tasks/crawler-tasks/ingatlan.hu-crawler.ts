@@ -6,7 +6,7 @@ import { IngatlanHuProcessor } from './ingatlan-crawler/data-processor/ingatlan.
 
 export class IngatlanHuCrawler extends Crawler implements Task {
     public async run(progressBar: ProgressBar) {
-        const pages = await this.getPageNumber();
+        const pages = await this.getPages();
 
         progressBar.initialize({
             barLength: pages.length,
@@ -31,11 +31,9 @@ export class IngatlanHuCrawler extends Crawler implements Task {
 
             await this.services.crawlerService.run(paginatedConfig);
         }
-
-        console.log(this.services.crawlerService.failedFetches);
     }
 
-    public async getPageNumber(): Promise<number[]> {
+    public async getPages(): Promise<number[]> {
         try {
             const html = await this.services.clientService.fetch(this.config.url);
             const processor = new IngatlanHuProcessor(html.text);

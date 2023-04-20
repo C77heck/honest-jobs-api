@@ -7,6 +7,7 @@ import { ExpressController } from '../controllers/libs/express.controller';
 import { PropertyDbService } from '../services/property-db.service';
 import { WatchedDbService } from '../services/watched-db.service';
 import { getPaginationOptions } from './libs/helpers/get-pagination-options';
+import { getSortOptions } from './libs/helpers/get-sort-options';
 
 export class PropertyController extends ExpressController {
     @Inject()
@@ -93,9 +94,8 @@ export class PropertyController extends ExpressController {
 
         const crawlerName = req.params.type === 'flats' ? 'ingatlanHuFlat' : 'ingatlanHuHouse';
 
-        const sortQuery = req.query?.sort || null;
+        const sortQuery = getSortOptions(req.query?.sort);
         const searchQuery = req.query?.search || '';
-
         const { limit, skip } = getPaginationOptions(req.query);
 
         const analyzedData = await this.datasetService.getProperties({
