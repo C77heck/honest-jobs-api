@@ -27,38 +27,45 @@ export class IngatlanHuProcessor {
         const links = $('.listing-card');
         const articles: any[] = [];
         links.each((index, element) => {
-            console.log({ links: $(element).attr('data-listing-id') });
-
             const url = $(element).attr('href');
             const totalElement = $(element)
-                .children('.listing__header')
-                .children('.listing__featured-parameters')
-                .children('.listing__price')
-                .children('.price__container ')
-                .children('.price ')
+                .children('.listing-card-content')
+                .children('.flex-column')
+                .children('.row')
+                .children('.align-content-betweenn')
+                .children('.w-100 ')
+                .children('.align-items-center')
+                .children('.font-family-secondary ')
                 .text()
                 .replace('M Ft', '')
                 .trim();
 
             const address = $(element)
-                .children('.listing__header')
-                .children('.listing__featured-parameters')
-                .children('.listing__address')
+                .children('.listing-card-content')
+                .children('.flex-column')
+                .children('.row')
+                .children('.align-content-betweenn')
+                .children('.w-100')
+                .children('.font-family-secondary')
                 .text();
 
             const sizeElement = $(element)
-                .children('.listing__parameters')
-                .children('.listing__data--area-size')
+                .children('.listing-card-content')
+                .children('.flex-column')
+                .children('.row')
+                .children('.align-content-betweenn')
+                .children('.w-100')
+                .children('.justify-content-start')
+                .children('.me-4')
+                .children('.text-onyx')
                 .text()
                 .split(' ');
 
-            const size = +sizeElement[1];
+            const size = +sizeElement?.[0];
             const total = parseFloat(totalElement) * 1000000;
 
             articles.push({
-                address,
-                size,
-                total,
+                address, size, total,
                 href: `${baseUrl}${url}`,
                 sqmPrice: parseFloat((total / size).toString()),
             });
