@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { Inject } from '../../../../application/libs/inject.decorator';
 import { Provider } from '../../../../application/provider';
 import {
@@ -15,10 +14,6 @@ class DataProcessorService extends Provider {
         this.hookService
             .$processedData
             .subscribe(async (value: ProcessedDataInterface) => this.handleDataProcessing(value));
-    }
-
-    private async log(data: string) {
-        return fs.writeFileSync(`${__dirname}/logs.txt`, data);
     }
 
     public async handleDataProcessing(data: ProcessedDataInterface) {

@@ -19,7 +19,10 @@ export class PropertyGroupDbService extends Provider {
         return property;
     }
 
-    public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{ data: PropertyGroupData[]; total: number }> {
+    public async paginate(query: MongoQuery = {}, options: PaginationOptions): Promise<{
+        data: PropertyGroupData[];
+        total: number
+    }> {
         const sort = options?.sort || { createdAt: -1 };
         const [result] = await this.document.aggregate([
             {

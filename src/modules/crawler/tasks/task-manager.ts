@@ -3,6 +3,7 @@ import { ProviderRegistry } from '../../../application/provider.registry';
 import { log } from '../../../libs/decorators/utility.decorators';
 import { ProgressBar } from '../../../libs/load-bar';
 import { PropertyDbService } from '../../api/services/property-db.service';
+import { ChromiumService } from '../services/chromium.service';
 import ClientService from '../services/client.service';
 import CrawlerService from '../services/crawler.service';
 import AggregationService from '../services/data-aggregator/aggregation.service';
@@ -19,27 +20,20 @@ export type CrawlerTypes = 'ingatlanHuFlat' | 'ingatlanHuHouse' | 'ingatlanHuOff
 export class TaskManager {
     private application: Application;
     private crawlerRegistry: IngatlanHuCrawler[];
+    private finishMessage = 'CRAWLER TASK IS COMPLETE';
 
     public static get instance() {
         return new (this as any)();
     }
 
     private async initializeCrawlerRegistry() {
-        const applicationServices = this.application.services;
-
         this.crawlerRegistry = [
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.house, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.office, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.flat, applicationServices),
-            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.house, applicationServices),
+            new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.flat, this.application.services),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.kecskemet.house, this.application.services),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapest.flat, this.application.services),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.flat, this.application.services),
+            // new IngatlanHuCrawler(ingatlanHuCrawlerConfig.budapestAgglomeration.house, this.application.services),
         ];
-    }
-
-    private endProcess() {
-        return process.exit(0);
     }
 
     private async bootKernel() {
@@ -47,6 +41,7 @@ export class TaskManager {
             .registerServiceProviders([
                 HookService,
                 ClientService,
+                ChromiumService,
                 PropertyService,
                 DataProcessorService,
                 ErrorService,
@@ -66,11 +61,12 @@ export class TaskManager {
         await this.bootKernel();
         await this.initializeCrawlerRegistry();
         const progressBar = new ProgressBar();
-
+        console.log('started');
         for (const crawler of this.crawlerRegistry) {
             await crawler.run(progressBar);
         }
-        console.log('CRAWLER TASK IS COMPLETE');
+
+        console.log(this.finishMessage);
     }
 
     @log()

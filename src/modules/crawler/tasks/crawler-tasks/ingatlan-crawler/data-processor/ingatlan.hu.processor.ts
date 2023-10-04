@@ -2,9 +2,9 @@ import * as cheerio from 'cheerio';
 import { PropertyData } from '../../../../models/documents/ingatlan.hu/property.document';
 
 export class IngatlanHuProcessor {
-    private html: any;
+    private readonly html: string;
 
-    public constructor(html: any) {
+    public constructor(html: string) {
         this.html = html;
     }
 
@@ -12,7 +12,6 @@ export class IngatlanHuProcessor {
         const $ = cheerio.load(this.html);
         const pagination = $('.text-battleship');
         const content = pagination.text().split('/ ');
-
         const numberOfPages = +content?.[1];
 
         if (numberOfPages < 2) {
@@ -62,7 +61,7 @@ export class IngatlanHuProcessor {
                 .split(' ');
 
             const size = +sizeElement?.[0];
-            const total = parseFloat(totalElement) * 1000000;
+            const total = parseFloat(totalElement.replace(',', '.')) * 1000000;
 
             articles.push({
                 address, size, total,

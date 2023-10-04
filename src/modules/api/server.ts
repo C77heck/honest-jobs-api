@@ -10,6 +10,7 @@ import { DatasetService } from '../analytics/services/dataset.service';
 import { PropertyService } from '../crawler/services/document-services/property.service';
 import ErrorService from '../crawler/services/error.service';
 import HookService from '../crawler/services/hook.service';
+import { CrawlerTriggerController } from './controllers/crawler-trigger.controller';
 import { PropertyController } from './controllers/property.controller';
 import { PropertyDbService } from './services/property-db.service';
 import { PropertyGroupDbService } from './services/property-group-db.service';
@@ -31,6 +32,7 @@ export class Server {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use('/api', this.application.controllers.propertyController.router);
+        this.app.use('/trigger', this.application.controllers.crawlerTriggerController.router);
 
         this.app.use((err: HttpError, _: Request, res: Response, __: NextFunction) => {
             logger.err(err, true);
@@ -56,6 +58,7 @@ export class Server {
                 DatasetService,
             ])
             .registerControllerProviders([
+                CrawlerTriggerController,
                 PropertyController
             ])
             .boot();

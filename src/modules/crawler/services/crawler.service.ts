@@ -13,11 +13,10 @@ class CrawlerService extends Provider {
 
     public async run(config: CrawlerConfigInterface, saveFailedFetches = true) {
         try {
-            console.log(config.url);
-
-            const siteData = await this.clientService.fetch<{ text: string }>(config.url);
-
-            if (!siteData?.text) {
+            const html = await (this.clientService as ClientService).fetch<{
+                text: string
+            }>(config.url);
+            if (!html) {
                 throw new Error('We did not get any text body from the request');
             }
 
@@ -25,10 +24,11 @@ class CrawlerService extends Provider {
                 location: config.location,
                 baseUrl: config.baseUrl,
                 crawlerName: config.crawlerName,
-                html: siteData.text,
+                html: html,
                 targetPoints: config.targetPoints,
             });
         } catch (error) {
+            console.log({ error });
             if (saveFailedFetches) {
                 this.hookService.$failedFetches.next(config);
             }

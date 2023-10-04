@@ -11,10 +11,10 @@ export class IocContainer {
         this.registeredProviders = registeredProviders;
     }
 
-    public boot() {
+    public async boot() {
         this.initiate();
         this.register();
-        this.bootProviders();
+        await this.bootProviders();
 
         return this;
     }
@@ -79,8 +79,17 @@ export class IocContainer {
      * this is where we can make hook subscriptions and other things that we would normally do in its
      * constructor.
      */
-    private bootProviders() {
-        Object.keys(this.services).forEach(key => this.services[key].boot());
-        Object.keys(this.controllers).forEach(key => this.controllers[key].boot());
+    private async bootProviders() {
+        const serviceKeys = Object.keys(this.services);
+
+        for (const serviceKey of serviceKeys) {
+            await this.services[serviceKey].boot();
+        }
+
+        const controllerKeys = Object.keys(this.controllers);
+
+        for (const controllerKey of controllerKeys) {
+            await this.services[controllerKey].boot();
+        }
     }
 }

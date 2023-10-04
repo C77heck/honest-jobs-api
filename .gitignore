@@ -8,6 +8,10 @@
 
 /dist
 
+/src/modules/crawler/tasks/configs
+
+.png
+image.png
 .pnp.js
 # testing
 /coverage

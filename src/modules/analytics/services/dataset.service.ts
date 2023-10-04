@@ -93,10 +93,10 @@ export class DatasetService extends Provider {
             case 'newPostings':
                 return this.propertyGroupDbService.paginate({
                     ...baseQuery,
-                    numberOfDaysAdvertised: { $lt: 7 },
+                    numberOfDaysAdvertised: { $lt: 5 },
                     size: { $lte: 150 },
                     total: { $lt: 60 * million }
-                }, paginationOption);
+                }, { ...paginationOption, sort: { numberOfDaysAdvertised: 1 } });
             default:
                 return this.propertyGroupDbService.paginate({
                     ...baseQuery,

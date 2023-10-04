@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Application } from '../../application/application';
 import { ProviderRegistry } from '../../application/provider.registry';
 import { PropertyDbService } from '../api/services/property-db.service';
@@ -16,8 +17,23 @@ export class AnalyticsManager {
     }
 
     public async run() {
-        await this.application.services.analyticsService.run();
-        console.log('ANALYTICS COMPLETE');
+        try {
+            this.log('started in run');
+            await (this.application.services.analyticsService as AnalyticsService).run();
+            return "ANALYTICS COMPLETE";
+        } catch (e) {
+            return e as string;
+        }
+    }
+
+    private log(content: string) {
+        fs.appendFile('log.txt', content, 'utf8', function (err) {
+            if (err) {
+                console.error('An error occurred while writing to the file:', err);
+            } else {
+                console.log('Content has been written to the file successfully.');
+            }
+        });
     }
 
     public async boot() {

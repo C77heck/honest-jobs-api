@@ -7,9 +7,10 @@
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec",
     "start": "node ./dist --env=production",
-    "start:crawler": "nodemon  src/crawler.ts",
+    "start:crawler": "ts-node  src/crawler.ts",
+    "start:get": "nodemon  src/get-requests.ts",
     "start:analytics": "nodemon  src/analytics.ts",
-    "start:api": "nodemon  src/api.ts"
+    "start:api": "nodemon src/api.ts"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
@@ -69,6 +70,7 @@
     "moment": "^2.29.4",
     "mongoose": "^6.2.9",
     "morgan": "^1.10.0",
+    "puppeteer": "^21.3.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.6.0",
     "superagent": "^8.0.6",
